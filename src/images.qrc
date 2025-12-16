@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/images/close.svg</file>
+        <file>resources/images/open.svg</file>
+        <file>resources/images/abort.svg</file>
+        <file>resources/images/opening.svg</file>
+        <file>resources/images/about.svg</file>
+        <file>resources/images/close_hover.svg</file>
+        <file>resources/images/close_normal.svg</file>
+        <file>resources/images/mxlogo.svg</file>
+        <file>resources/images/language.svg</file>
+		<file>resources/images/recent.svg</file>
+		<file>resources/images/recent-white.svg</file>
+        <file>resources/images/sort.svg</file>
+        <file>resources/images/search.svg</file>
+        <file>resources/images/noRecentFiles.png</file>
+        <file>resources/images/recentFileItemBg.png</file>
+    </qresource>
+</RCC>

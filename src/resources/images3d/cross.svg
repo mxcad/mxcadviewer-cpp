@@ -1,0 +1,11 @@
+<svg width="64.000000" height="64.000000" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<desc>
+			Created with Pixso.
+	</desc>
+	<defs/>
+	<mask id="mask_75_7" fill="white">
+		<path id="cross" d="M33 31L33 1L31 1L31 31L1 31L1 33L31 33L31 63L33 63L33 33L63 33L63 31L33 31Z" clip-rule="evenodd" fill="" fill-opacity="1.000000" fill-rule="evenodd"/>
+	</mask>
+	<path id="cross" d="M33 31L33 1L31 1L31 31L1 31L1 33L31 33L31 63L33 63L33 33L63 33L63 31L33 31Z" clip-rule="evenodd" fill="#000000" fill-opacity="1.000000" fill-rule="evenodd" mask="url(#mask_75_7)"/>
+	<path id="cross" d="M33 31L63 31L63 33L33 33L33 63L31 63L31 33L1 33L1 31L31 31L31 1L33 1L33 31ZM30 30L30 0L34 0L34 30L64 30L64 34L34 34L34 64L30 64L30 34L0 34L0 30L30 30Z" clip-rule="evenodd" fill="#FFFFFF" fill-opacity="1.000000" fill-rule="evenodd"/>
+</svg>

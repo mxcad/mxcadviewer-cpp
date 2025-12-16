@@ -1,0 +1,8 @@
+﻿
+本软件使用了Qt库(Qt5.14.2)进行开发，并且所使用的Qt库是基于LGPLv3进行许可的。
+
+Qt5.14.2的源代码可通过以下地址下载：https://download.qt.io/archive/qt/5.14/5.14.2/single/
+
+本软件使用了OpenCASCADE库(OpenCASCADE7.7.0)进行开发，并且所使用的OpenCASCADE库是基于LGPLv2.1进行许可的。
+
+OpenCASCADE7.7.0的源代码可通过以下地址下载：https://dev.opencascade.org/release/previous#node-84228

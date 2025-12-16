@@ -1,0 +1,28 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/images3d/modelTree.svg</file>
+        <file>resources/images3d/proj.svg</file>
+        <file>resources/images3d/shadow.svg</file>
+        <file>resources/images3d/showedges.svg</file>
+        <file>resources/images3d/wireframe.svg</file>
+        <file>resources/images3d/fitall.svg</file>
+        <file>resources/images3d/cross.svg</file>
+        <file>resources/images3d/assembly.svg</file>
+        <file>resources/images3d/explode.svg</file>
+        <file>resources/images3d/simple.svg</file>
+        <file>resources/images3d/measure.svg</file>
+        <file>resources/images3d/sectioning.svg</file>
+        <file>resources/images3d/checked.svg</file>
+        <file>resources/images3d/opencascade_hatch_1.png</file>
+        <file>resources/images3d/measureVertex.svg</file>
+        <file>resources/images3d/measure2PtMinDist.svg</file>
+        <file>resources/images3d/measureAngle.svg</file>
+        <file>resources/images3d/measureArea.svg</file>
+        <file>resources/images3d/measureBoundingBox.svg</file>
+        <file>resources/images3d/measureCircleCenter.svg</file>
+        <file>resources/images3d/measureDiameter.svg</file>
+        <file>resources/images3d/measureLength.svg</file>
+        <file>resources/images3d/measureMinDist.svg</file>
+        <file>resources/images3d/setting.svg</file>
+    </qresource>
+</RCC>

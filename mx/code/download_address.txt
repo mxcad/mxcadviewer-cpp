@@ -1,0 +1,9 @@
+1.Download address of mxcadlib compressed package mx.7z:
+	https://www.webcadsdk.com/mx_download.html
+
+2.After downloading, extract it to the current directory. The directory structure after extraction is as follows:
+	code
+	├── build_mxcadlib/
+	├── download_address.txt [current file]
+	├── sdk/
+	└── src/

@@ -1,0 +1,86 @@
+Custom License Agreement - mxcadviewer
+
+Copyright (c) 2025 Chengdu Dreamkaide Technology Co., Ltd.
+This License Agreement (hereinafter referred to as the "Agreement") is entered into between Chengdu Dreamkaide Technology Co., Ltd. (hereinafter referred to as the "Licensor") and the user of the software "mxcadviewer" (hereinafter referred to as the "User"). By using the Software, the User agrees to be bound by the terms and conditions set forth in this Agreement.
+
+1. Non-Commercial Use
+
+The Software is intended solely for non-commercial use. Non-commercial use refers to the utilization of the Software without the intent to generate profits, including but not limited to personal learning, research, and testing.
+
+For non-commercial purposes, the User may freely use, study, test, modify, and redistribute the source code of the Software without any restrictions.
+
+2. Source Code Redistribution
+
+If the User redistributes the source code of the Software, the following requirements must be met:
+
+- Include the original copyright notice and this License Agreement;
+
+- Retain all existing copyright notices, trademark notices, and other legal disclaimers in full without any modification.
+
+3. Binary Files
+
+The compiled binary forms of the Software (including but not limited to EXE files) shall not be reverse-engineered, decompiled, or disassembled.
+
+This restriction applies to all versions of the Software, including any updated or modified versions.
+
+4. Watermark Retention
+
+All watermarks, logos, and brand elements within the Software must remain intact and unaltered. Any violation of this clause will result in the immediate termination of this License.
+
+5. Commercial Use
+
+Unless the User has entered into a separate commercial license agreement with Chengdu Dreamkaide Technology Co., Ltd. and obtained written permission, the User is prohibited from using the Software for commercial purposes.
+
+Users who have not signed such an agreement shall not have the right to use the Software for commercial purposes. For inquiries regarding commercial licensing, please contact the Licensor.
+
+6. Disclaimer of Warranty
+
+The Software is provided "AS IS" without any warranty of any kind, either express or implied, including but not limited to the implied warranties of merchantability, fitness for a particular purpose, and non-infringement.
+
+Under no circumstances shall the Licensor be liable for any claims, damages, or other liabilities arising out of or in connection with the Software or its use, whether based on contract, tort, or any other legal theory.
+
+This disclaimer does not affect any consumer rights the User may have under applicable laws of the People's Republic of China.
+
+7. Commercial Licensing
+
+If the User has signed a purchase contract with Chengdu Dreamkaide Technology Co., Ltd., and such contract conflicts with this License Agreement, the purchase contract shall prevail. Users who have not signed such a contract shall be bound exclusively by this License Agreement.
+
+Specific terms of commercial licensing, such as licensing fees and validity periods, shall be detailed in the commercial license agreement.
+
+8. Contact Information
+
+For inquiries about commercial licensing, please contact us through the following channels:
+
+- Company Name: Chengdu Dreamkaide Technology Co., Ltd.
+
+- Address: Room 522, 5th Floor, Building 1, No. 1388 Middle Tianfu Avenue, Chengdu High-Tech Zone, China (Sichuan) Pilot Free Trade Zone
+
+- Email: 710714273@qq.com
+
+- Customer Service Link: http://www.webcadsdk.com
+
+9. Governing Law and Dispute Resolution
+
+This License Agreement shall be governed by the laws of the People's Republic of China.
+
+Any dispute arising out of or in connection with this Agreement shall first be resolved through friendly negotiation between the parties; if negotiation fails, either party may submit the dispute to the people's court with jurisdiction at the Licensor's location for litigation.
+
+10. Amendment and Termination of the Agreement
+
+10.1 Amendment of the Agreement
+
+The Licensor reserves the right to amend the terms of this Agreement at any time. The amended terms will be notified to Users through the official website or other appropriate means.
+
+10.2 Termination of the Agreement
+
+The User may terminate this Agreement at any time by ceasing to use the Software. Upon termination, the User must destroy all copies of the Software and any derivative works thereof.
+
+11. Intellectual Property Statement
+
+The Software and all related intellectual property rights (including but not limited to patents, copyrights, trademarks, and trade secrets) are owned by Chengdu Dreamkaide Technology Co., Ltd.
+
+Without the written consent of the Licensor, the User shall not infringe or attempt to infringe such rights in any manner.
+
+By using the Software, the User acknowledges that they have read and understood all the contents of this License Agreement and agree to be bound by its terms.
+
+Chengdu Dreamkaide Technology Co., Ltd.

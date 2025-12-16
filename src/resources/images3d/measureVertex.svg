@@ -1,0 +1,10 @@
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" fill="none">
+	<defs>
+		<linearGradient id="paint_linear_4" x1="16" x2="16" y1="3" y2="29" gradientUnits="userSpaceOnUse">
+			<stop stop-color="rgb(250,230,147)" offset="0" stop-opacity="1" />
+			<stop stop-color="rgb(150,109,44)" offset="1" stop-opacity="1" />
+		</linearGradient>
+	</defs>
+	<rect id="measureVertex" width="32" height="32" x="0" y="0" />
+	<path id="合并" d="M5.5 19.5L8.5 19.5L8.5 3L9.5 3L9.5 19.5L12.5 19.5L12.5 22.5L29 22.5L29 23.5L12.5 23.5L12.5 26.5L9.5 26.5L9.5 29L8.5 29L8.5 26.5L5.5 26.5L5.5 23.5L3 23.5L3 22.5L5.5 22.5L5.5 19.5ZM22 13C22 11.8954 21.1046 11 20 11C18.8954 11 18 11.8954 18 13C18 14.1046 18.8954 15 20 15C21.1046 15 22 14.1046 22 13ZM8.5 22.5L8.5 20.5L6.5 20.5L6.5 22.5L8.5 22.5ZM9.5 22.5L9.5 20.5L11.5 20.5L11.5 22.5L9.5 22.5ZM8.5 23.5L8.5 25.5L6.5 25.5L6.5 23.5L8.5 23.5ZM9.5 23.5L11.5 23.5L11.5 25.5L9.5 25.5L9.5 23.5Z" fill="url(#paint_linear_4)" fill-rule="evenodd" />
+</svg>
