@@ -3334,7 +3334,6 @@ void MxCADCommand::Mx_DrawRadiusDimMark()
 		MXAPP.CallMain([&]() {
 			McDbObjectId id = Mx2d::addEntityToAnnotationLayerAndClose(pRadiusDim);
 			emit Mx2dSignalTransfer::getInstance().signalAddAnnotation(MxUtils::gCurrentTab, id);
-            delete pRadiusDim;
 			});
 	}
 	// Unsupported entity type
