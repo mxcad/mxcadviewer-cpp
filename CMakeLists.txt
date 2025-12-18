@@ -17,6 +17,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows" AND MSVC)
 endif()
 
 option(MX_BUILD_3D "Build 3D" ON)
+option(MX_BUILD_LOGIN "Build login system" OFF)
 
 set(3RDPARTY_DIR "${CMAKE_SOURCE_DIR}/3rdparty" CACHE PATH "3rdparty directory")
 set(MX_DIR "${CMAKE_SOURCE_DIR}/mx/code" CACHE PATH "mx directory")
@@ -51,6 +52,11 @@ endif()
 # Add #define MX_BUILD_3D
 if(MX_BUILD_3D)
     add_definitions(-DMX_BUILD_3D)
+endif()
+
+#Add #define MX_BUILD_LOGIN
+if(MX_BUILD_LOGIN)
+	add_definitions(-DMX_BUILD_LOGIN)
 endif()
 
 
@@ -118,6 +124,15 @@ if(MX_BUILD_3D)
     )
 endif()
 
+if(MX_BUILD_LOGIN)
+	set(LOGIN_DIR ${COMMON_DIR}/mxlogin)
+	#MXLOGIN Sources
+	file(GLOB MXLOGIN_SOURCES
+		"${LOGIN_DIR}/*.cpp"
+		"${LOGIN_DIR}/*.h"
+	)
+endif()
+
 # Add 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(LINUX TRUE)
@@ -145,10 +160,10 @@ file(GLOB MXCAD2D_SOURCES
 
 
 # Create executable
-add_executable(${PROJECT_NAME} ${COMMON_SOURCES} ${LOGIN_SOURCES} ${MXCAD3D_SOURCES} ${MXCAD2D_SOURCES})
+add_executable(${PROJECT_NAME} ${COMMON_SOURCES} ${LOGIN_SOURCES} ${MXCAD3D_SOURCES} ${MXLOGIN_SOURCES} ${MXCAD2D_SOURCES})
 
 # Set include directories
-target_include_directories(${PROJECT_NAME} PRIVATE ${OpenCASCADE_INC_DIR} ${3RDPARTY_DIR} ${XLSXWRITER_INC_DIR} ${MXCAD_INC_DIR} ${COMMON_DIR} ${3D_DIR} ${2D_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${OpenCASCADE_INC_DIR} ${3RDPARTY_DIR} ${XLSXWRITER_INC_DIR} ${MXCAD_INC_DIR} ${COMMON_DIR} ${3D_DIR} ${LOGIN_DIR} ${2D_DIR})
 
 
 #include(mxcadlib/CMakeLists222.txt)
@@ -222,6 +237,15 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 	"${3RDPARTY_DIR}/mxconvert"
 	"$<TARGET_FILE_DIR:${PROJECT_NAME}>"
 )
+
+if(MX_BUILD_LOGIN)
+	# copy ssl dll to target directory
+	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
+		"${3RDPARTY_DIR}/ssl"
+		"$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+	)
+endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows" AND MSVC)
 
