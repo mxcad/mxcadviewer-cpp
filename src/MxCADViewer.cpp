@@ -71,6 +71,12 @@ for the use of this software, its documentation or related materials.
 
 #include "MxLanguageManager.h"
 #include "Mx3dProgressIndicator.h"
+#ifdef MX_BUILD_LOGIN
+#include "mxloginscene.h"
+#include "mxpersonalcenterwidget.h"
+#include "MxNetworkManager.h"
+#endif // MX_BUILD_LOGIN
+#include "MxLogger.h"
 
 MxCADViewer::MxCADViewer(QWidget* parent)
 	: QMainWindow(parent)
@@ -88,7 +94,11 @@ MxCADViewer::~MxCADViewer()
 
 void MxCADViewer::setupUi()
 {
+#ifdef MX_BUILD_LOGIN
+	setWindowTitle(MxUtils::getAppVersion() + tr("<Guest>"));
+#else
 	setWindowTitle(MxUtils::getAppVersion());
+#endif
 	setWindowIcon(QIcon(":/resources/images/mxlogo.svg"));
 	setAcceptDrops(true);
 	resize(1500, 1200);
@@ -98,6 +108,49 @@ void MxCADViewer::setupUi()
 	createActions();
 	createToolBars();
 	createCentralWidget();
+
+#ifdef MX_BUILD_LOGIN
+	// --- Setup Login Scene ---
+	m_loginScene = new MxLoginScene;
+	m_currentTabIndex = m_tabWidget->addTab(m_loginScene, tr("Login"));
+	connect(m_loginScene, &MxLoginScene::loginSuccess, this, [this](const QString& nickName, bool isVip) {
+		m_tabWidget->setTabText(m_tabWidget->indexOf(m_loginScene), tr("Profile"));
+		this->setWindowTitle(MxUtils::getAppVersion() + QString("<%1,%2>").arg(nickName).arg(isVip ? tr("VIP") : tr("Not VIP")));
+		m_accountAction->setMenu(m_accountMenuIsLogin);
+		});
+	connect(m_loginScene, &MxLoginScene::logoutSuccess, this, [this]() {
+		m_tabWidget->setTabText(m_tabWidget->indexOf(m_loginScene), tr("Login"));
+		this->setWindowTitle(MxUtils::getAppVersion() + tr("<Guest>"));
+		m_accountAction->setMenu(m_accountMenuIsLogout);
+		});
+	/*connect(&MxNetworkManager::getInstance(), &MxNetworkManager::changeWindowSubTitle, this, [this](const QString& subTitle) {
+		this->setWindowTitle(MxUtils::getAppVersion() + subTitle);
+		});*/
+	connect(&MxNetworkManager::getInstance(), &MxNetworkManager::notLogin, this, [this]() {
+		QMessageBox::information(this, tr("Tip"), tr("Please login to continue"));
+		m_loginScene->gotoLoginWidget("userLoginWidget");
+		m_tabWidget->setCurrentWidget(m_loginScene);
+		});
+	connect(&MxNetworkManager::getInstance(), &MxNetworkManager::notVip, this, [this]() {
+		QMessageBox::information(this, tr("Tip"), tr("Please upgrade to VIP to continue"));
+		MxLoginWidget* loginWidget = m_loginScene->getLoginWidget("personalCenterWidget");
+		MxPersonalCenterWidget* personalCenterWidget = dynamic_cast<MxPersonalCenterWidget*>(loginWidget);
+		personalCenterWidget->showBuyVipPage();
+		m_tabWidget->setCurrentWidget(m_loginScene);
+		});
+
+	// Attempt to fetch user info to auto-login
+	MxNetworkManager::getInstance().fetchUserInfo([this](bool success, MxUtils::LoginUserInfo userInfo) {
+		if (success)
+		{
+			m_loginScene->gotoLoginWidget("personalCenterWidget"); // Switch to personal center on success	
+			m_tabWidget->setTabText(m_tabWidget->indexOf(m_loginScene), tr("Profile"));
+			this->setWindowTitle(MxUtils::getAppVersion() + QString("<%1,%2>").arg(userInfo.nickName).arg(userInfo.isVip ? tr("VIP") : tr("Not VIP")));
+			m_accountAction->setMenu(m_accountMenuIsLogin);
+		}
+		});
+
+#endif
 
 	// --- Setup Recent Files Tab ---
 	m_recentFileWidget = new MxRecentFileWidget(m_tabWidget);
@@ -111,25 +164,94 @@ void MxCADViewer::setupUi()
 void MxCADViewer::createActions()
 {
 	m_openAction = new QAction(QIcon(":/resources/images/open.svg"), tr("Open"), this);
-	m_openAction->setToolTip(tr("Open Model"));
+	m_openAction->setToolTip(tr("Open File"));
 	m_openAction->setShortcut(QKeySequence::Open);
 
 	m_recentFileAction = new QAction(QIcon(":/resources/images/recent.svg"), tr("Recent"), this);
-	m_recentFileAction->setToolTip(tr("Recent file history"));
+	m_recentFileAction->setToolTip(tr("Recent Files"));
+
+#ifdef MX_BUILD_LOGIN
+
+	auto loginAction = new QAction(QIcon(":/resources/images_login/login.svg"), tr("Login"), this);
+	auto purchaseVipAction = new QAction(QIcon(":/resources/images_login/purchaseVip.svg"), tr("Purchase VIP"), this);
+	auto personalCenterAction = new QAction(QIcon(":/resources/images_login/account.svg"), tr("Profile"), this);
+	auto logoutAction = new QAction(QIcon(":/resources/images_login/logout.svg"), tr("Logout"), this);
+
+	connect(loginAction, &QAction::triggered, this, [this]() {
+		int idx = m_tabWidget->indexOf(m_loginScene);
+		if (idx == -1) {
+			m_tabWidget->insertTab(0, m_loginScene, tr("Login"));
+		}
+		m_loginScene->gotoLoginWidget("userLoginWidget");
+		m_tabWidget->setCurrentWidget(m_loginScene);
+		});
+	connect(purchaseVipAction, &QAction::triggered, this, [this]() {
+		int idx = m_tabWidget->indexOf(m_loginScene);
+		if (idx == -1) {
+			m_tabWidget->insertTab(0, m_loginScene, MxNetworkManager::getInstance().getUserInfo().isLogin ? tr("Profile") : tr("Login"));
+		}
+		if (!MxNetworkManager::getInstance().getUserInfo().isLogin)
+		{
+            QMessageBox::information(this, tr("Tip"), tr("Please login to continue"));
+            m_loginScene->gotoLoginWidget("userLoginWidget");
+            m_tabWidget->setCurrentWidget(m_loginScene);
+            return;
+		}
+		MxLoginWidget* loginWidget = m_loginScene->getLoginWidget("personalCenterWidget");
+		MxPersonalCenterWidget* personalCenterWidget = dynamic_cast<MxPersonalCenterWidget*>(loginWidget);
+		personalCenterWidget->showBuyVipPage();
+		m_tabWidget->setCurrentWidget(m_loginScene);
+		});
+	connect(personalCenterAction, &QAction::triggered, this, [this]() {
+		int idx = m_tabWidget->indexOf(m_loginScene);
+		if (idx == -1) {
+			m_tabWidget->insertTab(0, m_loginScene, tr("Profile"));
+		}
+		MxLoginWidget* loginWidget = m_loginScene->getLoginWidget("personalCenterWidget");
+		MxPersonalCenterWidget* personalCenterWidget = dynamic_cast<MxPersonalCenterWidget*>(loginWidget);
+		personalCenterWidget->showUserInfoPage();
+		m_tabWidget->setCurrentWidget(m_loginScene);
+		});
+	connect(logoutAction, &QAction::triggered, this, [this]() {
+		int idx = m_tabWidget->indexOf(m_loginScene);
+		if (idx == -1) {
+			m_tabWidget->insertTab(0, m_loginScene, tr("Login"));
+		}
+		MxLoginWidget* loginWidget = m_loginScene->getLoginWidget("personalCenterWidget");
+		MxPersonalCenterWidget* personalCenterWidget = dynamic_cast<MxPersonalCenterWidget*>(loginWidget);
+		personalCenterWidget->logout();
+		m_tabWidget->setCurrentWidget(m_loginScene);
+		});
+	m_accountMenuIsLogin = new QMenu(this);
+	m_accountMenuIsLogin->addAction(personalCenterAction);
+	m_accountMenuIsLogin->addAction(purchaseVipAction);
+	m_accountMenuIsLogin->addAction(logoutAction);
+	
+    
+
+	m_accountMenuIsLogout = new QMenu(this);
+	m_accountMenuIsLogout->addAction(loginAction);
+	m_accountMenuIsLogout->addAction(purchaseVipAction);
+
+	m_accountAction = new QAction(QIcon(":/resources/images_login/account.svg"), tr("Account"), this);
+	m_accountAction->setMenu(m_accountMenuIsLogout);
+	
+#endif // MX_BUILD_LOGIN
+
 
 	m_settingmenuAction = new QAction(QIcon(":/resources/images3d/setting.svg"), tr("Setting"), this);
 	m_settingmenuAction->setToolTip(tr("Setting"));
 
 	m_aboutAction = new QAction(QIcon(":/resources/images/about.svg"), tr("About"), this);
-	m_aboutAction->setToolTip(tr("About CAD Dream Viewer"));
+	m_aboutAction->setToolTip(tr("About MxCADViewer"));
 
 	m_settingLanguageAction = new QAction(QIcon(":/resources/images/language.svg"), tr("Language"), this);
-    m_settingLanguageAction->setToolTip(tr("Setting Language"));
+    m_settingLanguageAction->setToolTip(tr("Language Settings"));
 
 	m_englishAction = new QAction(tr("English"), this);
 	m_englishAction->setToolTip(tr("English"));
-	m_chineseAction = new QAction(tr("Chinese"), this);
-	m_chineseAction->setToolTip(tr("Chinese"));
+	m_chineseAction = new QAction(tr("Simplified Chinese"), this);
+	m_chineseAction->setToolTip(tr("Simplified Chinese"));
 
 	auto languageMenu = new QMenu(this);
     languageMenu->addAction(m_englishAction);
@@ -137,16 +259,17 @@ void MxCADViewer::createActions()
     m_settingLanguageAction->setMenu(languageMenu);
 
 	m_closeAction = new QAction(QIcon(":/resources/images/close.svg"), tr("Exit"), this);
-	m_closeAction->setToolTip(tr("Exit Application"));
+	m_closeAction->setToolTip(tr("Exit App"));
 }
 
 void MxCADViewer::createToolBars()
 {
-	m_mainToolBar = new QToolBar(tr("Main Toolbar"), this);
+	m_mainToolBar = new QToolBar(this);
 	m_mainToolBar->setFloatable(false);
 	m_mainToolBar->setMovable(false);
-	m_mainToolBar->setIconSize(QSize(40, 40));
+	m_mainToolBar->setIconSize(QSize(32, 32));
 	m_mainToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+	m_mainToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
 	addToolBar(Qt::TopToolBarArea, m_mainToolBar);
 }
 
@@ -171,6 +294,12 @@ void MxCADViewer::addActionsToUserToolBar()
 {
 	m_tabUserActions.append(m_openAction);
 	m_tabUserActions.append(m_recentFileAction);
+
+#ifdef MX_BUILD_LOGIN
+	m_tabUserActions.append(createSeparator());
+	m_tabUserActions.append(m_accountAction);
+#endif
+
 	m_tabUserActions.append(createSeparator());
 	m_tabUserActions.append(m_aboutAction);
 	m_tabUserActions.append(createSeparator());
@@ -183,7 +312,10 @@ void MxCADViewer::addActionsToRecentFileToolBar()
 {
 	m_tabRecentFileActions.append(m_openAction);
 	m_tabRecentFileActions.append(m_recentFileAction);
-	
+#ifdef MX_BUILD_LOGIN
+	m_tabRecentFileActions.append(createSeparator());
+	m_tabRecentFileActions.append(m_accountAction);
+#endif
 	m_tabRecentFileActions.append(createSeparator());
 	m_tabRecentFileActions.append(m_aboutAction);
 	m_tabRecentFileActions.append(createSeparator());
@@ -197,7 +329,10 @@ void MxCADViewer::addActionsTo3dViewToolBar()
 	m_tab3dViewActions.append(m_openAction);
 	m_tab3dViewActions.append(m_recentFileAction);
 	m_tab3dViewActions.append(createSeparator());
-	auto* changeBgColorAction = new QAction(tr("Change Background Color"), this);
+#ifdef MX_BUILD_LOGIN
+	m_tab3dViewActions.append(m_accountAction);
+#endif
+	auto* changeBgColorAction = new QAction(QIcon(":/resources/images3d/changeBgColor.svg"), tr("Change Background Color"), this);
 	connect(changeBgColorAction, &QAction::triggered, this, &MxCADViewer::onChangeBgColor);
 
 	auto* p3dVipMenu = new QMenu(this);
@@ -218,6 +353,10 @@ void MxCADViewer::addActionsTo2dViewToolBar()
 	// --- Standard Actions ---
 	m_tab2dViewActions.append(m_openAction);
 	m_tab2dViewActions.append(m_recentFileAction);
+#ifdef MX_BUILD_LOGIN
+	m_tab2dViewActions.append(createSeparator());
+	m_tab2dViewActions.append(m_accountAction);
+#endif
 	m_tab2dViewActions.append(createSeparator());
 	m_tab2dViewActions.append(m_aboutAction);
 	m_tab2dViewActions.append(createSeparator());
@@ -234,54 +373,96 @@ void MxCADViewer::addActionsTo2dViewToolBar()
 	pWinMenu->addAction(pActZoomWin);
 	connect(pActZoomAll, &QAction::triggered, this, []() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_ZoomAll"); });
 	connect(pActZoomWin, &QAction::triggered, this, []() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_ZoomWin"); });
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_window.svg", tr("Window"), MxPageType::PAGE_2D, [this](MxPageType type) { onDoNothing(type); }, pWinMenu);
+	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_window.svg", tr("Zoom"), tr("Zoom viewport"), MxPageType::PAGE_2D, [this](MxPageType type) { onDoNothing(type); }, pWinMenu);
 
 	// --- Basic 2D Actions ---
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_layer.svg", tr("Layers"), MxPageType::PAGE_2D, [this](MxPageType type) { onLayerManager(type); });
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_undo.svg", tr("Undo"), MxPageType::PAGE_2D, [this](MxPageType type) { emit Mx2dSignalTransfer::getInstance().signalUndo(MxUtils::gCurrentTab); });
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_redo.svg", tr("Redo"), MxPageType::PAGE_2D, [this](MxPageType type) { emit Mx2dSignalTransfer::getInstance().signalRedo(MxUtils::gCurrentTab); });
+	m_layerManagerAction = new QAction(QIcon(":/resources/images2d/2d_layer.svg"), tr("Layer Manager"), this);
+	m_layerManagerAction->setToolTip(tr("Open layer manager"));
+	m_tab2dViewActions.append(m_layerManagerAction);
+	
+#if 0
+	connect(m_layerManagerAction, &QAction::triggered, this, [this]() { onLayerManager(MxPageType::PAGE_2D); });
+#else
+	connect(m_layerManagerAction, &QAction::triggered, this, [this]() { emit showLayerManagerDialog(currentGuiDoc2d()); });
+#endif
+
+	m_undoAction = new QAction(QIcon(":/resources/images2d/2d_undo.svg"), tr("Undo"), this);
+	m_undoAction->setEnabled(false);
+	m_tab2dViewActions.append(m_undoAction);
+    connect(m_undoAction, &QAction::triggered, this, [this]() { emit Mx2dSignalTransfer::getInstance().signalUndo(MxUtils::gCurrentTab); });
+
+	m_redoAction = new QAction(QIcon(":/resources/images2d/2d_redo.svg"), tr("Redo"), this);
+    m_redoAction->setEnabled(false);
+	m_tab2dViewActions.append(m_redoAction);
+    connect(m_redoAction, &QAction::triggered, this, [this]() { emit Mx2dSignalTransfer::getInstance().signalRedo(MxUtils::gCurrentTab); });
+
+	
+	
 
 	// --- VIP Menu (fully populated) ---
 	auto* pVipMenu = new QMenu(this);
-	auto* pActExtractText = new QAction(tr("Extract Text"), this);
-	connect(pActExtractText, &QAction::triggered, this, [this]() { if (m_extractTextDialog && m_extractTextDialog->isVisible()) m_extractTextDialog->accept(); Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_ExtractTextRect"); });
-	auto* pActExtractTable = new QAction(tr("Extract Table"), this);
-	connect(pActExtractTable, &QAction::triggered, this, [this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_ExtractTable"); });
+	auto* pActExtractText = new QAction(QIcon(":/resources/images2d/2d_extractText.svg"), tr("Extract Text"), this);
+	connect(pActExtractText, &QAction::triggered, this, [this]() { 
+		MxUtils::doAction([this]() { 
+			emit extractText(currentGuiDoc2d());
+			//Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_ExtractTextRect");
+			/*if (m_extractTextDialog && m_extractTextDialog->isVisible())
+			{
+				m_extractTextDialog->accept(); 
+				Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_ExtractTextRect");
+			}*/
+			}); 
+		});
+	auto* pActExtractTable = new QAction(QIcon(":/resources/images2d/2d_extractTable.svg"), tr("Extract Table"), this);
+	connect(pActExtractTable, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_ExtractTable"); }); });
 
-	auto* pActArcLength = new QAction(tr("Arc Length"), this);
-	connect(pActArcLength, &QAction::triggered, this, [this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawArcLengthDimMark"); });
+	auto* pActArcLength = new QAction(QIcon(":/resources/images2d/2d_arcLength.svg"), tr("Arc Length"), this);
+	connect(pActArcLength, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawArcLengthDimMark"); }); });
 
-	auto* pActPt2LineDist = new QAction(tr("Point to Line Distance"), this);
-    connect(pActPt2LineDist, &QAction::triggered, this, [this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawDistPointToLineMark"); });
+	auto* pActPt2LineDist = new QAction(QIcon(":/resources/images2d/2d_pt2lineDist.svg"), tr("Point to Line Distance"), this);
+	connect(pActPt2LineDist, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawDistPointToLineMark"); }); });
 
-	auto* pActContinuousMeasurement = new QAction(tr("Continuous Measurement"), this);
-    connect(pActContinuousMeasurement, &QAction::triggered, this, [this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawContinuousMeasurementMark"); });
+	auto* pActContinuousMeasurement = new QAction(QIcon(":/resources/images2d/2d_continuousMeasurement.svg"), tr("Continuous Measurement"), this);
+    connect(pActContinuousMeasurement, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawContinuousMeasurementMark"); }); });
 
-	auto* pActBatchMeasurement = new QAction(tr("Batch Measurement"), this);
-    connect(pActBatchMeasurement, &QAction::triggered, this, [this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_BatchMeasure"); });
+	auto* pActBatchMeasurement = new QAction(QIcon(":/resources/images2d/2d_batchMeasurement.svg"), tr("Batch Measurement"), this);
+    connect(pActBatchMeasurement, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_BatchMeasure"); }); });
 
-	auto* pActViewSegmentLength = new QAction(tr("View Segment Length"), this);
-    connect(pActViewSegmentLength, &QAction::triggered, this, [this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_ShowSegmentLengths"); });
+	auto* pActViewSegmentLength = new QAction(QIcon(":/resources/images2d/2d_segLength.svg"), tr("Show Segment Length"), this);
+    connect(pActViewSegmentLength, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_ShowSegmentLengths"); }); });
 
-	auto* pActAreaWithArc = new QAction(tr("Area with Arc"), this);
-    connect(pActAreaWithArc, &QAction::triggered, this, [this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawArcPolyAreaMark"); });
+	auto* pActAreaWithArc = new QAction(QIcon(":/resources/images2d/2d_areaWithArc.svg"), tr("Area(with arcs)"), this);
+    connect(pActAreaWithArc, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawArcPolyAreaMark"); }); });
 
-	auto* pActMeasureFillArea = new QAction(tr("Measure Fill Area"), this);
-    connect(pActMeasureFillArea, &QAction::triggered, this, [this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawHatchArea2Mark"); });
+	auto* pActMeasureFillArea = new QAction(QIcon(":/resources/images2d/2d_fillArea.svg"), tr("Hatch Area"), this);
+    connect(pActMeasureFillArea, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawHatchArea2Mark"); }); });
 
-	auto* pActCalculateSideArea = new QAction(tr("Calculate Side Area"), this);
-    connect(pActCalculateSideArea, &QAction::triggered, this, [this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_CalculateSiderArea"); });
+	auto* pActCalculateSideArea = new QAction(QIcon(":/resources/images2d/2d_sideArea.svg"), tr("Calculate Side Area"), this);
+    connect(pActCalculateSideArea, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_CalculateSiderArea"); }); });
 
-	auto* pActAreaOffset = new QAction(tr("Area Offset"), this);
-    connect(pActAreaOffset, &QAction::triggered, this, [this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_SelectAreaToOffset"); });
+	auto* pActAreaOffset = new QAction(QIcon(":/resources/images2d/2d_areaOffset.svg"), tr("Area Offset"), this);
+    connect(pActAreaOffset, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_SelectAreaToOffset"); }); });
 
-	auto* pActMeasureCircle = new QAction(tr("Measure Circle"), this);
-    connect(pActMeasureCircle, &QAction::triggered, this, [this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawCircleMeasurementMark"); });
+	auto* pActMeasureCircle = new QAction(QIcon(":/resources/images2d/2d_measureCircle.svg"), tr("Circle"), this);
+    connect(pActMeasureCircle, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawCircleMeasurementMark"); }); });
 
-	auto* pActMeasureAngle = new QAction(tr("Measure Angle"), this);
-    connect(pActMeasureAngle, &QAction::triggered, this, [this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawAngleMeasurementMark"); });
+	auto* pActMeasureAngle = new QAction(QIcon(":/resources/images2d/2d_measureAngle.svg"), tr("Angle"), this);
+    connect(pActMeasureAngle, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawAngleMeasurementMark"); }); });
 
-
+	pVipMenu->addAction(pActExtractText);
+	pVipMenu->addAction(pActExtractTable);
+	pVipMenu->addAction(pActArcLength);
+	pVipMenu->addAction(pActPt2LineDist);
+	pVipMenu->addAction(pActContinuousMeasurement);
+	pVipMenu->addAction(pActBatchMeasurement);
+	pVipMenu->addAction(pActViewSegmentLength);
+	pVipMenu->addAction(pActAreaWithArc);
+	pVipMenu->addAction(pActMeasureFillArea);
+	pVipMenu->addAction(pActCalculateSideArea);
+	pVipMenu->addAction(pActAreaOffset);
+	pVipMenu->addAction(pActMeasureCircle);
+	pVipMenu->addAction(pActMeasureAngle);
+#ifdef MX_DEVELOPING
 	auto* pActCADSplitExport = new QAction(tr("Split and Export CAD"), this);
 	connect(pActCADSplitExport, &QAction::triggered, this, [this]() { onCADSplitExport(MxPageType::PAGE_2D); });
 	auto* pActPDFToCAD = new QAction(tr("PDF to CAD"), this);
@@ -292,14 +473,6 @@ void MxCADViewer::addActionsTo2dViewToolBar()
 	connect(pActBatchExportPDF, &QAction::triggered, this, [this]() { onBatchExportPDF(MxPageType::PAGE_2D); });
 	auto* pActShortcutSettings = new QAction(tr("Shortcut Settings"), this);
 	connect(pActShortcutSettings, &QAction::triggered, this, [this]() { onShortcutSettings(MxPageType::PAGE_2D); });
-	pVipMenu->addAction(pActExtractText);
-	pVipMenu->addAction(pActExtractTable);
-	pVipMenu->addAction(pActArcLength);
-	pVipMenu->addAction(pActPt2LineDist);
-	pVipMenu->addAction(pActContinuousMeasurement);
-	pVipMenu->addAction(pActBatchMeasurement);
-	pVipMenu->addAction(pActViewSegmentLength);
-#ifdef MX_DEVELOPING
 	pVipMenu->addAction(new QAction(tr("Modify Single Dimension"), this));
 	pVipMenu->addAction(new QAction(tr("External Reference Manager"), this));
 	pVipMenu->addAction(new QAction(tr("CAD Gray Display"), this));
@@ -312,88 +485,92 @@ void MxCADViewer::addActionsTo2dViewToolBar()
 	pVipMenu->addAction(pActBatchExportPDF);
 	pVipMenu->addAction(pActShortcutSettings);
 #endif
-	pVipMenu->addAction(pActAreaWithArc);
-	pVipMenu->addAction(pActMeasureFillArea);
-	pVipMenu->addAction(pActCalculateSideArea);
-	pVipMenu->addAction(pActAreaOffset);
-	pVipMenu->addAction(pActMeasureCircle);
-	pVipMenu->addAction(pActMeasureAngle);
 	
-	
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_vip.svg", tr("VIP"), MxPageType::PAGE_2D, [this](MxPageType type) { onDoNothing(type); }, pVipMenu);
+	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_vip.svg", tr("VIP"), tr("VIP functions"), MxPageType::PAGE_2D, [this](MxPageType type) { onDoNothing(type); }, pVipMenu);
 
-	// --- Main 2D Tools ---
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_measure.svg", tr("Measure"), MxPageType::PAGE_2D, [this](MxPageType type) { onMeasurement(type); });
+
+	auto* pActMeasurement = new QAction(QIcon(":/resources/images2d/2d_measure.svg"), tr("Measure"), this);
+	pActMeasurement->setToolTip(tr("Measure tools"));
+	m_tab2dViewActions.append(pActMeasurement);
+    connect(pActMeasurement, &QAction::triggered, this, [this]() { emit showMeasurementDialog(currentGuiDoc2d()); });
+
 #ifdef MX_DEVELOPING
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_measureStatistics.svg", tr("Statistics"), MxPageType::PAGE_2D, [this](MxPageType type) { onMeasurementStat(type); });
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_compare.svg", tr("Compare"), MxPageType::PAGE_2D, [this](MxPageType type) { onDrawingCompare(type); });
+	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_measureStatistics.svg", tr("Measure Stats"), tr("Statistics of measurement data"), MxPageType::PAGE_2D, [this](MxPageType type) { onMeasurementStat(type); });
+	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_compare.svg", tr("Drawing Compare"), tr("Compare drawing differences"), MxPageType::PAGE_2D, [this](MxPageType type) { onDrawingCompare(type); });
 	// --- Shape Recognition Menu ---
 	auto* pShapeRecognitionMenu = new QMenu(this);
-	auto* pActShapeRecognition = new QAction(QIcon(":/resources/images2d/2d_graphicRecognition.svg"), tr("Recognize Shapes"), this);
+	auto* pActShapeRecognition = new QAction(QIcon(":/resources/images2d/2d_graphicRecognition.svg"), tr("Entity Recognition"), this);
 	connect(pActShapeRecognition, &QAction::triggered, this, [this]() { onShapeRecognition(MxPageType::PAGE_2D); });
-	auto* pActRecognitedList = new QAction(tr("View Recognized Shapes"), this);
+	auto* pActRecognitedList = new QAction(tr("View Detected Entities"), this);
 	connect(pActRecognitedList, &QAction::triggered, this, [this]() { onLookRecognitedShapeList(MxPageType::PAGE_2D); });
-	auto* pActShapeRecogDemo = new QAction(tr("Recognition Demo"), this);
 	pShapeRecognitionMenu->addAction(pActShapeRecognition);
 	pShapeRecognitionMenu->addAction(pActRecognitedList);
-	pShapeRecognitionMenu->addAction(pActShapeRecogDemo);
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_graphicRecognition.svg", tr("Recognition"), MxPageType::PAGE_2D, [this](MxPageType type) { onDoNothing(type); }, pShapeRecognitionMenu);
+	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_graphicRecognition.svg", tr("Entity Recognition"), tr("Detect CAD drawing entities"), MxPageType::PAGE_2D, [this](MxPageType type) { onDoNothing(type); }, pShapeRecognitionMenu);
 #endif
 	
 
 	// --- Text Menu ---
 	auto* pTextMenu = new QMenu(this);
-	auto* pActSingleLineText = new QAction(tr("Single Line Text"), this);
+	auto* pActSingleLineText = new QAction(QIcon(":/resources/images2d/2d_singleLineText.svg"), tr("Single Line Text"), this);
 	connect(pActSingleLineText, &QAction::triggered, this, [this]() { onInsertSingleLineText(MxPageType::PAGE_2D); });
-	auto* pActMultLinesText = new QAction(tr("Multi Line Text"), this);
-	connect(pActMultLinesText, &QAction::triggered, this, [this]() { onMultiLineInput(MxPageType::PAGE_2D); });
-	auto* pActNumberText = new QAction(tr("Numbered Text"), this);
-	connect(pActNumberText, &QAction::triggered, this, [this]() { onNumberedText(MxPageType::PAGE_2D); });
-	auto* pActModText = new QAction(tr("Modify Text"), this);
-	connect(pActModText, &QAction::triggered, this, [this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_SelectTextToModify"); });
-	auto* pActMoveText = new QAction(tr("Move Text"), this);
-	connect(pActMoveText, &QAction::triggered, this, [this](bool) { onMoveText(MxPageType::PAGE_2D); });
-	auto* pActCloneText = new QAction(tr("Copy Text"), this);
-	connect(pActCloneText, &QAction::triggered, this, [this](bool) { onCloneText(MxPageType::PAGE_2D); });
-	pTextMenu->addAction(pActSingleLineText); pTextMenu->addAction(pActMultLinesText); pTextMenu->addAction(pActNumberText);
-	pTextMenu->addAction(pActModText); pTextMenu->addAction(pActMoveText); pTextMenu->addAction(pActCloneText);
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_text.svg", tr("Text"), MxPageType::PAGE_2D, [this](MxPageType type) { onDoNothing(type); }, pTextMenu);
+	auto* pActMultLinesText = new QAction(QIcon(":/resources/images2d/2d_multiLineText.svg"), tr("Multi Line Text"), this);
+	connect(pActMultLinesText, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { onMultiLineInput(MxPageType::PAGE_2D); }); });
+	auto* pActNumberText = new QAction(QIcon(":/resources/images2d/2d_numberedText.svg"), tr("Numbered Text"), this);
+	connect(pActNumberText, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() {onNumberedText(MxPageType::PAGE_2D); }); });
+	auto* pActModText = new QAction(QIcon(":/resources/images2d/2d_modifyText.svg"), tr("Modify Text"), this);
+	connect(pActModText, &QAction::triggered, this, []() { MxUtils::doAction([]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_SelectTextToModify"); }); });
+	auto* pActMoveText = new QAction(QIcon(":/resources/images2d/2d_moveText.svg"), tr("Move Text"), this);
+	connect(pActMoveText, &QAction::triggered, this, [this](bool) { MxUtils::doAction([this]() {onMoveText(MxPageType::PAGE_2D); }); });
+	auto* pActCloneText = new QAction(QIcon(":/resources/images2d/2d_copyText.svg"), tr("Copy Text"), this);
+	connect(pActCloneText, &QAction::triggered, this, [this](bool) { MxUtils::doAction([this]() {onCloneText(MxPageType::PAGE_2D); }); });
+	pTextMenu->addAction(pActSingleLineText); 
+	pTextMenu->addAction(pActMultLinesText); 
+	pTextMenu->addAction(pActNumberText);
+	pTextMenu->addAction(pActModText); 
+	pTextMenu->addAction(pActMoveText); 
+	pTextMenu->addAction(pActCloneText);
+	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_text.svg", tr("Text"), tr("Create or modify text"), MxPageType::PAGE_2D, [this](MxPageType type) { onDoNothing(type); }, pTextMenu);
 
 	// --- Draw Line ---
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_line.svg", tr("Draw Line"), MxPageType::PAGE_2D, [](MxPageType) { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawLine"); });
+	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_line.svg", tr("Draw Line"), tr("Draw Line"), MxPageType::PAGE_2D, [](MxPageType) { MxUtils::doAction([]() {Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawLine"); }); });
 
 	// --- Shapes Menu ---
 	auto* pShapeMenu = new QMenu(this);
 	auto* pActRectangle = new QAction(QIcon(":/resources/images2d/2d_dimRectangle.svg"), tr("Rectangle"), this);
-	connect(pActRectangle, &QAction::triggered, this, []() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawRectMark"); });
+	connect(pActRectangle, &QAction::triggered, this, []() { MxUtils::doAction([]() {Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawRectMark"); }); });
 	auto* pActEllipse = new QAction(QIcon(":/resources/images2d/2d_dimEllipse.svg"), tr("Ellipse"), this);
-	connect(pActEllipse, &QAction::triggered, this, []() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawEllipseMark"); });
+	connect(pActEllipse, &QAction::triggered, this, []() { MxUtils::doAction([]() {Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawEllipseMark"); }); });
 	auto* pActCloudLine = new QAction(QIcon(":/resources/images2d/2d_dimCloud.svg"), tr("Cloud"), this);
-	connect(pActCloudLine, &QAction::triggered, this, []() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawRectCloudMark"); });
+	connect(pActCloudLine, &QAction::triggered, this, []() { MxUtils::doAction([]() {Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawRectCloudMark"); }); });
 	auto* pActLeadLine = new QAction(QIcon(":/resources/images2d/2d_dimLeader.svg"), tr("Leader"), this);
-	connect(pActLeadLine, &QAction::triggered, this, [this]() { if (!m_leaderTextInputDialog) { m_leaderTextInputDialog = new Mx2dLeaderTextInputDialog(this); } m_leaderTextInputDialog->show(); });
+	connect(pActLeadLine, &QAction::triggered, this, [this]() { 
+		MxUtils::doAction([this]() {
+
+			emit showLeaderTextInputDialog(currentGuiDoc2d());
+			});
+		});
 	pShapeMenu->addAction(pActRectangle); pShapeMenu->addAction(pActEllipse); pShapeMenu->addAction(pActCloudLine); pShapeMenu->addAction(pActLeadLine);
 #ifdef MX_DEVELOPING
 	pShapeMenu->addAction(new QAction(QIcon(":/resources/images2d/2d_dimPic.svg"), tr("Picture"), this));
 	pShapeMenu->addAction(new QAction(QIcon(":/resources/images2d/2d_dimFreeDraw.svg"), tr("Freehand"), this));
 #endif // MX_DEVELOPING
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_shapes.svg", tr("Shapes"), MxPageType::PAGE_2D, [this](MxPageType type) { onDoNothing(type); }, pShapeMenu);
+	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_shapes.svg", tr("Shapes"), tr("Shapes"), MxPageType::PAGE_2D, [this](MxPageType type) { onDoNothing(type); }, pShapeMenu);
 
 	// --- Delete Menu ---
 	auto* pDeleteMenu = new QMenu(this);
-	auto* pActDelDim = new QAction(tr("Delete Annotation"), this);
+	auto* pActDelDim = new QAction(QIcon(":/resources/images2d/2d_dimAnnotations.svg"), tr("Delete Annotation"), this);
 	connect(pActDelDim, &QAction::triggered, this, []() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_EraseAnnotation"); });
-	auto* pActDelAllDim = new QAction(tr("Delete All Annotations"), this);
+	auto* pActDelAllDim = new QAction(QIcon(":/resources/images2d/2d_dimAllAnnotations.svg"), tr("Delete All Annotations"), this);
 	connect(pActDelAllDim, &QAction::triggered, this, [this]() {
 		if (QMessageBox::question(this, tr("Confirm"), tr("Are you sure you want to delete all annotations?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
 			Mx2dSignalTransfer::getInstance().signalEraseAllAnnotations(MxUtils::gCurrentTab);
 		}
 		});
 	pDeleteMenu->addAction(pActDelDim); pDeleteMenu->addAction(pActDelAllDim);
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_delete.svg", tr("Delete"), MxPageType::PAGE_2D, [this](MxPageType type) { onDoNothing(type); }, pDeleteMenu);
+	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_delete.svg", tr("Delete"), tr("Delete one or more annotations"), MxPageType::PAGE_2D, [this](MxPageType type) { onDoNothing(type); }, pDeleteMenu);
 
 	// --- Hide/Show Annotation ---
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_hideDim.svg", tr("Hide Annotations"), MxPageType::PAGE_2D, [this](MxPageType) {
+	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_hideDim.svg", tr("Hide Annotations"), tr("Hide or show all annotations"), MxPageType::PAGE_2D, [this](MxPageType) {
 		static bool isShow = false;
 		//MrxDbgRbList spParam = Mx::mcutBuildList(RTSHORT, isShow ? 1 : 0, 0);
 		//Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_ShowHideAnnotation", spParam.orphanData());
@@ -401,34 +578,43 @@ void MxCADViewer::addActionsTo2dViewToolBar()
 		isShow = !isShow;
 		});
 
+#ifdef MX_DEVELOPING
 	// --- Import/Export Menu ---
 	auto* pImportExportMenu = new QMenu(this);
 	pImportExportMenu->addAction(new QAction(tr("Import Drawing and Annotations"), this));
 	pImportExportMenu->addAction(new QAction(tr("Export Drawing and Annotations"), this));
 	pImportExportMenu->addAction(pActExportPDF);       // Reuse existing action
 	pImportExportMenu->addAction(pActBatchExportPDF);  // Reuse existing action
-#ifdef MX_DEVELOPING
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_inputOutput.svg", tr("Import/Export"), MxPageType::PAGE_2D, [this](MxPageType type) { onDoNothing(type); }, pImportExportMenu);
+
+	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_inputOutput.svg", tr("Import/Export"), tr("Import/Export Annotations or PDF"), MxPageType::PAGE_2D, [this](MxPageType type) { onDoNothing(type); }, pImportExportMenu);
 
 	// --- More Tools ---
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_dimSetting.svg", tr("Settings"), MxPageType::PAGE_2D, [this](MxPageType type) { onDimSetting(type); });
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_proportion.svg", tr("Scale"), MxPageType::PAGE_2D, [](MxPageType) { /* TODO: Implement scale logic */ });
+	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_dimSetting.svg", tr("Annotation Settings"), tr("Annotation settings"), MxPageType::PAGE_2D, [this](MxPageType type) { onDimSetting(type); });
+	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_proportion.svg", tr("Ratio"), tr("Annotation ratio setting"), MxPageType::PAGE_2D, [](MxPageType) { /* TODO: Implement scale logic */ });
 #endif // MX_DEVELOPING
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_textSearch.svg", tr("Find Text"), MxPageType::PAGE_2D, [this](MxPageType type) { onTextSearch(type); });
+
+	auto* pActTextSearch = new QAction(QIcon(":/resources/images2d/2d_textSearch.svg"), tr("Text Search"), this);
+	pActTextSearch->setToolTip(tr("Locate text in drawings or annotations"));
+    m_tab2dViewActions.append(pActTextSearch);
+    connect(pActTextSearch, &QAction::triggered, this, [this]() {
+		emit showTextSearchDialog(currentGuiDoc2d());
+		});
+
+	//createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_test.svg", tr("Test"), tr("Test"), MxPageType::PAGE_2D, [this](MxPageType type) { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_TestThread"); });
 
 #ifdef MX_DEVELOPING
 	// --- Screen Rotation Menu ---
 	auto* pScreenRotMenu = new QMenu(this);
-	pScreenRotMenu->addAction(new QAction(tr(u8"Rotate Clockwise 90°"), this));
-	pScreenRotMenu->addAction(new QAction(tr(u8"Rotate Counter-Clockwise 90°"), this));
+	pScreenRotMenu->addAction(new QAction(tr("Rotate Clockwise 90 Degree"), this));
+	pScreenRotMenu->addAction(new QAction(tr("Rotate Counter-Clockwise 90 Degree"), this));
 	pScreenRotMenu->addAction(new QAction(tr("Custom Rotation"), this));
 	pScreenRotMenu->addSeparator();
 	pScreenRotMenu->addAction(new QAction(tr("Restore Initial View"), this));
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_screenRotate.svg", tr("Rotate View"), MxPageType::PAGE_2D, [this](MxPageType type) { onDoNothing(type); }, pScreenRotMenu);
+	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_screenRotate.svg", tr("Rotate View"), tr("Rotate viewport"), MxPageType::PAGE_2D, [this](MxPageType type) { onDoNothing(type); }, pScreenRotMenu);
 
 	// --- Final Tools ---
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_print.svg", tr("Print"), MxPageType::PAGE_2D, [this](MxPageType type) { onPrint(type); });
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_dimClassify.svg", tr("Annotation Categories"), MxPageType::PAGE_2D, [this](MxPageType type) { onDimCategoryManager(type); });
+	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_print.svg", tr("Print"), tr("Print"), MxPageType::PAGE_2D, [this](MxPageType type) { onPrint(type); });
+	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_dimClassify.svg", tr("Annotation Categories"), tr("Open annotation categories manager"), MxPageType::PAGE_2D, [this](MxPageType type) { onDimCategoryManager(type); });
 #endif // MX_DEVELOPING
 }
 
@@ -466,9 +652,9 @@ void MxCADViewer::connectSignalSlots()
 	connect(&MxSignalTransfer::getInstance(), &MxSignalTransfer::signalOpenFile, this, &MxCADViewer::onOpenFile);
 
 	// --- Signals for 2D specific functionality ---
-	connect(&Mx2dSignalTransfer::getInstance(), &Mx2dSignalTransfer::signalExtractTextFinished, this, [this](QWidget* tab, const QStringList& textList) {
+	/*connect(&Mx2dSignalTransfer::getInstance(), &Mx2dSignalTransfer::signalExtractTextFinished, this, [this](QWidget* tab, const QStringList& textList) {
 		Q_UNUSED(tab); onExtractText(MxPageType::PAGE_2D); if (m_extractTextDialog) m_extractTextDialog->setTexts(textList);
-		});
+		});*/
 	connect(&Mx2dSignalTransfer::getInstance(), &Mx2dSignalTransfer::signalAreaMarkInformation, this, [this](QWidget* tab, const Mx2d::PLVertexList& arr) {
 		Q_UNUSED(tab); /*onCalculateSideArea(MxPageType::PAGE_2D);*/ if (!m_calculateSideAreaDialog) { m_calculateSideAreaDialog = new Mx2dCalculateSideAreaDialog(this); } m_calculateSideAreaDialog->setPolylineData(arr); m_calculateSideAreaDialog->exec();
 		});
@@ -531,8 +717,14 @@ void MxCADViewer::onOpen()
 
 void MxCADViewer::onRecentFile()
 {
-	m_tabWidget->insertTab(0, m_recentFileWidget, tr("Recent Files"));
-	m_tabWidget->setCurrentIndex(0);
+#ifdef MX_BUILD_LOGIN
+	int index = m_tabWidget->indexOf(m_loginScene);
+#else
+	int index = -1;
+#endif
+
+	m_tabWidget->insertTab(index + 1, m_recentFileWidget, tr("Recent Files"));
+	m_tabWidget->setCurrentIndex(index + 1);
 }
 
 
@@ -544,27 +736,79 @@ void MxCADViewer::onAbout()
 
 void MxCADViewer::onEnglish()
 {
+	if (MxLanguageManager::getInstance().getCurrentLanguage() == "en_US")
+	{
+		QMessageBox::information(this, tr("Tip"), tr("The current language is English. No changes are needed."));
+        return;
+	}
 	MxLanguageManager::getInstance().setLanguage("en_US");
-	// prompt: restart the application to apply the changes
-    QMessageBox::information(this, tr("Restart"), tr("Please restart the application to apply the changes."));
+	QMessageBox::StandardButton result = QMessageBox::question(this, tr("Tip"), tr("Language settings updated successfully. The changes will take effect after restarting the application. Do you want to restart the application immediately?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+	if (result == QMessageBox::Yes)
+	{
+		restartApp();
+	}
 }
 
 void MxCADViewer::onChinese()
 {
+    if (MxLanguageManager::getInstance().getCurrentLanguage() == "zh_CN")
+	{
+		QMessageBox::information(this, tr("Tip"), tr("The current language is Chinese. No changes are needed."));
+        return;
+	}
     MxLanguageManager::getInstance().setLanguage("zh_CN");
-	QMessageBox::information(this, tr("Restart"), tr("Please restart the application to apply the changes."));
+	QMessageBox::StandardButton result = QMessageBox::question(this, tr("Tip"), tr("Language settings updated successfully. The changes will take effect after restarting the application. Do you want to restart the application immediately?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+	if (result == QMessageBox::Yes)
+	{
+		restartApp();
+	}
+}
+
+void MxCADViewer::restartApp()
+{
+	QString appPath = QCoreApplication::applicationFilePath();
+	QStringList appArgs = QCoreApplication::arguments();
+	appArgs.removeFirst();
+	bool isNewProcessStarted = QProcess::startDetached(appPath, appArgs);
+	if (isNewProcessStarted)
+	{
+		QCoreApplication::quit();
+	}
+	else
+	{
+		QMessageBox::critical(this, tr("Error"), tr("Failed to start new application process. Restart aborted."));
+	}
 }
 
 void MxCADViewer::onTabChanged(int index)
 {
 	MxDrawApp::StopAllCommand();
 	emit MxSignalTransfer::getInstance().signalHidePromptMessage(MxUtils::gCurrentTab);
+
+	QWidget* prevWidget = m_tabWidget->widget(m_currentTabIndex);
+	if (prevWidget)
+	{
+		if (auto* pPrevMxCAD = qobject_cast<Mx2dGuiDocument*>(prevWidget))
+		{
+			pPrevMxCAD->closeAllModelessDialogs();
+			
+		}
+	}
+	m_currentTabIndex = index;
+
 	QWidget* widget = m_tabWidget->widget(index);
 	MxUtils::gCurrentTab = widget;
 	if (!widget) return;
 	if (auto* pMxCAD = qobject_cast<Mx2dGuiDocument*>(widget)) {
 		pMxCAD->triggerUpdate();
 		pMxCAD->makeCurrent();
+		int nbUndo = pMxCAD->undoCount();
+		int nbRedo = pMxCAD->redoCount();
+		m_undoAction->setEnabled(nbUndo > 0);
+		m_redoAction->setEnabled(nbRedo > 0);
+	}
+	else if(auto* pRecent = qobject_cast<MxRecentFileWidget*>(widget)) {
+		pRecent->updateLayout();
 	}
 }
 
@@ -574,7 +818,11 @@ void MxCADViewer::onTabCloseRequested(int index)
 	if (!widget) return;
 
 	// For special tabs, just remove them from view
-	if (widget == m_recentFileWidget) {
+	if (widget == m_recentFileWidget
+#ifdef MX_BUILD_LOGIN
+        || widget == m_loginScene
+#endif
+		) {
 		m_tabWidget->removeTab(index);
 	}
 	// For document tabs, remove the tab and handle cleanup
@@ -593,7 +841,7 @@ void MxCADViewer::onTabCloseRequested(int index)
 void MxCADViewer::onAddOpenedFile(QString path, QWidget* guidoc)
 {
 	m_mapFileOpened.insert(path, guidoc);
-	qDebug() << "Opened file: " << path;
+	LOG_INFO(QString("Opened file:  %1").arg(path));
 }
 
 void MxCADViewer::onOpenFile(const QString& filePath)
@@ -662,9 +910,10 @@ void MxCADViewer::setToolButtonPopupMode(QAction* action)
 	}
 }
 
-void MxCADViewer::createAndAddAction(QList<QAction*>& group, const QString& iconPath, const QString& text, MxPageType pageType, const FunctionCallBack& callback, QMenu* menu)
+void MxCADViewer::createAndAddAction(QList<QAction*>& group, const QString& iconPath, const QString& text, const QString& toolTip, MxPageType pageType, const FunctionCallBack& callback, QMenu* menu)
 {
 	auto* action = new QAction(QIcon(iconPath), text, this);
+	action->setToolTip(toolTip);
 	if (menu) { action->setMenu(menu); }
 	connect(action, &QAction::triggered, this, [this, pageType, callback]() { callback(pageType); });
 	group.append(action);
@@ -714,6 +963,17 @@ void MxCADViewer::newCADDocument(const QString& path)
 		guiDoc->deleteLater();
 		QMessageBox::warning(this, tr("Failed"), QString(tr("Failed to convert! error:%1")).arg(error));
 		});
+	connect(guiDoc, &Mx2dGuiDocument::undoRedoChanged, this, [this](int nbUndo, int nbRedo) {
+		m_undoAction->setEnabled(nbUndo > 0);
+        m_redoAction->setEnabled(nbRedo > 0);
+		});
+
+	connect(this, &MxCADViewer::showLayerManagerDialog, guiDoc, &Mx2dGuiDocument::showLayerManagerDialog);
+	connect(this, &MxCADViewer::showMeasurementDialog, guiDoc, &Mx2dGuiDocument::showMeasurementDialog);
+	connect(this, &MxCADViewer::showLeaderTextInputDialog, guiDoc, &Mx2dGuiDocument::showLeaderTextInputDialog);
+	connect(this, &MxCADViewer::showTextSearchDialog, guiDoc, &Mx2dGuiDocument::showTextSearchDialog);
+	connect(this, &MxCADViewer::extractText, guiDoc, &Mx2dGuiDocument::extractText);
+
 	guiDoc->openFile(path);
 }
 
@@ -789,10 +1049,13 @@ void MxCADViewer::onCloseGuiDocument(QWidget* widget)
 	if (index != -1) { onTabCloseRequested(index); }
 }
 
+#ifdef MX_BUILD_LOGIN
 void MxCADViewer::onSetWindowSubTitle(const QString& subTitle)
 {
 	setWindowTitle(MxUtils::getAppVersion() + subTitle);
 }
+#endif // MX_BUILD_LOGIN
+
 
 void MxCADViewer::onChangeBgColor() { 
 #ifdef MX_BUILD_3D
@@ -805,17 +1068,21 @@ void MxCADViewer::onDoTest(MxPageType) {
 
 }
 
-// --- 2D Dialog Slots Implementation ---
-void MxCADViewer::onLayerManager(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_layerManagerDialog, Mx2dLayerManagerDialog, std::false_type{}); Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_GetAllLayer"); }
-void MxCADViewer::onTextSearch(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_textSearchDialog, Mx2dTextSearchDialog, std::false_type{}); }
+QWidget* MxCADViewer::currentGuiDoc2d()
+{
+	QWidget* w = m_tabWidget->currentWidget();
+    if (w && w->inherits("Mx2dGuiDocument"))
+		return w;
+	return nullptr;
+}
+
+
 void MxCADViewer::onDimCategoryManager(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_dimCategoryManagerDialog, Mx2dDimCategoryManagerDialog, std::true_type{}); }
 void MxCADViewer::onDrawingCompare(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_compareSelDrawingDialog, Mx2dCompareSelDrawingDialog, std::true_type{}); }
 void MxCADViewer::onDimSetting(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_annotationSettingDialog, Mx2dAnnotationSettingDialog, std::true_type{}); }
-void MxCADViewer::onMeasurement(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_measurementDialog, Mx2dMeasurementDialog, std::false_type{}); }
 void MxCADViewer::onMeasurementStat(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_measurementStatDialog, Mx2dMeasurementStatDialog, std::false_type{}); }
 void MxCADViewer::onShapeRecognition(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_shapeRecognitionDialog, Mx2dShapeRecognitionDialog, std::true_type{}); }
 void MxCADViewer::onLookRecognitedShapeList(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_shapeListDialog, Mx2dShapeListDialog, std::false_type{}); }
-void MxCADViewer::onExtractText(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_extractTextDialog, Mx2dExtractTextDialog, std::false_type{}); }
 void MxCADViewer::onExtractTable(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_extractTableSaveDialog, Mx2dTableSaveDialog, std::true_type{}); }
 void MxCADViewer::onPrint(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_printHintDialog, Mx2dPrintHintDialog, std::true_type{}); }
 void MxCADViewer::onShortcutSettings(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_shortcutSettingsDialog, Mx2dShortcutSettingsDialog, std::true_type{}); }

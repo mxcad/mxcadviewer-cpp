@@ -7,12 +7,14 @@ for the use of this software, its documentation or related materials.
 *******************************************************************************************/
 
 #pragma once
+#include <QObject>
 #include "Mx2dICommand.h"
 #include <stack>
 #include <memory>
 #include <QString>
 
-class Mx2dAnnotationEditor {
+class Mx2dAnnotationEditor : public QObject{
+	Q_OBJECT
 public:
 	Mx2dAnnotationEditor() = default;
 	~Mx2dAnnotationEditor() = default;
@@ -45,7 +47,9 @@ public:
 public:
 	bool undo();
 	bool redo();
-
+public:
+	int undoCount() const;
+    int redoCount() const;
 private:
 	void executeCommand(std::unique_ptr<Mx2dICommand> command);
 	void saveToFile(const QString& fileName);
@@ -54,5 +58,7 @@ private:
 	std::set<McDbObjectId> m_annotations;
 	std::stack<std::unique_ptr<Mx2dICommand>> m_undoStack;
 	std::stack<std::unique_ptr<Mx2dICommand>> m_redoStack;
+signals:
+	void undoRedoChanged(int nbUndo, int nbRedo);
 };
 

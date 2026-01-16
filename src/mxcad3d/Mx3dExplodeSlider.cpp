@@ -139,7 +139,7 @@ void Mx3dExplodeSlider::initUi()
     spinBox->setObjectName("spinBox");
     spinBox->setWrapping(false);
     spinBox->setMaximum(100);
-    spinBox->setSuffix(tr("%"));
+    spinBox->setSuffix("%");
     horizontalLayout->addWidget(spinBox);
 
     // --- Restore Button ---

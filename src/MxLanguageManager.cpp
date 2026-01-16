@@ -1,4 +1,4 @@
-/******************************************************************************************
+﻿/******************************************************************************************
 Copyright (c) 2025 Chengdu Dreamkaide Technology Co., Ltd. <https://www.webcadsdk.com/>
 All rights reserved.
 Applications incorporating this software must include the following copyright notice.
@@ -25,9 +25,15 @@ void MxLanguageManager::setLanguage(const QString& language)
     m_settings.setValue("language", language);
 }
 
+QString MxLanguageManager::getCurrentLanguage()
+{
+    return m_currentLanguage;
+}
+
 MxLanguageManager::MxLanguageManager(QObject* parent)
 	: QObject(parent)
 {
+    m_currentLanguage = getLanguage();
 }
 
 MxLanguageManager::~MxLanguageManager()

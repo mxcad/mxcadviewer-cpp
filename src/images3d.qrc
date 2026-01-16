@@ -24,5 +24,6 @@
         <file>resources/images3d/measureLength.svg</file>
         <file>resources/images3d/measureMinDist.svg</file>
         <file>resources/images3d/setting.svg</file>
+        <file>resources/images3d/changeBgColor.svg</file>
     </qresource>
 </RCC>

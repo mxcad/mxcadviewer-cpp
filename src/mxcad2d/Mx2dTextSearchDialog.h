@@ -21,13 +21,13 @@ for the use of this software, its documentation or related materials.
 #include "MxCADInclude.h"
 
 #include "Mx2dUtils.h"
-
+class Mx2dGuiDocument;
 class Mx2dTextSearchDialog : public QDialog
 {
 	Q_OBJECT
 
 public:
-	explicit Mx2dTextSearchDialog(QWidget* parent = nullptr);
+	Mx2dTextSearchDialog(Mx2dGuiDocument* guiDoc);
 	~Mx2dTextSearchDialog();
 
 private slots:
@@ -67,9 +67,12 @@ private:
 
 	QButtonGroup* m_pAreaButtonGroup;
 	QButtonGroup* m_pScopeButtonGroup;
-
+	Mx2dGuiDocument* m_guiDoc;
 	void initControls();
 	void initLayout();
 	void addToTable(int count, const QString& text, Mx2d::Mx2dExtents ext2d);
 	void updateSearchResult();
+
+protected:
+	void closeEvent(QCloseEvent* ) override;
 };

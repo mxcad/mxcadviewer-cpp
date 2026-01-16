@@ -167,7 +167,7 @@ void Mx2dMeasurementStatDialog::populateTables()
 		m_pLengthTable->setItem(i, 0, new QTableWidgetItem(QString::number(i + 1)));
 		m_pLengthTable->setCellWidget(i, 1, createColorWidget(color));
 		m_pLengthTable->setItem(i, 2, new QTableWidgetItem(QString::number(lengths[i])));
-		m_pLengthTable->setItem(i, 3, new QTableWidgetItem(tr("Uncategorized")));
+		m_pLengthTable->setItem(i, 3, new QTableWidgetItem(tr("Default")));
 	}
 
 	// Populate area table
@@ -181,7 +181,7 @@ void Mx2dMeasurementStatDialog::populateTables()
 		m_pAreaTable->setCellWidget(i, 1, createColorWidget(color));
 		m_pAreaTable->setItem(i, 2, new QTableWidgetItem(QString::number(areas[i].first, 'f', 2)));
 		m_pAreaTable->setItem(i, 3, new QTableWidgetItem(QString::number(areas[i].second, 'f', 2)));
-		m_pAreaTable->setItem(i, 4, new QTableWidgetItem(tr("Uncategorized")));
+		m_pAreaTable->setItem(i, 4, new QTableWidgetItem(tr("Default")));
 	}
 }
 
@@ -209,8 +209,8 @@ QWidget* Mx2dMeasurementStatDialog::createColorWidget(const QColor& color)
 
 void Mx2dMeasurementStatDialog::updateTotals()
 {
-	QString totalsText = tr("Total Length: 419502\n");
-	totalsText += tr("Total Area: 3197619296.6; Total Perimeter: 514161.12");
+	QString totalsText = tr("Total Length:")+"419502\n";
+	totalsText += (tr("Total Area:") + "3197619296.6;" + tr("Total Perimeter:") + "514161.12");
 	m_pTotalsTextEdit->setText(totalsText);
 }
 

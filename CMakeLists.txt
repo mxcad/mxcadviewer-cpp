@@ -130,6 +130,7 @@ if(MX_BUILD_LOGIN)
 	file(GLOB MXLOGIN_SOURCES
 		"${LOGIN_DIR}/*.cpp"
 		"${LOGIN_DIR}/*.h"
+		"${LOGIN_DIR}/*.ui"
 	)
 endif()
 
@@ -160,7 +161,7 @@ file(GLOB MXCAD2D_SOURCES
 
 
 # Create executable
-add_executable(${PROJECT_NAME} ${COMMON_SOURCES} ${LOGIN_SOURCES} ${MXCAD3D_SOURCES} ${MXLOGIN_SOURCES} ${MXCAD2D_SOURCES})
+add_executable(${PROJECT_NAME} ${COMMON_SOURCES} ${MXCAD3D_SOURCES} ${MXLOGIN_SOURCES} ${MXCAD2D_SOURCES})
 
 # Set include directories
 target_include_directories(${PROJECT_NAME} PRIVATE ${OpenCASCADE_INC_DIR} ${3RDPARTY_DIR} ${XLSXWRITER_INC_DIR} ${MXCAD_INC_DIR} ${COMMON_DIR} ${3D_DIR} ${LOGIN_DIR} ${2D_DIR})

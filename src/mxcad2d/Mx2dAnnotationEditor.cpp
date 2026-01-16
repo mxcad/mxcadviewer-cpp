@@ -15,13 +15,14 @@ for the use of this software, its documentation or related materials.
 #include <QJsonDocument>
 
 #include "Mx2dAnnotationFactory.h"
+#include "MxLogger.h"
 
 void Mx2dAnnotationEditor::loadFromFile(const QString& fileName)
 {
 	m_fileName = fileName;
 	QFile jsonFile(fileName);
 	if (!jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		qDebug() << "Failed to open file: " << fileName;
+		LOG_ERROR(QString("Failed to open file: %1").arg(fileName));
 		return;
 	}
 	QByteArray jsonData = jsonFile.readAll();
@@ -30,29 +31,33 @@ void Mx2dAnnotationEditor::loadFromFile(const QString& fileName)
 	QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData, &parseError);
 
 	if (parseError.error != QJsonParseError::NoError) {
-		qDebug() << "Failed to parse JSON: " << parseError.errorString();
+        LOG_ERROR(QString("Failed to parse JSON: %1").arg(parseError.errorString()));
 		return;
 	}
 	if (!jsonDoc.isObject()) {
-		qDebug() << "JSON is not an object";
+        LOG_ERROR(QString("JSON is not an object"));
 		return;
 	}
 
 	QJsonObject rootObj = jsonDoc.object();
 	if (!rootObj.contains("annotations") || !rootObj["annotations"].isArray()) {
-		qDebug() << "JSON does not contain an array of annotations";
+        LOG_ERROR(QString("JSON does not contain an array of annotations"));
 		return;
 	}
 	QJsonArray annotations = rootObj["annotations"].toArray();
 	for (const auto& annotation : annotations)
 	{
 		if (!annotation.isObject()) {
-			qDebug() << "Annotation is not an object";
+            LOG_ERROR(QString("Annotation is not an object"));
 			continue;
 		}
 		QJsonObject annotationObj = annotation.toObject();
 		if (!annotationObj.contains("type")) {
-			qDebug() << "Annotation does not contain a type";
+            LOG_ERROR(QString("Annotation does not contain a type"));
+			continue;
+		}
+		if (!annotationObj.contains("space")) {
+			LOG_ERROR(QString("Annotation does not contain a space"));
 			continue;
 		}
 		QString type = annotationObj["type"].toString();
@@ -63,9 +68,19 @@ void Mx2dAnnotationEditor::loadFromFile(const QString& fileName)
 			McCmColor newColor; newColor.setRGB(230, 81, 0);
 			pAnnotation->setColor(newColor);
 			McDbObjectId id;
-			McDbBlockTableRecordPointer spModelSpace(MCDB_MODEL_SPACE, acdbCurDwg(), McDb::kForWrite);
-			if (spModelSpace.openStatus() == Mcad::eOk) {
-				spModelSpace->appendAcDbEntity(id, pAnnotation);
+			
+			QString spaceName = annotationObj["space"].toString();
+			McDbObjectId layoutId = MrxDbgUtils::getLayoutId(Mx::mcdbCurDwg(), spaceName.toLocal8Bit().constData());
+			McDbObjectPointer<McDbLayout> spLayout(layoutId, McDb::kForRead);
+			if (!spLayout.openStatus() == Mcad::eOk) {
+				LOG_ERROR(QString("Failed to open layout: %1").arg(spaceName));
+				continue;
+			}
+			McDbObjectId spaceId = spLayout->getBlockTableRecordId();
+			McDbBlockTableRecordPointer spSpace(spaceId, McDb::kForWrite);
+			//McDbBlockTableRecordPointer spSpace(MCDB_MODEL_SPACE, acdbCurDwg(), McDb::kForWrite);
+			if (spSpace.openStatus() == Mcad::eOk) {
+				spSpace->appendAcDbEntity(id, pAnnotation);
 				pAnnotation->close();
 				McDbEntityPointer spEntity(id, McDb::kForWrite);
 				spEntity->setLayer("MxCADAnnotationLayer");
@@ -170,6 +185,7 @@ void Mx2dAnnotationEditor::executeCommand(std::unique_ptr<Mx2dICommand> command)
 	{
 		m_redoStack.pop();
 	}
+	emit undoRedoChanged(undoCount(), redoCount());
 	saveToFile(m_fileName);
 }
 
@@ -190,6 +206,27 @@ void Mx2dAnnotationEditor::saveToFile(const QString& fileName)
 		}
 		if (!spAnnotation->isErased()) {
 			QJsonObject annotationObj = spAnnotation->toJson();
+#if 0
+			McDbObjectId blockTableRecordId = spAnnotation->ownerId();
+			McDbBlockTableRecordPointer spSpace(blockTableRecordId, McDb::kForRead);
+			if (spSpace.openStatus() != Mcad::eOk) {
+				LOG_ERROR(QString("Failed to open block table record when get layout name."));
+				continue;
+			}
+			McDbObjectId layoutId = spSpace->getLayoutId();
+			McDbObjectPointer<McDbLayout> spLayout(layoutId, McDb::kForRead);
+			if (spLayout.openStatus() != Mcad::eOk) {
+				LOG_ERROR(QString("Failed to open layout, id: %1").arg(spAnnotation->objectId().asOldId()));
+				continue;
+			}
+			MxString layoutName;
+			spLayout->getLayoutName(layoutName);
+			QString qsLayoutName = QString::fromLocal8Bit(layoutName.c_str());
+#else
+			McDbObjectId blockTableRecordId = spAnnotation->ownerId();
+			QString qsLayoutName = Mx2d::getBlockTableRecordLayoutName(blockTableRecordId);
+#endif
+			annotationObj["space"] = qsLayoutName;
 			annotations.append(annotationObj);
 		}
 	}
@@ -210,6 +247,7 @@ bool Mx2dAnnotationEditor::undo()
 	m_undoStack.pop();
 	command->undo();
 	m_redoStack.push(std::move(command));
+	emit undoRedoChanged(undoCount(), redoCount());
 	saveToFile(m_fileName);
 	return true;
 }
@@ -224,6 +262,17 @@ bool Mx2dAnnotationEditor::redo()
 	m_redoStack.pop();
 	command->execute();
 	m_undoStack.push(std::move(command));
+	emit undoRedoChanged(undoCount(), redoCount());
 	saveToFile(m_fileName);
 	return true;
+}
+
+int Mx2dAnnotationEditor::undoCount() const
+{
+	return m_undoStack.size();
+}
+
+int Mx2dAnnotationEditor::redoCount() const
+{
+	return m_redoStack.size();
 }

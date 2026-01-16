@@ -11,9 +11,10 @@ for the use of this software, its documentation or related materials.
 #include <QIcon>
 #include "MxUtils.h"
 #include "Mx2dUtils.h"
+#include "Mx2dGuiDocument.h"
 
-Mx2dMeasurementDialog::Mx2dMeasurementDialog(QWidget* parent)
-	: QDialog(parent)
+Mx2dMeasurementDialog::Mx2dMeasurementDialog(Mx2dGuiDocument* guiDoc, QWidget* parent)
+	: QDialog(parent), m_guiDoc(guiDoc)
 {
 	initWindowFlags();
 
@@ -28,25 +29,25 @@ Mx2dMeasurementDialog::Mx2dMeasurementDialog(QWidget* parent)
 	m_buttonLayout->setContentsMargins(0, 0, 0, 0);
 
 	// Add buttons
-	addButton(":/resources/images2d/2d_measure.svg", tr("Aligned"), SLOT(onButtonAlignedDimClicked()));
-	addButton(":/resources/images2d/2d_measure.svg", tr("Linear"), SLOT(onButtonLinearDimClicked()));
-	addButton(":/resources/images2d/2d_measure.svg", tr("Area"), SLOT(onButtonPolyAreaClicked()));
-	addButton(":/resources/images2d/2d_measure.svg", tr("Rectangular Area"), SLOT(onButtonRectAreaClicked()));
-	addButton(":/resources/images2d/2d_measure.svg", tr("Coordinate"), SLOT(onButtonCoordMarkClicked()));
+	addButton(":/resources/images2d/2d_aligned.svg", tr("Aligned"), SLOT(onButtonAlignedDimClicked()));
+	addButton(":/resources/images2d/2d_linear.svg", tr("Linear"), SLOT(onButtonLinearDimClicked()));
+	addButton(":/resources/images2d/2d_area.svg", tr("Area"), SLOT(onButtonPolyAreaClicked()));
+	addButton(":/resources/images2d/2d_rectArea.svg", tr("Rectangular Area"), SLOT(onButtonRectAreaClicked()));
+	addButton(":/resources/images2d/2d_coordinate.svg", tr("Coordinate"), SLOT(onButtonCoordMarkClicked()));
 	
-	addButton(":/resources/images2d/2d_measure.svg", tr("Arc Length"), SLOT(onButtonArcLengthClicked()));
-	addButton(":/resources/images2d/2d_measure.svg", tr("Distance from Point to Line"), SLOT(onButtonDistPointToLineClicked()));
-	addButton(":/resources/images2d/2d_measure.svg", tr("Continuous Measurement"), SLOT(onButtonContinuousMeasurementClicked()));
-	addButton(":/resources/images2d/2d_measure.svg", tr("Batch Measurement"), SLOT(onButtonBatchMeasurementClicked()));
-	addButton(":/resources/images2d/2d_measure.svg", tr("Show Segment Lengths"), SLOT(onButtonShowSegmentLengthClicked()));
+	addButton(":/resources/images2d/2d_arcLength.svg", tr("Arc Length"), SLOT(onButtonArcLengthClicked()));
+	addButton(":/resources/images2d/2d_pt2lineDist.svg", tr("Point to Line Distance"), SLOT(onButtonDistPointToLineClicked()));
+	addButton(":/resources/images2d/2d_continuousMeasurement.svg", tr("Continuous Measurement"), SLOT(onButtonContinuousMeasurementClicked()));
+	addButton(":/resources/images2d/2d_batchMeasurement.svg", tr("Batch Measurement"), SLOT(onButtonBatchMeasurementClicked()));
+	addButton(":/resources/images2d/2d_segLength.svg", tr("Show Segment Lengths"), SLOT(onButtonShowSegmentLengthClicked()));
 	
-	addButton(":/resources/images2d/2d_measure.svg", tr("Area (with Arcs)"), SLOT(onButtonArcPolyAreaClicked()));
-	addButton(":/resources/images2d/2d_measure.svg", tr("Measure Hatch Area"), SLOT(onButtonHatchAreaClicked()));
-	addButton(":/resources/images2d/2d_measure.svg", tr("Calculate Side Area"), SLOT(onButtonCalculateSiderAreaClicked()));
-	addButton(":/resources/images2d/2d_measure.svg", tr("Area Offset"), SLOT(onButtonAreaOffsetClicked()));
-	addButton(":/resources/images2d/2d_measure.svg", tr("Measure Circle"), SLOT(onButtonCircleMeasurementClicked()));
-	addButton(":/resources/images2d/2d_measure.svg", tr("Radius"), SLOT(onButtonRadiusDimClicked()));
-	addButton(":/resources/images2d/2d_measure.svg", tr("Measure Angle"), SLOT(onButtonAngleMeasurementClicked()));
+	addButton(":/resources/images2d/2d_areaWithArc.svg", tr("Area(with arcs)"), SLOT(onButtonArcPolyAreaClicked()));
+	addButton(":/resources/images2d/2d_fillArea.svg", tr("Hatch Area"), SLOT(onButtonHatchAreaClicked()));
+	addButton(":/resources/images2d/2d_sideArea.svg", tr("Calculate Side Area"), SLOT(onButtonCalculateSiderAreaClicked()));
+	addButton(":/resources/images2d/2d_areaOffset.svg", tr("Area Offset"), SLOT(onButtonAreaOffsetClicked()));
+	addButton(":/resources/images2d/2d_measureCircle.svg", tr("Circle"), SLOT(onButtonCircleMeasurementClicked()));
+	addButton(":/resources/images2d/2d_radius.svg", tr("Radius"), SLOT(onButtonRadiusDimClicked()));
+	addButton(":/resources/images2d/2d_measureAngle.svg", tr("Angle"), SLOT(onButtonAngleMeasurementClicked()));
 	
 #ifdef MX_DEVELOPING
 	addButton(":/resources/images2d/2d_measure.svg", tr("Set Dimension Ratio"));
@@ -81,85 +82,105 @@ void Mx2dMeasurementDialog::addButton(const QString& iconPath, const QString& te
 
 void Mx2dMeasurementDialog::onButtonArcPolyAreaClicked()
 {
-	Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawArcPolyAreaMark");
+	MxUtils::doAction([this]() {
+		m_guiDoc->executeCommand("Mx_DrawArcPolyAreaMark");
+		});
 }
 
 void Mx2dMeasurementDialog::onButtonRectAreaClicked()
 {
-	Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawRectAreaMark");
+	m_guiDoc->executeCommand("Mx_DrawRectAreaMark");
 }
 
 void Mx2dMeasurementDialog::onButtonCoordMarkClicked()
 {
-	Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawCartesianCoordMark");
+	m_guiDoc->executeCommand("Mx_DrawCartesianCoordMark");
 }
 
 void Mx2dMeasurementDialog::onButtonAlignedDimClicked()
 {
-	Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawAlignedDimMark");
+	m_guiDoc->executeCommand("Mx_DrawAlignedDimMark");
 }
 
 void Mx2dMeasurementDialog::onButtonLinearDimClicked()
 {
-	Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawLinearDimMark");
+	m_guiDoc->executeCommand("Mx_DrawLinearDimMark");
 }
 
 void Mx2dMeasurementDialog::onButtonContinuousMeasurementClicked()
 {
-	Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawContinuousMeasurementMark");
+	MxUtils::doAction([this]() {
+		m_guiDoc->executeCommand("Mx_DrawContinuousMeasurementMark");
+		});
 }
 
 void Mx2dMeasurementDialog::onButtonShowSegmentLengthClicked()
 {
-	Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_ShowSegmentLengths");
+	MxUtils::doAction([this]() {
+		m_guiDoc->executeCommand("Mx_ShowSegmentLengths");
+		});
 }
 
 void Mx2dMeasurementDialog::onButtonRadiusDimClicked()
 {
-	Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawRadiusDimMark");
+	m_guiDoc->executeCommand("Mx_DrawRadiusDimMark");
 }
 
 void Mx2dMeasurementDialog::onButtonArcLengthClicked()
 {
-	Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawArcLengthDimMark");
+	MxUtils::doAction([this]() {
+		m_guiDoc->executeCommand("Mx_DrawArcLengthDimMark");
+		});
 }
 
 void Mx2dMeasurementDialog::onButtonCircleMeasurementClicked()
 {
-	Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawCircleMeasurementMark");
+	m_guiDoc->executeCommand("Mx_DrawCircleMeasurementMark");
 }
 
 void Mx2dMeasurementDialog::onButtonDistPointToLineClicked()
 {
-	Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawDistPointToLineMark");
+	MxUtils::doAction([this]() {
+		m_guiDoc->executeCommand("Mx_DrawDistPointToLineMark");
+		});
 }
 
 void Mx2dMeasurementDialog::onButtonAngleMeasurementClicked()
 {
-	Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawAngleMeasurementMark");
+	MxUtils::doAction([this]() {
+		m_guiDoc->executeCommand("Mx_DrawAngleMeasurementMark");
+		});
 }
 
 void Mx2dMeasurementDialog::onButtonCalculateSiderAreaClicked()
 {
-	Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_CalculateSiderArea");
+	MxUtils::doAction([this]() {
+		m_guiDoc->executeCommand("Mx_CalculateSiderArea");
+		});
 }
 
 void Mx2dMeasurementDialog::onButtonHatchAreaClicked()
 {
-	Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawHatchArea2Mark");
+	MxUtils::doAction([this]() {
+		m_guiDoc->executeCommand("Mx_DrawHatchArea2Mark");
+		});
 }
 
 void Mx2dMeasurementDialog::onButtonAreaOffsetClicked()
 {
-	Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_SelectAreaToOffset");
+	MxUtils::doAction([this]() {
+		m_guiDoc->executeCommand("Mx_SelectAreaToOffset");
+		});
 }
 
 void Mx2dMeasurementDialog::onButtonBatchMeasurementClicked()
 {
-	Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_BatchMeasure");
+	MxUtils::doAction([this]() {
+		m_guiDoc->executeCommand("Mx_BatchMeasure");
+		});
 }
 
 void Mx2dMeasurementDialog::onButtonPolyAreaClicked()
 {
-	Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawPolyAreaMark");
+	m_guiDoc->executeCommand("Mx_DrawPolyAreaMark");
 }

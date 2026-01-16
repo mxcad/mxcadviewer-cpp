@@ -57,10 +57,10 @@ void Mx2dCompareSelDrawingDialog::setupUi()
 	m_pStartButton = new QPushButton(tr("Start Comparison"), this);
 	m_pCancelButton = new QPushButton(tr("Cancel"), this);
 
-	m_pDrawing1ComboBox->addItem(tr("C:\\Users\\MxDev2\\Downloads\\TestDrawing.dwg (Model)"));
-	m_pDrawing1ComboBox->addItem(tr("C:\\Users\\MxDev2\\Downloads\\ExternalInternalMold.dwg (Model)"));
-	m_pDrawing2ComboBox->addItem(tr("C:\\Users\\MxDev2\\Downloads\\ExternalInternalMold.dwg (Model)"));
-	m_pDrawing2ComboBox->addItem(tr("C:\\Users\\MxDev2\\Downloads\\TestDrawing.dwg (Model)"));
+	m_pDrawing1ComboBox->addItem("C:\\Users\\MxDev2\\Downloads\\TestDrawing.dwg" + tr("(Model)"));
+	m_pDrawing1ComboBox->addItem("C:\\Users\\MxDev2\\Downloads\\ExternalInternalMold.dwg" + tr("(Model)"));
+	m_pDrawing2ComboBox->addItem("C:\\Users\\MxDev2\\Downloads\\ExternalInternalMold.dwg" + tr("(Model)"));
+	m_pDrawing2ComboBox->addItem("C:\\Users\\MxDev2\\Downloads\\TestDrawing.dwg" + tr("(Model)"));
 
 	m_pColor1Button->setFixedSize(28, 28);
 	m_pColor2Button->setFixedSize(28, 28);

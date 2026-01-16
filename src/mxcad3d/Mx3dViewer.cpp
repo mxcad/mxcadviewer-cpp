@@ -261,12 +261,11 @@ void Mx3dViewer::showEdges()
 
 void Mx3dViewer::wireMode()
 {
-    static bool isWireMode = false;
     AIS_DisplayMode mode = AIS_Shaded;
-    if (!isWireMode) {
+    if (!myIsWireMode) {
         mode = AIS_WireFrame;
     }
-    isWireMode = !isWireMode;
+    myIsWireMode = !myIsWireMode;
     AIS_ListOfInteractive aList;
     myContext->ObjectsInside(aList);
     for (AIS_ListOfInteractive::Iterator it(aList); it.More(); it.Next())
@@ -286,6 +285,22 @@ void Mx3dViewer::fitAll()
     myView->Redraw();
 }
 
+namespace { 
+	static Handle(Aspect_NeutralWindow) createNativeWindow(QWidget* widget)
+	{
+		auto window = new Aspect_NeutralWindow;
+		Aspect_Drawable nativeWin = 0;
+#ifdef Q_OS_WIN
+		HDC  wglDevCtx = wglGetCurrentDC();
+		HWND wglWin = WindowFromDC(wglDevCtx);
+		nativeWin = (Aspect_Drawable)wglWin;
+#else
+		nativeWin = (Aspect_Drawable)widget->winId();
+#endif
+		window->SetNativeHandle(nativeWin);
+		return window;
+	}
+}
 
 void Mx3dViewer::initializeGL()
 {
@@ -309,22 +324,27 @@ void Mx3dViewer::initializeGL()
     }
 
     Handle(Aspect_NeutralWindow) aWindow = Handle(Aspect_NeutralWindow)::DownCast(myView->Window());
-    if (!aWindow.IsNull())
-    {
-        aWindow->SetNativeHandle(aNativeWin);
-        aWindow->SetSize(aViewSize.x(), aViewSize.y());
-        myView->SetWindow(aWindow, aGlCtx->RenderingContext());
-    }
-    else
-    {
-        aWindow = new Aspect_NeutralWindow();
-        aWindow->SetVirtual(true);
-        aWindow->SetNativeHandle(aNativeWin);
-        aWindow->SetSize(aViewSize.x(), aViewSize.y());
-        myView->SetWindow(aWindow, aGlCtx->RenderingContext());
+	/*if (!aWindow.IsNull())
+	{
+		aWindow->SetNativeHandle(aNativeWin);
+		aWindow->SetSize(aViewSize.x(), aViewSize.y());
+		myView->SetWindow(aWindow, aGlCtx->RenderingContext());
+	}
+	else
+	{
+		aWindow = new Aspect_NeutralWindow();
+		aWindow->SetVirtual(true);
+		aWindow->SetNativeHandle(aNativeWin);
+		aWindow->SetSize(aViewSize.x(), aViewSize.y());
+		myView->SetWindow(aWindow, aGlCtx->RenderingContext());
 
-        myContext->Display(myViewCube, 0, 0, false);
-    }
+		myContext->Display(myViewCube, 0, 0, false);
+	}*/
+	if (!aWindow)
+        aWindow = createNativeWindow(this);
+
+    aWindow->SetSize(aViewSize.x(), aViewSize.y());
+    myView->SetWindow(aWindow, aGlCtx->RenderingContext());
 }
 
 bool Mx3dViewer::event(QEvent* theEvent)
@@ -431,7 +451,7 @@ void Mx3dViewer::mouseMoveEvent(QMouseEvent* theEvent)
     QOpenGLWidget::mouseMoveEvent(theEvent);
     if (myView.IsNull())
         return;
-
+    updateView();
     if (myHasTouchInput && theEvent->source() == Qt::MouseEventSynthesizedBySystem)
         return; // skip mouse events emulated by system from screen touches
 
@@ -520,9 +540,6 @@ void Mx3dViewer::paintGL()
     }
 
     Graphic3d_Vec2i aViewSizeOld;
-    // don't use QWidget::rect() as it might return misleading information
-    // const QRect aRect = rect();
-    // Graphic3d_Vec2i aViewSizeNew(aRect.right() - aRect.left(), aRect.bottom() - aRect.top());
     const Graphic3d_Vec2i        aViewSizeNew = aDefaultFbo->GetVPSize();
     Handle(Aspect_NeutralWindow) aWindow = Handle(Aspect_NeutralWindow)::DownCast(myView->Window());
     aWindow->Size(aViewSizeOld.x(), aViewSizeOld.y());
@@ -534,9 +551,8 @@ void Mx3dViewer::paintGL()
     }
 
     // flush pending input events and redraw the viewer
-    Handle(V3d_View) aView = !myFocusView.IsNull() ? myFocusView : myView;
-    aView->InvalidateImmediate();
-    AIS_ViewController::FlushViewEvents(myContext, aView, true);
+    AIS_ViewController::FlushViewEvents(myContext, myView, true);
+    myView->Redraw();
 }
 
 void Mx3dViewer::handleViewRedraw(const Handle(AIS_InteractiveContext)& theCtx,

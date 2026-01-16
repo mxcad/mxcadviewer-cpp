@@ -76,6 +76,7 @@ private:
     void sortItems(SortType sortType);
     void reverseItems();
     void resortItems();
+public:
     void updateLayout();
 
 private slots:

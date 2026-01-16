@@ -50,5 +50,34 @@
         <file>resources/images2d/2d_textSearchRegion.svg</file>
         <file>resources/images2d/2d_deletePdfPreview.svg</file>
         <file>resources/images2d/2d_editPdfPageName.svg</file>
+        <file>resources/images2d/2d_arcLength.svg</file>
+        <file>resources/images2d/2d_areaOffset.svg</file>
+        <file>resources/images2d/2d_areaWithArc.svg</file>
+        <file>resources/images2d/2d_batchMeasurement.svg</file>
+        <file>resources/images2d/2d_continuousMeasurement.svg</file>
+        <file>resources/images2d/2d_extractTable.svg</file>
+        <file>resources/images2d/2d_extractText.svg</file>
+        <file>resources/images2d/2d_fillArea.svg</file>
+        <file>resources/images2d/2d_measureAngle.svg</file>
+        <file>resources/images2d/2d_measureCircle.svg</file>
+        <file>resources/images2d/2d_pt2lineDist.svg</file>
+        <file>resources/images2d/2d_segLength.svg</file>
+        <file>resources/images2d/2d_sideArea.svg</file>
+        <file>resources/images2d/2d_aligned.svg</file>
+        <file>resources/images2d/2d_area.svg</file>
+        <file>resources/images2d/2d_coordinate.svg</file>
+        <file>resources/images2d/2d_linear.svg</file>
+        <file>resources/images2d/2d_radius.svg</file>
+        <file>resources/images2d/2d_rectArea.svg</file>
+        <file>resources/images2d/2d_copyText.svg</file>
+        <file>resources/images2d/2d_dimAllAnnotations.svg</file>
+        <file>resources/images2d/2d_dimAnnotations.svg</file>
+        <file>resources/images2d/2d_modifyText.svg</file>
+        <file>resources/images2d/2d_moveText.svg</file>
+        <file>resources/images2d/2d_multiLineText.svg</file>
+        <file>resources/images2d/2d_numberedText.svg</file>
+        <file>resources/images2d/2d_singleLineText.svg</file>
+        <file>resources/images2d/2d_test.svg</file>
+        <file>resources/images2d/2d_dropdown.svg</file>
     </qresource>
 </RCC>

@@ -94,6 +94,7 @@ private:
     QString myGlInfo;
     bool    myIsCoreProfile = true;
     bool    myHasTouchInput = false;
+    bool    myIsWireMode = false;
 };
 
 template<typename Function>

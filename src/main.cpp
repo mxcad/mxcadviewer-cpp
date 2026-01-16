@@ -9,22 +9,14 @@ for the use of this software, its documentation or related materials.
 #include "MxCADViewer.h"
 #include <QtWidgets/QApplication>
 #include <QStyleFactory>
-#include <QSettings>
-#include <QProcess>
-#include <QPalette>
 #include <QFontDatabase>
 #include <QDebug>
 #include "MxRecentFile.h"
 #include "MxRecentFileManager.h"
-#include <QLockFile>
-#include <QDir>
-#include <QMessageBox>
-#include <QNetworkAccessManager>
-#include <QLocalServer>
-#include <QLocalSocket>
+#include <QFileInfo>
 #include <QTranslator>
-#include <QLibraryInfo>
 #include "MxLanguageManager.h"
+#include "MxLogger.h"
 
 #include "MxCADInclude.h"
 #include "MxOpenGLView.h"
@@ -81,6 +73,7 @@ int main(int argc, char* argv[]) {
 	qRegisterMetaTypeStreamOperators<QList<MxRecentFile>>();
 	QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 	QApplication a(argc, argv);
+	MxLogger::instance()->init(QDir(QCoreApplication::applicationDirPath()).filePath("log"));
 	// ==================== Load local translation ====================
 
     QString locale = MxLanguageManager::getInstance().getLanguage();
@@ -98,46 +91,6 @@ int main(int argc, char* argv[]) {
 	if (qtbaseTranslator.load(QString(":/resources/translations/qtbase_%1.qm").arg(locale)))
 	{
 		a.installTranslator(&qtbaseTranslator);
-	}
-	const QString serverName = "MxCADViewer_Instance";
-
-	QLocalServer::removeServer(serverName);
-
-	QLocalSocket socket;
-	socket.connectToServer(serverName);
-
-
-	if (socket.waitForConnected(500)) {
-		if (a.arguments().size() > 1) {
-			QStringList files;
-			for (int i = 1; i < a.arguments().size(); ++i) {
-				QFileInfo fileInfo(a.arguments().at(i));
-				if (fileInfo.isFile()) {
-					files.append(fileInfo.absoluteFilePath());
-				}
-			}
-			if (!files.isEmpty()) {
-				QByteArray data;
-				QDataStream stream(&data, QIODevice::WriteOnly);
-				stream << files;
-				socket.write(data);
-				socket.waitForBytesWritten(1000);
-			}
-		}
-		return 0;
-	}
-
-	QLockFile lockFile(QDir::temp().absoluteFilePath(
-		QCoreApplication::applicationName() + ".lock"
-	));
-	if (!lockFile.tryLock(100)) {
-		QMessageBox::information(nullptr, QCoreApplication::translate("Main","Hint"), QCoreApplication::translate("Main", "MxCADViewer is running."));
-		return 1;
-	}
-
-	QLocalServer server;
-	if (!server.listen(serverName)) {
-		QMessageBox::information(nullptr, QCoreApplication::translate("Main", "Hint"), QCoreApplication::translate("Main", "Cannot start single instance server."));
 	}
 
 	// Global style
@@ -179,20 +132,6 @@ int main(int argc, char* argv[]) {
 			mainWindow.showMaximized();
 
 
-			QObject::connect(&server, &QLocalServer::newConnection, [&]() {
-				QLocalSocket* client = server.nextPendingConnection();
-				client->waitForReadyRead();
-				QByteArray receivedData = client->readAll();
-				QDataStream stream(receivedData);
-				QStringList files;
-				stream >> files;
-				for (const QString& file : files) {
-					mainWindow.onOpenFile(file);
-				}
-				client->deleteLater();
-			});
-
-
 			QStringList cmdLineFiles;
 			for (int i = 1; i < a.arguments().size(); ++i) {
 				QFileInfo fileInfo(a.arguments().at(i));
@@ -206,7 +145,6 @@ int main(int argc, char* argv[]) {
 
 
 			exitCode = a.exec();
-			server.close();
 
 		}
 

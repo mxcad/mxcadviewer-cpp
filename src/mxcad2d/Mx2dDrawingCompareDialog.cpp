@@ -60,13 +60,13 @@ void Mx2dDrawingCompareDialog::initUI()
 	m_pColorLabel1 = new QLabel();
 	m_pColorLabel1->setFixedSize(20, 20);
 	m_pColorLabel1->setStyleSheet("background-color: yellow; border: 1px solid gray;");
-	m_pPathLabel1 = new QLabel(tr("C:\\Users\\MxDev2\\Downloads\\ExternalInternalMold.dwg"));
+	m_pPathLabel1 = new QLabel("C:\\Users\\MxDev2\\Downloads\\ExternalInternalMold.dwg");
 
 	m_pCheckPaper2 = new QCheckBox(tr("Drawing 2"));
 	m_pColorLabel2 = new QLabel();
 	m_pColorLabel2->setFixedSize(20, 20);
 	m_pColorLabel2->setStyleSheet("background-color: cyan; border: 1px solid gray;");
-	m_pPathLabel2 = new QLabel(tr("C:\\Users\\MxDev2\\Downloads\\TestDrawing.dwg"));
+	m_pPathLabel2 = new QLabel("C:\\Users\\MxDev2\\Downloads\\TestDrawing.dwg");
 
 	m_pCheckSyncDisplay = new QCheckBox(tr("Sync display to main window"));
 

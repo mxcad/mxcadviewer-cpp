@@ -25,15 +25,12 @@ QT_END_NAMESPACE
 
 class MxProgressDialog;
 class MxRecentFileWidget;
-class Mx2dLayerManagerDialog;
-class Mx2dTextSearchDialog;
 #ifdef MX_BUILD_3D
 class Mx3dSetBgColorDialog;
 #endif
 class Mx2dDimCategoryManagerDialog;
 class Mx2dCompareSelDrawingDialog;
 class Mx2dAnnotationSettingDialog;
-class Mx2dMeasurementDialog;
 class Mx2dExtractTextDialog;
 class Mx2dTableSaveDialog;
 class Mx2dMeasurementStatDialog;
@@ -44,7 +41,6 @@ class Mx2dShortcutSettingsDialog;
 class Mx2dExportPdfDialog;
 class Mx2dInsertSingleLineTextDialog;
 class Mx2dMultiLineInputDialog;
-class Mx2dLeaderTextInputDialog;
 class Mx2dNumberedTextDialog;
 class Mx2dPdfToDwgDialog;
 class Mx2dSplitExportDialog;
@@ -53,6 +49,9 @@ class Mx2dCalculateSideAreaDialog;
 class Mx2dModifySingleLineTextDialog;
 class Mx2dModifyMultiLineTextDialog;
 class Mx2dAreaOffsetDialog;
+#ifdef MX_BUILD_LOGIN
+class MxLoginScene;
+#endif
 
 /**
  * @class MxCADViewer
@@ -109,7 +108,7 @@ private:
     void newCADDocument(const QString& path);
 
     // --- Helper Methods ---
-    void createAndAddAction(QList<QAction*>& group, const QString& iconPath, const QString& text, MxPageType pageType, const FunctionCallBack& callback, QMenu* menu = nullptr);
+    void createAndAddAction(QList<QAction*>& group, const QString& iconPath, const QString& text, const QString& toolTip, MxPageType pageType, const FunctionCallBack& callback, QMenu* menu = nullptr);
     QAction* createSeparator();
     void setToolButtonPopupMode(QAction* action);
     static void openFolderAndSelectFile(const QString& filePath);
@@ -121,13 +120,17 @@ private slots:
     void onAbout();
     void onEnglish();
     void onChinese();
+    void restartApp();
 
     // --- Tab and Window Management ---
     void onTabCloseRequested(int index);
     void onTabChanged(int index);
     void updateToolBar(int index);
     void onCloseGuiDocument(QWidget* widget);
+#ifdef MX_BUILD_LOGIN
     void onSetWindowSubTitle(const QString& subTitle);
+#endif // MX_BUILD_LOGIN
+
 
     // --- File and Document Management ---
     void onAddOpenedFile(QString path, QWidget* guidoc);
@@ -137,16 +140,12 @@ private slots:
 
     // --- 2D View Specific Slots ---
     void onDoNothing(MxPageType pageType);
-    void onLayerManager(MxPageType pageType);
-    void onTextSearch(MxPageType pageType);
     void onDimCategoryManager(MxPageType pageType);
     void onDrawingCompare(MxPageType pageType);
     void onDimSetting(MxPageType pageType);
-    void onMeasurement(MxPageType pageType);
     void onMeasurementStat(MxPageType pageType);
     void onShapeRecognition(MxPageType pageType);
     void onLookRecognitedShapeList(MxPageType pageType);
-    void onExtractText(MxPageType pageType);
     void onExtractTable(MxPageType pageType);
     void onPrint(MxPageType pageType);
     void onShortcutSettings(MxPageType pageType);
@@ -166,18 +165,29 @@ private:
     // --- Core UI Components ---
     QTabWidget* m_tabWidget;
     QToolBar* m_mainToolBar;
-
+    int m_currentTabIndex;
     // --- Main Actions ---
     QAction* m_openAction;
     QAction* m_closeAction;
+#ifdef MX_BUILD_LOGIN
+	QAction* m_accountAction;
+    QMenu* m_accountMenuIsLogin;
+    QMenu* m_accountMenuIsLogout;
+#endif
     QAction* m_settingmenuAction;
     QAction* m_aboutAction;
     QAction* m_settingLanguageAction;
     QAction* m_englishAction;
     QAction* m_chineseAction;
     QAction* m_recentFileAction;
+    QAction* m_undoAction;
+    QAction* m_redoAction;
+    QAction* m_layerManagerAction;
     
     // --- Main Scenes/Widgets ---
+#ifdef MX_BUILD_LOGIN
+	MxLoginScene* m_loginScene;
+#endif
     MxRecentFileWidget* m_recentFileWidget;
     MxProgressDialog* m_progressDialog;
 
@@ -195,13 +205,10 @@ private:
     Mx3dSetBgColorDialog* m_setBgColorDialog = nullptr;
 #endif
     
-    Mx2dLayerManagerDialog*         m_layerManagerDialog = nullptr;
-    Mx2dTextSearchDialog*           m_textSearchDialog = nullptr;
     Mx2dDimCategoryManagerDialog*   m_dimCategoryManagerDialog = nullptr;
     Mx2dCompareSelDrawingDialog*    m_compareSelDrawingDialog = nullptr;
     Mx2dAnnotationSettingDialog*    m_annotationSettingDialog = nullptr;
-    Mx2dMeasurementDialog*          m_measurementDialog = nullptr;
-    Mx2dExtractTextDialog*          m_extractTextDialog = nullptr;
+    
     Mx2dTableSaveDialog*            m_extractTableSaveDialog = nullptr;
     Mx2dMeasurementStatDialog*      m_measurementStatDialog = nullptr;
     Mx2dShapeRecognitionDialog*     m_shapeRecognitionDialog = nullptr;
@@ -211,7 +218,6 @@ private:
     Mx2dExportPdfDialog*            m_exportPdfDialog = nullptr;
     Mx2dInsertSingleLineTextDialog* m_insertSingleLineTextDialog = nullptr;
     Mx2dMultiLineInputDialog*       m_multiLineInputDialog = nullptr;
-    Mx2dLeaderTextInputDialog*      m_leaderTextInputDialog = nullptr;
     Mx2dNumberedTextDialog*         m_numberedTextDialog = nullptr;
     Mx2dPdfToDwgDialog*             m_pdfToDwgDialog = nullptr;
     Mx2dSplitExportDialog*          m_splitExportDialog = nullptr;
@@ -220,4 +226,13 @@ private:
     Mx2dModifySingleLineTextDialog* m_modifySingleLineTextDialog = nullptr;
     Mx2dModifyMultiLineTextDialog*  m_modifyMultiLineTextDialog = nullptr;
     Mx2dAreaOffsetDialog*           m_areaOffsetDialog = nullptr;
+private:
+    QWidget* currentGuiDoc2d();
+
+signals:
+    void showLayerManagerDialog(QWidget* guiDoc2d);
+    void showMeasurementDialog(QWidget* guiDoc2d);
+    void showLeaderTextInputDialog(QWidget* guiDoc2d);
+    void showTextSearchDialog(QWidget* guiDoc2d);
+    void extractText(QWidget* guiDoc2d);
 };

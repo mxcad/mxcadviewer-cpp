@@ -15,6 +15,7 @@ for the use of this software, its documentation or related materials.
 #include <QApplication>
 #include <QClipboard>
 #include <QDebug>
+#include "MxLogger.h"
 
 Mx2dExtractTextDialog::Mx2dExtractTextDialog(QWidget* parent)
 	: QDialog(parent)
@@ -68,14 +69,12 @@ void Mx2dExtractTextDialog::onCopyButtonClicked()
 {
 	QClipboard* clipboard = QApplication::clipboard();
 	if (!clipboard) {
-		qWarning() << "Could not get the clipboard.";
+		LOG_ERROR(QString("Could not get the clipboard."));
 		return;
 	}
 
 	QString textToCopy = m_pTextEdit->toPlainText();
 	clipboard->setText(textToCopy);
-
-	qDebug() << "Text copied to clipboard.";
 
 	accept();
 }

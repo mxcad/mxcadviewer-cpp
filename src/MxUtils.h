@@ -1,4 +1,4 @@
-/******************************************************************************************
+﻿/******************************************************************************************
 Copyright (c) 2025 Chengdu Dreamkaide Technology Co., Ltd. <https://www.webcadsdk.com/>
 All rights reserved.
 Applications incorporating this software must include the following copyright notice.
@@ -14,7 +14,7 @@ for the use of this software, its documentation or related materials.
 
 class QNetworkReply;
 class QWidget;
-namespace MxUtils { 
+namespace MxUtils {
 	QString getAppVersion();
 	QString GB2312ToQString(const std::string& str);
 	std::string QStringToGB2312(const QString& qstr);
@@ -50,6 +50,8 @@ namespace MxUtils {
 	void drawScale9Pixmap(QPainter& painter, const QPixmap& pixmap, const QRect& targetRect, int leftMargin, int topMargin, int rightMargin, int bottomMargin);
 
 	QPixmap roundedPixmap(const QPixmap& source);
+
+	int doAction(std::function<void()> func);
 
 	extern QWidget* gCurrentTab;
 }

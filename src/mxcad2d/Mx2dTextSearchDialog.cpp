@@ -19,9 +19,10 @@ for the use of this software, its documentation or related materials.
 #include "xlsxwriter.h"
 #include "Mx2dSignalTransfer.h"
 #include "MxUtils.h"
+#include "Mx2dGuiDocument.h"
 
-Mx2dTextSearchDialog::Mx2dTextSearchDialog(QWidget* parent)
-	: QDialog(parent)
+Mx2dTextSearchDialog::Mx2dTextSearchDialog(Mx2dGuiDocument* guiDoc)
+	: QDialog(guiDoc), m_guiDoc(guiDoc)
 {
 	Qt::WindowFlags flags = Qt::Dialog;
 	flags |= Qt::CustomizeWindowHint;
@@ -49,7 +50,6 @@ void Mx2dTextSearchDialog::initControls()
 	m_pSearchContentCombo = new QComboBox(this);
 	m_pSearchContentCombo->setFixedWidth(400);
 	m_pSearchContentCombo->setEditable(true);
-	//m_pSearchContentCombo->addItem(tr("pipe"));
 
 	m_pSearchBtn = new QPushButton(tr("Search"), this);
 	connect(m_pSearchBtn, &QPushButton::clicked, this, &Mx2dTextSearchDialog::onSearchClicked); // Execute text search command
@@ -61,7 +61,9 @@ void Mx2dTextSearchDialog::initControls()
 	// Search area
 	m_pWholePaperRadio = new QRadioButton(tr("Entire drawing"), this);
 	m_pRectAreaRadio = new QRadioButton(tr("Rectangular area search"), this);
+	m_pRectAreaRadio->setStyleSheet("QRadioButton {color: #BA9600;}");
 	m_pIrregularAreaRadio = new QRadioButton(tr("Irregular area search"), this);
+    m_pIrregularAreaRadio->setStyleSheet("QRadioButton {color: #BA9600;}");
 	m_pWholePaperRadio->setChecked(true);
 	// Search area button group
 	m_pAreaButtonGroup = new QButtonGroup(this);
@@ -80,6 +82,7 @@ void Mx2dTextSearchDialog::initControls()
 	// Search scope
 	m_pPaperTextRadio = new QRadioButton(tr("Text in the drawing itself"), this);
 	m_pAppTextRadio = new QRadioButton(tr("Text and measurement annotations added by this software"), this);
+    m_pAppTextRadio->setStyleSheet("QRadioButton {color: #BA9600;}");
 	m_pPaperTextRadio->setChecked(true);
 	// Search scope button group
 	m_pScopeButtonGroup = new QButtonGroup(this);
@@ -118,6 +121,7 @@ void Mx2dTextSearchDialog::initControls()
 
 	// Bottom buttons
 	m_pExportExcelBtn = new QPushButton(tr("Export to Excel"), this);
+	m_pExportExcelBtn->setStyleSheet("QPushButton {color: #BA9600;}");
 	m_pNextResultBtn = new QPushButton(tr("View Next"), this);
 	m_pExportExcelBtn->setEnabled(false);
 	m_pNextResultBtn->setEnabled(false);
@@ -126,7 +130,7 @@ void Mx2dTextSearchDialog::initControls()
 	// Connect slot functions for buttons
 	connect(m_pNextResultBtn, &QPushButton::clicked, this, &Mx2dTextSearchDialog::onNextResultClicked);
 	connect(m_pExportExcelBtn, &QPushButton::clicked, this, &Mx2dTextSearchDialog::onExportToExcelClicked);
-	connect(m_pCompleteBtn, &QPushButton::clicked, this, &QDialog::accept);
+	connect(m_pCompleteBtn, &QPushButton::clicked, this, &QDialog::close);
 }
 
 void Mx2dTextSearchDialog::initLayout()
@@ -238,6 +242,12 @@ void Mx2dTextSearchDialog::updateSearchResult()
 	m_results.clear();
 }
 
+void Mx2dTextSearchDialog::closeEvent(QCloseEvent*)
+{
+	MxDrawApp::ClearVectorLine(m_guiDoc->cadView().GetOcxHandle());
+	MxDrawApp::UpdateDisplay(m_guiDoc->cadView().GetOcxHandle());
+}
+
 // Call with id parameter
 void Mx2dTextSearchDialog::onSearchResults(const QList<QPair<QString, Mx2d::Mx2dExtents>>& result)
 {
@@ -264,7 +274,7 @@ void Mx2dTextSearchDialog::onSearchClicked()
 		std::string sAscii = s.toLocal8Bit().constData();
 		MrxDbgRbList spParam = Mx::mcutBuildList(RTSTR, sAscii.c_str(), RTSHORT, m_pFullMatchCheck->isChecked() ? 1 : 0, 0);
 
-		Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_TextSearch", spParam.orphanData());
+		m_guiDoc->executeCommand("Mx_TextSearch", spParam.orphanData());
 	}
 	else {
 		updateSearchResult();
@@ -285,11 +295,11 @@ void Mx2dTextSearchDialog::onSelectAreaClicked()
 	// Determine area selection method
 	if (m_pRectAreaRadio->isChecked())
 	{
-		Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_TextSearchRect", spParam.orphanData());
+		m_guiDoc->executeCommand("Mx_TextSearchRect", spParam.orphanData());
 	}
 	else if (m_pIrregularAreaRadio->isChecked())
 	{
-		Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_TextSearchPolygon", spParam.orphanData());
+		m_guiDoc->executeCommand("Mx_TextSearchPolygon", spParam.orphanData());
 	}
 }
 
@@ -355,7 +365,7 @@ void Mx2dTextSearchDialog::onCurrentItemChanged(QTableWidgetItem* current, QTabl
 		double maxY = textItem->data(Qt::UserRole + 3).toDouble();
 
 		MrxDbgRbList spParam = Mx::mcutBuildList(RTREAL, minX, RTREAL, minY, RTREAL, maxX, RTREAL, maxY, 0);
-		Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_MoveViewCenterTo", spParam.orphanData());
+		m_guiDoc->executeCommand("Mx_MoveViewCenterTo", spParam.orphanData());
 	}
 }
 

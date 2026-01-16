@@ -10,6 +10,7 @@ for the use of this software, its documentation or related materials.
 #include <algorithm>
 #include <QDebug>
 #include "Mx2dGuiDocument.h"
+#include "MxLogger.h"
 namespace {
 
 	bool isSameLineText(McDbText* text, McDbText* other) {
@@ -388,14 +389,12 @@ namespace Mx2d {
 		double ptParam = 0.0;
 		Mcad::ErrorStatus es = pPoly->getParamAtPoint(pt, ptParam);
 		if (es != Mcad::eOk) return -1;
-		qDebug() << "ptParam:" << ptParam;
         for (unsigned int i = 0; i < pPoly->numVerts(); i++)
         {
 			McGePoint3d curPt;
 			pPoly->getPointAt(i, curPt);
 			double curPtParam = 0.0;
 			pPoly->getParamAtPoint(curPt, curPtParam);
-			qDebug() << "curPtParam:" << curPtParam;
 			if (curPtParam > ptParam)
 			{
                 double prevBulge = 0.0;
@@ -716,10 +715,11 @@ namespace Mx2d {
 		{
 			McCmColor newColor; newColor.setRGB(230, 81, 0);
 			pEnt->setColor(newColor);
-			McDbObjectId id;
-			McDbBlockTableRecordPointer spModelSpace(MCDB_MODEL_SPACE, acdbCurDwg(), McDb::kForWrite);
-			if (spModelSpace.openStatus() == Mcad::eOk) {
-				spModelSpace->appendAcDbEntity(id, pEnt);
+			McDbObjectId id, curSpaceId;
+			curSpaceId = Mx::mcdbCurDwg()->currentSpaceId();
+			McDbBlockTableRecordPointer spCurSpace(curSpaceId, McDb::kForWrite);
+			if (spCurSpace.openStatus() == Mcad::eOk) {
+				spCurSpace->appendAcDbEntity(id, pEnt);
 				pEnt->close();
 				McDbEntityPointer spEntity(id, McDb::kForWrite);
 				spEntity->setLayer("MxCADAnnotationLayer");
@@ -738,13 +738,84 @@ namespace Mx2d {
 		Mx2dGuiDocument* pCadGuiDoc = qobject_cast<Mx2dGuiDocument*>(tab);
 		if (!pCadGuiDoc)
 		{
-			qDebug() << "tab is invalid!";
+            LOG_ERROR(QString("tab is invalid!"));
 			return;
 		}
-		if (!pCadGuiDoc->executeCommand(cmdStr.toStdString().c_str(), param))
+		if (!pCadGuiDoc->executeCommand(cmdStr, param))
 		{
-			qDebug() << QString("failed to execute %1!").arg(cmdStr);
+            LOG_ERROR(QString("failed to execute %1!").arg(cmdStr));
 		}
+	}
+
+	QString getEntityLayoutName(McDbObjectId entId)
+	{
+		McDbObjectPointer<McDbEntity> spEnt(entId, McDb::kForRead);
+		if (spEnt.openStatus() != Mcad::eOk)
+			return {};
+
+		McDbObjectId ownerId = spEnt->ownerId();
+
+		McDbDatabase* pDatabase = spEnt->database();
+		McDbDictionary* pDict = nullptr;
+		if (pDatabase->getLayoutDictionary(pDict, McDb::kForRead) != Mcad::eOk)
+			return {};
+
+		McDbDictionaryIterator* pIter = pDict->newIterator();
+		MXASSERT(pIter != nullptr);
+		QString qsLayoutName;
+		for (; !pIter->done(); pIter->next())
+		{
+			McDbObjectPointer<McDbLayout> spLayout(pIter->objectId(), McDb::kForRead);
+			if (spLayout.openStatus() != Mcad::eOk)
+				continue;
+
+			if (spLayout->getBlockTableRecordId() == ownerId)
+			{
+				MxString sLayoutName;
+				spLayout->getLayoutName(sLayoutName);
+				qsLayoutName = QString::fromLocal8Bit(sLayoutName.c_str());
+				break;
+			}
+
+		}
+		pDict->close();
+		delete pIter;
+
+		return qsLayoutName;
+	}
+
+	QString getBlockTableRecordLayoutName(McDbObjectId btrId)
+	{
+		McDbBlockTableRecordPointer spBTR(btrId, McDb::kForRead);
+		if (spBTR.openStatus() != Mcad::eOk)
+			return {};
+		McDbDatabase* pDatabase = spBTR->database();
+		McDbDictionary* pDict = nullptr;
+		if (pDatabase->getLayoutDictionary(pDict, McDb::kForRead) != Mcad::eOk)
+			return {};
+
+		McDbDictionaryIterator* pIter = pDict->newIterator();
+		MXASSERT(pIter != nullptr);
+		QString qsLayoutName;
+		for (; !pIter->done(); pIter->next())
+		{
+			McDbObjectPointer<McDbLayout> spLayout(pIter->objectId(), McDb::kForRead);
+			if (spLayout.openStatus() != Mcad::eOk)
+				continue;
+
+			if (spLayout->getBlockTableRecordId() == btrId)
+			{
+				MxString sLayoutName;
+				spLayout->getLayoutName(sLayoutName);
+				qsLayoutName = QString::fromLocal8Bit(sLayoutName.c_str());
+				break;
+			}
+
+		}
+		pDict->close();
+		delete pIter;
+
+		return qsLayoutName;
 	}
 
 	

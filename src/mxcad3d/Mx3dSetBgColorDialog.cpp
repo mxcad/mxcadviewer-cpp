@@ -223,12 +223,12 @@ void Mx3dSetBgColorDialog::onRestoreSolidBgDefault()
 
 void Mx3dSetBgColorDialog::onRestoreGradientBgDefault()
 {
-    const QColor defaultColor1(35, 159, 151);
-    const QColor defaultColor2(80, 194, 160);
+    const QColor defaultColor1(100, 100, 100);
+    const QColor defaultColor2(200, 200, 200);
 
     m_gradientBgColor1 = defaultColor1;
     m_gradientBgColor2 = defaultColor2;
-    m_gradientModeComboBox->setCurrentIndex(0);
+    m_gradientModeComboBox->setCurrentIndex(1);
 
     updateColorPreview(m_gradientColor1Preview, defaultColor1);
     updateColorPreview(m_gradientColor2Preview, defaultColor2);

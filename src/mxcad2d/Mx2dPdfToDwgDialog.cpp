@@ -61,8 +61,8 @@ void Mx2dPdfToDwgDialog::setupUi()
 	m_pClearButton->setFixedWidth(100);
 	m_pConvertButton->setFixedWidth(100);
 
-	const QString blueButtonStyle = tr("QPushButton { background-color: #337AB7; color: white; border: none; padding: 8px; border-radius: 3px; } QPushButton:disabled { background-color: #A0B8D0; }");
-	const QString grayButtonStyle = tr("QPushButton { background-color: #FFFFFF; border: 1px solid #ADADAD; padding: 8px; border-radius: 3px; } QPushButton:disabled { background-color: #F0F0F0; color: #a0a0a0; }");
+	const QString blueButtonStyle = "QPushButton { background-color: #337AB7; color: white; border: none; padding: 8px; border-radius: 3px; } QPushButton:disabled { background-color: #A0B8D0; }";
+	const QString grayButtonStyle = "QPushButton { background-color: #FFFFFF; border: 1px solid #ADADAD; padding: 8px; border-radius: 3px; } QPushButton:disabled { background-color: #F0F0F0; color: #a0a0a0; }";
 	m_pAddButton->setStyleSheet(blueButtonStyle);
 	m_pConvertButton->setStyleSheet(blueButtonStyle);
 	m_pDeleteButton->setStyleSheet(grayButtonStyle);

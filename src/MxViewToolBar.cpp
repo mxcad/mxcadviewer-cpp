@@ -55,9 +55,14 @@ void MxViewToolBar::paintEvent(QPaintEvent* event)
 	else
 	{
 		painter.fillRect(rect(), QColor(200, 200, 200));
+		QColor borderColor(50, 50, 50);
+		QPen borderPen(borderColor);
+		borderPen.setWidth(1);
+		painter.setPen(borderPen);
+		QRect borderRect = rect().adjusted(1, 1, -2, -2);
+		painter.drawRect(borderRect);
 	}
 	
-    painter.end();
 }
 
 void MxViewToolBar::addAction(QAction* action)
@@ -65,16 +70,14 @@ void MxViewToolBar::addAction(QAction* action)
 	QToolButton* button = new QToolButton();
 	button->setStyleSheet(R"(
 		QToolButton:checked {
-			background-color: rgb(0,120,215);
-			color: white;
+			background-color: rgb(152, 212, 255);
 		}
 		QToolButton:hover {
-			background-color: rgb(0, 140, 235);
-			color: white;
+			background-color: rgb(171, 220, 255);
 		}
 	)");
 
-    button->setIconSize(QSize(40, 40));
+    button->setIconSize(QSize(32, 32));
 
     button->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
@@ -87,7 +90,7 @@ void MxViewToolBar::addAction(QAction* action)
 
 void MxViewToolBar::addWidget(QWidget* widget)
 {
-	widget->setFixedHeight(44);
+	widget->setFixedHeight(36);
 	m_pHBoxLayout->addWidget(widget);
 	adjustSize();
 }

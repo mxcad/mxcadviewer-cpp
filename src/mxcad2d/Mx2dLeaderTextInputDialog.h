@@ -13,13 +13,13 @@ for the use of this software, its documentation or related materials.
 class QTextEdit;
 class QLabel;
 class QPushButton;
-
+class Mx2dGuiDocument;
 class Mx2dLeaderTextInputDialog : public QDialog
 {
 	Q_OBJECT
 
 public:
-	explicit Mx2dLeaderTextInputDialog(QWidget* parent = nullptr);
+	explicit Mx2dLeaderTextInputDialog(Mx2dGuiDocument* guiDoc, QWidget* parent = nullptr);
 	~Mx2dLeaderTextInputDialog();
 
 	QString getText() const;
@@ -35,7 +35,7 @@ private:
 	QTextEdit* m_pTextEdit;
 	QLabel* m_pLineCountLabel;
 	QPushButton* m_pStartButton;
-
+	Mx2dGuiDocument* m_guiDoc;
 	const int m_maxLines = 10;
 	QString m_text;
 };

@@ -17,8 +17,8 @@ void Mx3dBgColorManager::loadFromSettings()
     m_bgColorMode = m_settings.value("BgColorMode", 1).value<int>();
     m_gradientMode = m_settings.value("GradientMode", 1).value<int>();
     m_bgColor = m_settings.value("BgColor", QColor(160, 160, 160)).value<QColor>();
-	m_gradientBgColor1 = m_settings.value("GradientBgColor1", QColor(35, 159, 151)).value<QColor>();
-	m_gradientBgColor2 = m_settings.value("GradientBgColor2", QColor(80, 194, 160)).value<QColor>();
+	m_gradientBgColor1 = m_settings.value("GradientBgColor1", QColor(100, 100, 100)).value<QColor>();
+	m_gradientBgColor2 = m_settings.value("GradientBgColor2", QColor(200, 200, 200)).value<QColor>();
     
 	
     connect(&Mx3dSignalTransfer::getInstance(), &Mx3dSignalTransfer::signalSetBgColor, this, &Mx3dBgColorManager::onSetBgColor);

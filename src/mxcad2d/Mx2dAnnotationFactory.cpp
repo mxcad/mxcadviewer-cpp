@@ -1,4 +1,4 @@
-/******************************************************************************************
+﻿/******************************************************************************************
 Copyright (c) 2025 Chengdu Dreamkaide Technology Co., Ltd. <https://www.webcadsdk.com/>
 All rights reserved.
 Applications incorporating this software must include the following copyright notice.
@@ -8,6 +8,7 @@ for the use of this software, its documentation or related materials.
 
 #include "Mx2dAnnotationFactory.h"
 #include <QDebug>
+#include "MxLogger.h"
 
 Mx2dAnnotationFactory& Mx2dAnnotationFactory::instance()
 {
@@ -26,6 +27,6 @@ Mx2dCustomAnnotation* Mx2dAnnotationFactory::createAnnotation(const QString& typ
 	if (it != m_creatorMap.end()) {
 		return it.value()();
 	}
-	qDebug() << "Unsupported annotation type: " << type;
+	LOG_ERROR(QString("Unsupported annotation type: ").arg(type));
 	return nullptr;
 }

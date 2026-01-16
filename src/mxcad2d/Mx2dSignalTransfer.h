@@ -32,7 +32,7 @@ private:
 signals:
 
 	void signalTextSearched(const QList<QPair<QString, Mx2d::Mx2dExtents>>& result);
-	void signalLayerInformation(const Mx2d::Mx2dLayerInfo& info); 
+	void signalLayerInformation(const Mx2d::LayerInfo& info); 
 	void signalLayersOffStatusSetted(QWidget* target); 
 	void signalExtractTextFinished(QWidget* target, const QStringList& textList); 
 	void signalAreaMarkInformation(QWidget* target, const Mx2d::PLVertexList& arr); 

@@ -11,9 +11,10 @@ for the use of this software, its documentation or related materials.
 #include <QtWidgets>
 #include "Mx2dUtils.h"
 #include "MxUtils.h"
+#include "Mx2dGuiDocument.h"
 
-Mx2dLeaderTextInputDialog::Mx2dLeaderTextInputDialog(QWidget* parent)
-	: QDialog(parent)
+Mx2dLeaderTextInputDialog::Mx2dLeaderTextInputDialog(Mx2dGuiDocument* guiDoc, QWidget* parent)
+	: QDialog(parent), m_guiDoc(guiDoc)
 {
 	Qt::WindowFlags flags = Qt::Dialog;
 	flags |= Qt::CustomizeWindowHint;
@@ -99,5 +100,5 @@ void Mx2dLeaderTextInputDialog::onInsertClicked()
 
 	std::string sAscii = m_text.toLocal8Bit();
 	MrxDbgRbList spParam = Mx::mcutBuildList(RTSTR, sAscii.c_str(), 0);
-	Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawLeaderMark", spParam.orphanData());
+	m_guiDoc->executeCommand("Mx_DrawLeaderMark", spParam.orphanData());
 }

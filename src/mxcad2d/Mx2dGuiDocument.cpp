@@ -29,39 +29,58 @@ for the use of this software, its documentation or related materials.
 #include <QCoreApplication>
 #include "MxUtils.h"
 #include <QtConcurrent>
+#include "MxLogger.h"
+#include <QPushButton>
+#include <QButtonGroup>
+
+#include "Mx2dLayerManagerDialog.h"
+#include "Mx2dMeasurementDialog.h"
+#include "Mx2dLeaderTextInputDialog.h"
+#include "Mx2dTextSearchDialog.h"
+#include "Mx2dExtractTextDialog.h"
 
 Mx2dGuiDocument::Mx2dGuiDocument(QWidget* parent) : QWidget(parent) {
 
-	m_pTabWidget = new QTabWidget(this);
-	m_pTabWidget->setStyleSheet("QTabWidget {border: none;}");
-	m_pModelWidget = new QWidget(m_pTabWidget);
-	int idxModel = m_pTabWidget->addTab(m_pModelWidget, tr("Model"));
-	m_pTabWidget->setCurrentIndex(idxModel);
+	m_pViewWidget = new QWidget(this);
+	m_pViewWidget->setStyleSheet("QTabWidget {border: none;}");
+	
 
-	// TODO: add paper space view
-
-	m_pTabWidget->setTabPosition(QTabWidget::South);
-	m_pTabWidget->setTabShape(QTabWidget::Triangular);
-
-	m_p2dViewToolBar = new MxViewToolBar(m_pTabWidget);
+	m_p2dViewToolBar = new MxViewToolBar(this);
 	m_p2dViewToolBar->setMaximumWidth(150);
-
+#ifdef MX_DEVELOPING
 	QAction* actDimClassify = new QAction(QIcon(":/resources/images2d/2d_dimClassify.svg"), tr("Annotation Category Management"), this);
 	m_p2dViewToolBar->addAction(actDimClassify);
-
+#endif
 	QLabel* pLabel = new QLabel(tr("Annotation Category"), this);
 	pLabel->setContentsMargins(10, 0, 10, 0);
 
 	m_p2dViewToolBar->addWidget(pLabel);
 
 	QComboBox* pComboBox = new QComboBox(this);
-	pComboBox->setStyleSheet("QComboBox{ combobox-popup: 0; }");
+	pComboBox->setStyleSheet(R"(
+		QComboBox {
+			border: 1px solid gray;
+			padding: 1px 18px 1px 3px;
+			min-width: 6em;
+			combobox-popup: 0;
+		}
+		QComboBox::drop-down {
+			subcontrol-origin: padding;
+			subcontrol-position: top right;
+			width: 25px;
+			border-left-width: 1px;
+		}
+		QComboBox::down-arrow {
+			image: url(:/resources/images2d/2d_dropdown.svg);
+		}
+	)");
 	pComboBox->setFixedHeight(40);
-	pComboBox->addItem(tr("Uncategorized"));
+	pComboBox->addItem(tr("default"));
 	m_p2dViewToolBar->addWidget(pComboBox);
-
+#ifdef MX_DEVELOPING
 	QAction* actDimModify = new QAction(QIcon(":/resources/images2d/2d_modifyDim.svg"), tr("Select one or more annotations to modify properties in batch"), this);
 	m_p2dViewToolBar->addAction(actDimModify);
+#endif
 
 	QAction* actDimMove = new QAction(QIcon(":/resources/images2d/2d_moveDim.svg"), tr("Move Annotation"), this);
 	m_p2dViewToolBar->addAction(actDimMove);
@@ -74,14 +93,15 @@ Mx2dGuiDocument::Mx2dGuiDocument(QWidget* parent) : QWidget(parent) {
 	connect(actDimCopy, &QAction::triggered, [this]() {
 		Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_CopyAnnotation");
 		});
-
+#ifdef MX_DEVELOPING
 	QAction* actDimPaste = new QAction(QIcon(":/resources/images2d/2d_pasteDim.svg"), tr("Paste Annotation"), this);
 	m_p2dViewToolBar->addAction(actDimPaste);
+#endif
 
 	computeToolBarPosition();
 
 	// prompt label
-	m_pPromptLabel = new QLabel(m_pTabWidget);
+	m_pPromptLabel = new QLabel(this);
 	m_pPromptLabel->setAttribute(Qt::WA_DeleteOnClose);
 	m_pPromptLabel->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 	m_pPromptLabel->setStyleSheet(
@@ -95,7 +115,7 @@ Mx2dGuiDocument::Mx2dGuiDocument(QWidget* parent) : QWidget(parent) {
 
 
 #ifdef Q_OS_WIN
-	m_cadView.Create(1000, 1000, (HWND)(m_pModelWidget->winId()), true, 100, 100);
+	m_cadView.Create(1000, 1000, (HWND)(m_pViewWidget->winId()), true, 100, 100);
 #else
 	MxOpenGLView* pGLView = new MxOpenGLView();
 	m_pGLView = pGLView;
@@ -112,7 +132,6 @@ Mx2dGuiDocument::Mx2dGuiDocument(QWidget* parent) : QWidget(parent) {
 	setFocusPolicy(Qt::StrongFocus);
 #endif
 
-	//connect(this, &Mx2dGuiDocument::transferDone, this, &Mx2dGuiDocument::renderShape);
 	m_updatePending = false;
 	m_devicePixelRatio = 1.0;
 	if (MxUtils::isSpecialSystem("uos"))
@@ -125,10 +144,21 @@ Mx2dGuiDocument::Mx2dGuiDocument(QWidget* parent) : QWidget(parent) {
 	m_isOpenGLPollEvents = false;
 #endif
 
-	QHBoxLayout* layout = new QHBoxLayout(this);
-	layout->addWidget(m_pTabWidget);
-	layout->setContentsMargins(0, 0, 0, 0);
-	setLayout(layout);
+	QVBoxLayout* mainLayout = new QVBoxLayout(this);
+	mainLayout->addWidget(m_pViewWidget);
+	mainLayout->setContentsMargins(0, 0, 0, 9);
+
+	m_spaceBtnLayout = new QHBoxLayout();
+	m_spaceBtnLayout->addSpacerItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
+	m_spaceBtnLayout->setSpacing(6);
+
+	mainLayout->addLayout(m_spaceBtnLayout);
+	mainLayout->setStretch(0, 1);
+	mainLayout->setStretch(1, 0);
+	mainLayout->setSpacing(0);
+	setLayout(mainLayout);
+
+	m_pSpaceBtnGroup = new QButtonGroup(this);
 
 	// Create timer
 	QTimer* timer = new QTimer(this);
@@ -171,10 +201,21 @@ bool Mx2dGuiDocument::makeCurrent()
 	return m_cadView.GetMxCADObject()->MakeCurrent();
 }
 
-bool Mx2dGuiDocument::executeCommand(const char* pszExecute, resbuf* pParam)
+bool Mx2dGuiDocument::executeCommand(const QString& cmdStr, resbuf* pParam)
 {
-	return m_cadView.GetMxCADObject()->SendStringToExecute(pszExecute, pParam);
+	return m_cadView.GetMxCADObject()->SendStringToExecute(cmdStr.toLocal8Bit().constData(), pParam);
 }
+
+int Mx2dGuiDocument::undoCount() const
+{
+	return m_pAnnoEditor->undoCount();
+}
+
+int Mx2dGuiDocument::redoCount() const
+{
+	return m_pAnnoEditor->redoCount();
+}
+
 
 
 
@@ -187,6 +228,19 @@ void Mx2dGuiDocument::wheelEvent(QWheelEvent* theEvent)
 	m_pGLView->onMouseScroll(0, theEvent->delta() / 120);
 	m_cadView.UpdateDisplay();
 #endif
+}
+
+void Mx2dGuiDocument::closeAllModelessDialogs()
+{
+	QList<QDialog*> modelessDialogs = this->findChildren<QDialog*>();
+	for (QDialog* dlg : modelessDialogs) {
+		if (dlg->property("modeless_dialog").toBool()) {
+			if (dlg->isVisible())
+			{
+				dlg->close();
+			}
+		}
+	}
 }
 
 void Mx2dGuiDocument::resizeEvent(QResizeEvent* event)
@@ -294,12 +348,12 @@ void Mx2dGuiDocument::onMessageBoxInformation(QWidget* target, const QString& me
 
 void Mx2dGuiDocument::computeToolBarPosition()
 {
-	if (!m_pTabWidget || !m_p2dViewToolBar)
+	if (!m_pViewWidget || !m_p2dViewToolBar)
 	{
 		return;
 	}
-	int tabW = m_pTabWidget->size().width();
-	int tabH = m_pTabWidget->size().height();
+	int tabW = m_pViewWidget->size().width();
+	int tabH = m_pViewWidget->size().height();
 	int toolBarW = m_p2dViewToolBar->size().width();
 	int toolBarH = m_p2dViewToolBar->size().height();
 	int targetX = tabW / 2 - toolBarW / 2;
@@ -309,12 +363,12 @@ void Mx2dGuiDocument::computeToolBarPosition()
 
 void Mx2dGuiDocument::computePromptLabelPosition()
 {
-	if (!m_pTabWidget || !m_pPromptLabel)
+	if (!m_pViewWidget || !m_pPromptLabel)
 	{
 		return;
 	}
 	int yOffset = 20;
-	m_pPromptLabel->move(m_pTabWidget->width() / 2 - m_pPromptLabel->width() / 2, yOffset);
+	m_pPromptLabel->move(m_pViewWidget->width() / 2 - m_pPromptLabel->width() / 2, yOffset);
 }
 
 void Mx2dGuiDocument::connectSignals()
@@ -322,6 +376,7 @@ void Mx2dGuiDocument::connectSignals()
 	connect(this, &Mx2dGuiDocument::fileRead, this, [this](bool success) {
 		if (success)
 		{
+			m_spaceNames = getSpaceNames();
 			renderShape();
 		}
 		});
@@ -434,6 +489,37 @@ void Mx2dGuiDocument::connectSignals()
 		m_pAnnoEditor->redo();
 		MxDrawApp::UpdateDisplay();
 		});
+	connect(m_pAnnoEditor.get(), &Mx2dAnnotationEditor::undoRedoChanged, this, &Mx2dGuiDocument::undoRedoChanged);
+}
+
+QStringList Mx2dGuiDocument::getSpaceNames()
+{
+	QStringList spaceNames;
+	MxStringArray layoutNames;
+	MrxDbgUtils::GetAllLayoutName(Mx::mcdbCurDwg(), layoutNames);
+	for (int i = 0; i < layoutNames.size(); ++i)
+	{
+        MxString layoutName = layoutNames[i];
+		QString currentLayoutName = QString::fromLocal8Bit(layoutName.c_str());
+		spaceNames.append(currentLayoutName);
+		QPushButton* btn = new QPushButton(currentLayoutName, this);
+		// set btn checked style
+        btn->setStyleSheet("QPushButton{ padding: 10px;}"
+            "QPushButton:checked{background-color: white; color: #57b8ff;}");
+		btn->setCheckable(true);
+		m_spaceBtnLayout->insertWidget(i, btn, 0);
+		m_pSpaceBtnGroup->addButton(btn, i);
+		if (i == 0)
+			btn->setChecked(true);
+	}
+	connect(m_pSpaceBtnGroup, QOverload<int, bool>::of(&QButtonGroup::buttonToggled), this, [this](int id, bool checked) {
+		if (checked)
+		{
+			MxDrawApp::SetCurrentLayout(m_spaceNames[id].toLocal8Bit().constData());
+            MxDrawApp::UpdateDisplay();
+		}
+		});
+	return spaceNames;
 }
 
 void Mx2dGuiDocument::mousePressEvent(QMouseEvent* theEvent)
@@ -596,12 +682,12 @@ void Mx2dGuiDocument::openFile(const QString& filePath) {
 		process.start();
 
 		if (!process.waitForStarted(2000)) {
-			qDebug() << tr("failed start mxconvert convert program: ") << process.errorString();
+			LOG_ERROR(QString("failed start mxconvert convert program: %1").arg(process.errorString()));
 			emit runConverterFailed();
 			return;
 		}
 
-		if (process.waitForFinished(10000)) {
+		if (process.waitForFinished(200000)) {
 			QByteArray stdoutData = process.readAllStandardOutput();
 			QByteArray stderrData = process.readAllStandardError();
 			QJsonParseError parseError;
@@ -639,7 +725,7 @@ void Mx2dGuiDocument::openFile(const QString& filePath) {
 			}
 		}
 		else {
-			qDebug() << tr("timeout or crashed: ") << process.errorString();
+            LOG_ERROR(QString("mxconvert timeout or crashed: %1").arg(process.errorString()));
 			emit convertFailed(process.errorString());
 		}
 
@@ -648,4 +734,88 @@ void Mx2dGuiDocument::openFile(const QString& filePath) {
 #ifdef Q_OS_LINUX
 	m_isOpenGLPollEvents = true;
 #endif
+}
+
+void Mx2dGuiDocument::showLayerManagerDialog(QWidget* guiDoc2d)
+{
+	if (guiDoc2d != this)
+		return;
+	if (!m_layerManagerDialog)
+	{
+		m_layerManagerDialog = new Mx2dLayerManagerDialog(this, this);
+		m_layerManagerDialog->setProperty("modeless_dialog", true);
+	}
+
+	if (!m_layerManagerDialog->isVisible())
+	{
+		m_layerManagerDialog->show();
+	}
+}
+
+void Mx2dGuiDocument::showMeasurementDialog(QWidget* guiDoc2d)
+{
+    if (guiDoc2d != this)
+        return;
+    if (!m_measurementDialog)
+    {
+        m_measurementDialog = new Mx2dMeasurementDialog(this, this);
+        m_measurementDialog->setProperty("modeless_dialog", true);
+    }
+    if (!m_measurementDialog->isVisible())
+    {
+        m_measurementDialog->show();
+    }
+}
+
+void Mx2dGuiDocument::showLeaderTextInputDialog(QWidget* guiDoc2d)
+{
+    if (guiDoc2d != this)
+        return;
+    if (!m_leaderTextInputDialog)
+    {
+        m_leaderTextInputDialog = new Mx2dLeaderTextInputDialog(this, this);
+        m_leaderTextInputDialog->setProperty("modeless_dialog", true);
+    }
+    if (!m_leaderTextInputDialog->isVisible())
+    {
+        m_leaderTextInputDialog->show();
+    }
+}
+
+void Mx2dGuiDocument::showTextSearchDialog(QWidget* guiDoc2d)
+{
+    if (guiDoc2d != this)
+        return;
+    if (!m_textSearchDialog)
+    {
+        m_textSearchDialog = new Mx2dTextSearchDialog(this);
+        m_textSearchDialog->setProperty("modeless_dialog", true);
+    }
+    if (!m_textSearchDialog->isVisible())
+    {
+        m_textSearchDialog->show();
+    }
+}
+
+void Mx2dGuiDocument::extractText(QWidget* guiDoc2d)
+{
+	if (guiDoc2d != this)
+        return;
+	
+	connect(&Mx2dSignalTransfer::getInstance(), &Mx2dSignalTransfer::signalExtractTextFinished, this, [this](QWidget* tab, const QStringList& textList) {
+		if (tab != this)
+            return;
+		if (!m_extractTextDialog)
+		{
+			m_extractTextDialog = new Mx2dExtractTextDialog(this);
+			m_extractTextDialog->setProperty("modeless_dialog", true);
+		}
+		if (!m_extractTextDialog->isVisible())
+		{
+			m_extractTextDialog->show();
+		}
+		m_extractTextDialog->setTexts(textList);
+		disconnect(&Mx2dSignalTransfer::getInstance(), &Mx2dSignalTransfer::signalExtractTextFinished, this, nullptr);
+		});
+	executeCommand("Mx_ExtractTextRect");
 }

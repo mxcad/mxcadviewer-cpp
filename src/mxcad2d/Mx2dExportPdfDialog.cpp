@@ -115,23 +115,23 @@ void Mx2dExportPdfDialog::setupUi()
 	m_pPageSizeComboBox = new QComboBox();
 	m_pPageSizeComboBox->setStyleSheet("QComboBox{ combobox-popup: 0; }");
 	m_pPageSizeComboBox->addItems({
-		tr("A0 (841 x 1189 mm)"),
-		tr("A1 (594 x 841 mm)"),
-		tr("A2 (420 x 594 mm)"),
-		tr("A3 (297 x 420 mm)"),
-		tr("A4 (210 x 297 mm)"),
+		"A0 (841 x 1189 mm)",
+		"A1 (594 x 841 mm)",
+		"A2 (420 x 594 mm)",
+		"A3 (297 x 420 mm)",
+		"A4 (210 x 297 mm)",
 		tr("Custom Size...")
 		});
 	m_pScaleComboBox = new QComboBox();
 	m_pScaleComboBox->setStyleSheet("QComboBox{ combobox-popup: 0; }");
-	m_pScaleComboBox->addItems({ tr("None"), tr("1/8"), tr("1/4"), tr("3/8"), tr("1/2"), tr("5/8"), tr("3/4"), tr("7/8"), tr("1"), tr("5/4"), tr("3/2"), tr("7/4"), tr("2"), tr("3"), tr("4") });
+	m_pScaleComboBox->addItems({ tr("None"), "1/8", "1/4", "3/8", "1/2", "5/8", "3/4", "7/8", "1", "5/4", "3/2", "7/4", "2", "3", "4" });
 
 	m_pWidthSpinBox = new QSpinBox();
 	m_pWidthSpinBox->setRange(1, 10000);
-	m_pWidthSpinBox->setSuffix(tr(" mm"));
+	m_pWidthSpinBox->setSuffix(" mm");
 	m_pHeightSpinBox = new QSpinBox();
 	m_pHeightSpinBox->setRange(1, 10000);
-	m_pHeightSpinBox->setSuffix(tr(" mm"));
+	m_pHeightSpinBox->setSuffix(" mm");
 
 	pStdPageSizeLayout->addWidget(m_pPageSizeComboBox);
 	pStdPageSizeLayout->addWidget(new QLabel("+"));
@@ -233,7 +233,7 @@ void Mx2dExportPdfDialog::onPaperSizeChanged(int index)
 	}
 	else {
 		// Use regular expression to extract numbers from "A0 (841 x 1189 mm)"
-		QRegularExpression re(tr("\\((\\d+)\\s*x\\s*(\\d+).*\\)"));
+		QRegularExpression re("\\((\\d+)\\s*x\\s*(\\d+).*\\)");
 		QRegularExpressionMatch match = re.match(selectedText);
 		if (match.hasMatch()) {
 			int w = match.captured(1).toInt();
@@ -241,8 +241,6 @@ void Mx2dExportPdfDialog::onPaperSizeChanged(int index)
 			int selectedScaleIndex = m_pScaleComboBox->currentIndex();
 			if (selectedScaleIndex != 0)
 			{
-				/*   0        1        2        3        4        5        6        7      8        9        10       11     12      13     14 */
-				/*tr("None"), tr("1/8"), tr("1/4"), tr("3/8"), tr("1/2"), tr("5/8"), tr("3/4"), tr("7/8"), tr("1"), tr("5/4"), tr("3/2"), tr("7/4"), tr("2"), tr("3"), tr("4") */
 				switch (selectedScaleIndex)
 				{
 				case 1: h += h * (1 / 8.); break;	// "1/8"

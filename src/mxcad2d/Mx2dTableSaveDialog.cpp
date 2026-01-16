@@ -35,7 +35,6 @@ Mx2dTableSaveDialog::Mx2dTableSaveDialog(QWidget* parent)
 
 Mx2dTableSaveDialog::~Mx2dTableSaveDialog()
 {
-	qDebug() << "Mx2dTableSaveDialog destroyed.";
 }
 
 void Mx2dTableSaveDialog::setupUi()
@@ -120,9 +119,6 @@ void Mx2dTableSaveDialog::onBrowseButtonClicked()
 
 void Mx2dTableSaveDialog::onSaveModeChanged()
 {
-	// This function can be used to perform specific operations when switching modes
-	// For example, you can change the default filename or path based on the mode
-	qDebug() << "Save mode changed. New file mode is:" << m_pNewFileRadio->isChecked();
 }
 
 Mx2dTableSaveDialog::SaveMode Mx2dTableSaveDialog::getSaveMode() const

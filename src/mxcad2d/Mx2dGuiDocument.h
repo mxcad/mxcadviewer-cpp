@@ -19,6 +19,14 @@ class MxOpenGLView;
 class QTabWidget;
 class MxViewToolBar;
 class QLabel;
+class QHBoxLayout;
+class QButtonGroup;
+
+class Mx2dLayerManagerDialog;
+class Mx2dMeasurementDialog;
+class Mx2dLeaderTextInputDialog;
+class Mx2dTextSearchDialog;
+class Mx2dExtractTextDialog;
 class Mx2dGuiDocument : public QWidget
 {
 	Q_OBJECT
@@ -29,7 +37,15 @@ public:
 	void openFile(const QString& filePath);
 	void triggerUpdate();
 	bool makeCurrent();
-	bool executeCommand(const char* pszExecute, struct resbuf* pParam = 0);
+	bool executeCommand(const QString& cmdStr, struct resbuf* pParam = 0);
+	int undoCount() const;
+	int redoCount() const;
+
+	MxCADView& cadView(){ return m_cadView;}
+
+
+	void closeAllModelessDialogs();
+
 protected:
 	void resizeEvent(QResizeEvent* event) override;
 	void paintEvent(QPaintEvent* event) override;
@@ -44,13 +60,14 @@ private:
 
 private:
 	MxCADView		m_cadView;
-	QTabWidget*		m_pTabWidget = nullptr;
-	QWidget*		m_pModelWidget = nullptr;
+	QWidget*		m_pViewWidget = nullptr;
 	MxViewToolBar*	m_p2dViewToolBar = nullptr;
 	QLabel*			m_pPromptLabel = nullptr;
 	QString			m_filePath;
-	
+	QHBoxLayout*	m_spaceBtnLayout = nullptr;
 	std::unique_ptr<Mx2dAnnotationEditor> m_pAnnoEditor;
+	QStringList m_spaceNames;
+	QButtonGroup* m_pSpaceBtnGroup = nullptr;
 signals:
 	void transferDone();
 private slots:
@@ -63,7 +80,7 @@ private:
 	void computeToolBarPosition();
 	void computePromptLabelPosition();
 	void connectSignals();
-
+	QStringList getSpaceNames();
 public:
 	double m_devicePixelRatio;
 	bool m_updatePending;
@@ -78,4 +95,18 @@ signals:
 	void fileReady();
 	void runConverterFailed();
 	void convertFailed(const QString& error);
+
+	void undoRedoChanged(int nbUndo, int nbRedo);
+private:
+	Mx2dLayerManagerDialog* m_layerManagerDialog = nullptr;
+	Mx2dMeasurementDialog* m_measurementDialog = nullptr;
+	Mx2dLeaderTextInputDialog* m_leaderTextInputDialog = nullptr;
+	Mx2dTextSearchDialog* m_textSearchDialog = nullptr;
+	Mx2dExtractTextDialog* m_extractTextDialog = nullptr;
+public:
+	void showLayerManagerDialog(QWidget* guiDoc2d);
+	void showMeasurementDialog(QWidget* guiDoc2d);
+	void showLeaderTextInputDialog(QWidget* guiDoc2d);
+	void showTextSearchDialog(QWidget* guiDoc2d);
+	void extractText(QWidget* guiDoc2d);
 };

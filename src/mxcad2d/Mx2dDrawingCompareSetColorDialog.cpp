@@ -31,13 +31,13 @@ Mx2dDrawingCompareSetColorDialog::Mx2dDrawingCompareSetColorDialog(QWidget* pare
 	m_btnColor1->setFixedSize(30, 30);
 	m_btnColor1->setStyleSheet("background-color: yellow;");
 
-	m_lblPath1 = new QLabel(tr("C:\\Users\\MxDev2\\Downloads\\ExternalInternalMold.dwg (Model)"));
+	m_lblPath1 = new QLabel("C:\\Users\\MxDev2\\Downloads\\ExternalInternalMold.dwg" + tr("Model"));
 
 	m_btnColor2 = new QToolButton();
 	m_btnColor2->setFixedSize(30, 30);
 	m_btnColor2->setStyleSheet("background-color: cyan;");
 
-	m_lblPath2 = new QLabel(tr("C:\\Users\\MxDev2\\Downloads\\TestDrawing.dwg (Model)"));
+	m_lblPath2 = new QLabel("C:\\Users\\MxDev2\\Downloads\\TestDrawing.dwg" + tr("Model"));
 
 	m_btnColorSame = new QToolButton();
 	m_btnColorSame->setFixedSize(30, 30);

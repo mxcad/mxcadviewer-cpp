@@ -1,4 +1,4 @@
-/******************************************************************************************
+﻿/******************************************************************************************
 Copyright (c) 2025 Chengdu Dreamkaide Technology Co., Ltd. <https://www.webcadsdk.com/>
 All rights reserved.
 Applications incorporating this software must include the following copyright notice.
@@ -21,6 +21,10 @@ for the use of this software, its documentation or related materials.
 #include <QFileInfo>
 #include <QRegularExpression>
 #include <regex>
+
+#ifdef MX_BUILD_LOGIN
+#include "MxNetworkManager.h"
+#endif
 
 namespace MxUtils {
 	QString getAppVersion()
@@ -214,6 +218,16 @@ namespace MxUtils {
 		painter.drawPixmap(0, 0, source);
 
 		return rounded;
+	}
+
+	int doAction(std::function<void()> func)
+	{
+#ifdef MX_BUILD_LOGIN
+		return MxNetworkManager::getInstance().doVipFunction(func);
+#else
+		func();
+		return 2;
+#endif
 	}
 
 	QWidget* gCurrentTab = nullptr;

@@ -21,19 +21,27 @@ for the use of this software, its documentation or related materials.
 #include <QDebug>
 #include "Mx2dSignalTransfer.h"
 #include "MxUtils.h"
+#include "Mx2dGuiDocument.h"
+#include "MxSignalTransfer.h"
+#include <QCoreApplication>
 
-Mx2dLayerManagerDialog::Mx2dLayerManagerDialog(QWidget* parent)
-    : QDialog(parent)
+
+Mx2dLayerManagerDialog::Mx2dLayerManagerDialog(Mx2dGuiDocument* guiDoc, QWidget* parent)
+    : QDialog(parent), m_guiDoc(guiDoc)
 {
-    // Set window flags for a standard, non-resizable dialog with a close button
-    setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
+	// Set window flags for a standard, non-resizable dialog with a close button
+	setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
 
-    setupUi();
-    setButtonToolTips();
-    connectSignals();
+	setupUi();
+	setButtonToolTips();
+	connectSignals();
 
-    setWindowTitle(tr("Layer Manager"));
-    adjustSize();
+	setWindowTitle(tr("Layer Manager"));
+
+    m_originLayerInfo = getAllLayersInfo();
+    m_currentLayerInfo = m_originLayerInfo;
+    updateLayerTable(m_currentLayerInfo);
+	adjustSize();
 }
 
 void Mx2dLayerManagerDialog::keyPressEvent(QKeyEvent* event)
@@ -104,159 +112,182 @@ void Mx2dLayerManagerDialog::setButtonToolTips()
 
 void Mx2dLayerManagerDialog::connectSignals()
 {
-    // Connect to global signals for layer information updates
-    connect(&Mx2dSignalTransfer::getInstance(), &Mx2dSignalTransfer::signalLayerInformation, this, &Mx2dLayerManagerDialog::onLayerInformationReceived);
-    connect(&Mx2dSignalTransfer::getInstance(), &Mx2dSignalTransfer::signalLayersOffStatusSetted, this, [](QWidget* tab) {
-        // Refresh layer information after a batch operation
-        Mx2d::execCmd2d(tab, "Mx_GetAllLayer");
-        });
-
-    // Connect button clicks to CAD commands
     connect(m_btnRestoreInit, &QPushButton::clicked, this, [this]() {
-        restoreInitialLayerState(MxUtils::gCurrentTab);
+        restoreInitialLayerState();
         });
     connect(m_btnOpenAll, &QPushButton::clicked, this, [this]() {
-        setAllLayersOffStatus(MxUtils::gCurrentTab, false);
+        setAllLayersOffStatus(false);
         });
     connect(m_btnCloseAll, &QPushButton::clicked, this, [this]() {
-        setAllLayersOffStatus(MxUtils::gCurrentTab, true);
+        setAllLayersOffStatus(true);
         });
-    connect(m_btnCloseSelected, &QPushButton::clicked, this, []() {
-        Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_SetSelectedLayersOff");
+    connect(m_btnCloseSelected, &QPushButton::clicked, this, [this]() {
+        MxUtils::doAction([this]() { m_guiDoc->executeCommand("Mx_SetSelectedLayersOff"); });
         });
-    connect(m_btnKeepSelected, &QPushButton::clicked, this, []() {
-        Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_SetNotSelectedLayersOff");
+    connect(m_btnKeepSelected, &QPushButton::clicked, this, [this]() {
+        MxUtils::doAction([this]() { m_guiDoc->executeCommand("Mx_SetNotSelectedLayersOff"); });
         });
 
     // Connect table cell click to toggle layer visibility
-    connect(m_layerTable, &QTableWidget::cellClicked, this, &Mx2dLayerManagerDialog::onLayerVisibilityToggled);
+    connect(m_layerTable, &QTableWidget::cellClicked, this, &Mx2dLayerManagerDialog::onSwitchCellClicked);
+    connect(&Mx2dSignalTransfer::getInstance(), &Mx2dSignalTransfer::signalLayersOffStatusSetted, this, [this](QWidget* curDoc) {
+        if (curDoc != m_guiDoc)
+            return;
+		MxDrawApp::UpdateLayerDisplayStatus(m_guiDoc->cadView().GetOcxHandle());
+		MxDrawApp::UpdateDisplay(m_guiDoc->cadView().GetOcxHandle());
+        m_currentLayerInfo = getAllLayersInfo();
+        updateLayerTable(m_currentLayerInfo);
+        });
 }
 
-void Mx2dLayerManagerDialog::updateLayerTable(const Mx2d::Mx2dLayerInfo& info)
+
+void Mx2dLayerManagerDialog::updateLayerTable(const Mx2d::LayerInfo& info)
 {
-    // Disconnect signal to prevent feedback loops while updating
-    disconnect(m_layerTable, &QTableWidget::cellClicked, this, &Mx2dLayerManagerDialog::onLayerVisibilityToggled);
+	// Disconnect signal to prevent feedback loops while updating
+	//disconnect(m_layerTable, &QTableWidget::cellClicked, this, &Mx2dLayerManagerDialog::onSwitchCellClicked);
 
-    m_layerTable->setRowCount(0); // Clear table contents
-    m_layerTable->setRowCount(info.datas.size());
+	m_layerTable->setRowCount(0); // Clear table contents
+	m_layerTable->setRowCount(info.size());
 
-    const QIcon visibleIcon(":/resources/images2d/2d_layerSwitchOn.svg");
-    const QIcon hiddenIcon(":/resources/images2d/2d_layerSwitchOff.svg");
+	const QIcon visibleIcon(":/resources/images2d/2d_layerSwitchOn.svg");
+	const QIcon hiddenIcon(":/resources/images2d/2d_layerSwitchOff.svg");
 
-    for (int row = 0; row < info.datas.size(); ++row) {
-        const auto& layerData = info.datas[row];
+	for (int row = 0; row < info.size(); ++row) {
+		const auto& layerData = info[row];
 
-        // Column 0: On/Off Icon
-        auto* iconLabel = new QLabel();
-        iconLabel->setPixmap(layerData.isOff ? hiddenIcon.pixmap(20, 20) : visibleIcon.pixmap(20, 20));
-        iconLabel->setAlignment(Qt::AlignCenter);
-        m_layerTable->setCellWidget(row, 0, iconLabel);
+		// Column 0: On/Off Icon
+		auto* iconLabel = new QLabel();
+		iconLabel->setPixmap(layerData.isOff ? hiddenIcon.pixmap(20, 20) : visibleIcon.pixmap(20, 20));
+		iconLabel->setAlignment(Qt::AlignCenter);
+		m_layerTable->setCellWidget(row, 0, iconLabel);
 
-        // Column 1: Color Swatch
-        auto* colorLabel = new QLabel();
-        QPixmap colorPixmap(20, 20);
-        colorPixmap.fill(QColor(layerData.color.red(), layerData.color.green(), layerData.color.blue()));
-        QPainter painter(&colorPixmap);
-        painter.setPen(QColor(136, 136, 136));
-        painter.drawRect(0, 0, colorPixmap.width() - 1, colorPixmap.height() - 1);
-        colorLabel->setPixmap(colorPixmap);
-        colorLabel->setAlignment(Qt::AlignCenter);
-        m_layerTable->setCellWidget(row, 1, colorLabel);
+		// Column 1: Color Swatch
+		auto* colorLabel = new QLabel();
+		QPixmap colorPixmap(20, 20);
+		colorPixmap.fill(QColor(layerData.color.red(), layerData.color.green(), layerData.color.blue()));
+		QPainter painter(&colorPixmap);
+		painter.setPen(QColor(136, 136, 136));
+		painter.drawRect(0, 0, colorPixmap.width() - 1, colorPixmap.height() - 1);
+		colorLabel->setPixmap(colorPixmap);
+		colorLabel->setAlignment(Qt::AlignCenter);
+		m_layerTable->setCellWidget(row, 1, colorLabel);
 
-        // Column 2: Layer Name
-        auto* nameItem = new QTableWidgetItem(layerData.name);
-        m_layerTable->setItem(row, 2, nameItem);
+		// Column 2: Layer Name
+		auto* nameItem = new QTableWidgetItem(layerData.name);
+		m_layerTable->setItem(row, 2, nameItem);
 
-        m_layerTable->setRowHeight(row, 30);
+		m_layerTable->setRowHeight(row, 30);
+	}
+
+	// Reconnect the signal
+	//connect(m_layerTable, &QTableWidget::cellClicked, this, &Mx2dLayerManagerDialog::onSwitchCellClicked);
+}
+
+void Mx2dLayerManagerDialog::restoreInitialLayerState()
+{
+	setSomeLayersOffStatus(m_originLayerInfo);
+    m_currentLayerInfo = m_originLayerInfo;
+    updateLayerTable(m_originLayerInfo);
+}
+
+void Mx2dLayerManagerDialog::setSomeLayersOffStatus(const Mx2d::LayerInfo& info)
+{
+	//MrxDbgRbList spParam = makeLayersStatusResbuf(info);
+    //m_guiDoc->executeCommand("Mx_SetSomeLayersOffStatus", spParam.orphanData());
+
+
+	for (const auto & ly : info)
+	{
+		McDbObjectId id = ly.id;
+		bool status = ly.isOff;
+		if (!id.isValid()) continue;
+		McDbLayerTableRecordPointer spLayerRecord(id, McDb::kForWrite);
+		if (spLayerRecord.openStatus() != Mcad::eOk) 
+            continue;
+
+		spLayerRecord->setIsOff(status);
+	}
+	MxDrawApp::UpdateLayerDisplayStatus(m_guiDoc->cadView().GetOcxHandle());
+    MxDrawApp::UpdateDisplay(m_guiDoc->cadView().GetOcxHandle());
+
+    for (const auto& layerNew : info)
+    {
+        for (auto& layer : m_currentLayerInfo)
+        {
+            if (layer.id == layerNew.id)
+            {
+                layer.isOff = layerNew.isOff;
+                break;
+            }
+        }
+    }
+    updateLayerTable(m_currentLayerInfo);
+}
+
+void Mx2dLayerManagerDialog::setAllLayersOffStatus(bool isOff)
+{
+    Mx2d::LayerInfo layerInfo = m_originLayerInfo;
+    for (auto & ly : layerInfo)
+    {
+        ly.isOff = isOff;
+    }
+	setSomeLayersOffStatus(layerInfo);
+}
+
+void Mx2dLayerManagerDialog::onSwitchCellClicked(int row, int column)
+{
+    if (column != 0) 
+        return;
+    if (row < 0 || row >= m_currentLayerInfo.length())
+        return;
+	Mx2d::LayerInfoDetail& ly = m_currentLayerInfo[row];
+    ly.isOff = !ly.isOff;
+	Mx2d::LayerInfo layerInfo;
+	layerInfo.append(ly);
+	setSomeLayersOffStatus(layerInfo);
+    updateLayerTable(m_currentLayerInfo);
+}
+
+Mx2d::LayerInfo Mx2dLayerManagerDialog::getAllLayersInfo()
+{
+	McDbLayerTablePointer spLayerTable(Mx::mcdbCurDwg(), McDb::kForRead);
+    if (spLayerTable.openStatus() != Mcad::eOk)
+    {
+        return {};
     }
 
-    // Reconnect the signal
-    connect(m_layerTable, &QTableWidget::cellClicked, this, &Mx2dLayerManagerDialog::onLayerVisibilityToggled);
-}
+	Mx2d::LayerInfo layerInfo;
 
-resbuf* Mx2dLayerManagerDialog::makeLayersStatusResbuf(const QList<McDbObjectId>& ids, const QList<bool>& offStatus)
-{
-    if (ids.isEmpty() || ids.length() != offStatus.length())
-        return nullptr;
-
-    resbuf* head = Mx::mcutBuildList(RTId, ids[0].asOldId(), 0);
-    resbuf* current = head;
-
-    resbuf* statusNode = Mx::mcutBuildList(RTSHORT, offStatus[0] ? 1 : 0, 0);
-    current->rbnext = statusNode;
-    current = statusNode;
-
-    for (int i = 1; i < ids.length(); ++i) {
-        resbuf* idNode = Mx::mcutBuildList(RTId, ids[i].asOldId(), 0);
-        current->rbnext = idNode;
-        current = idNode;
-
-        statusNode = Mx::mcutBuildList(RTSHORT, offStatus[i] ? 1 : 0, 0);
-        current->rbnext = statusNode;
-        current = statusNode;
+	McDbLayerTableIterator* pLayerIter = nullptr;
+    Mcad::ErrorStatus status = spLayerTable->newIterator(pLayerIter);
+    if (status != Mcad::eOk)
+    {
+        return {};
     }
-    return head;
-}
+	if (pLayerIter)
+	{
+		for (pLayerIter->start(); !pLayerIter->done(); pLayerIter->step())
+		{
+			McDbLayerTableRecord* pRecord = nullptr;
+			pLayerIter->getRecord(pRecord, McDb::kForRead);
+			if (pRecord)
+			{
+				MxString sName;
+				pRecord->getName(sName);
+				QString qsName = QString::fromLocal8Bit(sName.c_str());
+				// Skip internal annotation layer
+				if (qsName == "MxCADAnnotationLayer") {
+					pRecord->close();
+					continue;
+				}
 
-void Mx2dLayerManagerDialog::restoreInitialLayerState(QWidget* tab)
-{
-    if (!m_originLayerInfoMap.contains(tab)) return;
+				layerInfo.append({ pRecord->objectId(), pRecord->isOff(), qsName, pRecord->color() });
+				pRecord->close();
+			}
+		}
 
-    const auto& initialInfo = m_originLayerInfoMap[tab];
-    QList<McDbObjectId> ids;
-    QList<bool> offStatus;
-    for (const auto& layer : initialInfo.datas) {
-        ids.append(layer.id);
-        offStatus.append(layer.isOff);
-    }
-    setSomeLayersOffStatus(tab, ids, offStatus);
-}
-
-void Mx2dLayerManagerDialog::setSomeLayersOffStatus(QWidget* tab, const QList<McDbObjectId>& ids, const QList<bool>& offStatus)
-{
-    MrxDbgRbList spParam = makeLayersStatusResbuf(ids, offStatus);
-    Mx2d::execCmd2d(tab, "Mx_SetSomeLayersOffStatus", spParam.orphanData());
-}
-
-void Mx2dLayerManagerDialog::setAllLayersOffStatus(QWidget* tab, bool isOff)
-{
-    if (!m_currentLayerInfoMap.contains(tab)) return;
-
-    const auto& currentInfo = m_currentLayerInfoMap[tab]; // Use stored info for complete list
-    QList<McDbObjectId> ids;
-    QList<bool> offStatus;
-    for (const auto& layer : currentInfo.datas) {
-        ids.append(layer.id);
-        offStatus.append(isOff);
-    }
-    setSomeLayersOffStatus(tab, ids, offStatus);
-}
-
-void Mx2dLayerManagerDialog::onLayerInformationReceived(const Mx2d::Mx2dLayerInfo& info)
-{
-    // If this is the first time we see this tab's layer info, store it as the "original" state.
-    if (!m_originLayerInfoMap.contains(info.pTab)) {
-        m_originLayerInfoMap[info.pTab] = info;
-    }
-    m_currentLayerInfoMap[info.pTab] = info;
-    // Update the UI with the latest layer information.
-    updateLayerTable(info);
-}
-
-void Mx2dLayerManagerDialog::onLayerVisibilityToggled(int row, int column)
-{
-    if (column != 0) return;
-    QWidget* currentTab = MxUtils::gCurrentTab;
-    if (!currentTab || !m_currentLayerInfoMap.contains(currentTab)) return;
-
-    // Get the current layer info for the active tab
-    const auto& currentLayers = m_currentLayerInfoMap[currentTab];
-    if (row < 0 || row >= currentLayers.datas.size()) return;
-
-    // Toggle the state of the clicked layer
-    const auto& layerToToggle = currentLayers.datas[row];
-    QList<McDbObjectId> ids = { layerToToggle.id };
-    QList<bool> offStatus = { !layerToToggle.isOff }; // Invert the current status
-
-    setSomeLayersOffStatus(currentTab, ids, offStatus);
+		delete pLayerIter;
+        pLayerIter = nullptr;
+	}
+	return layerInfo;
 }

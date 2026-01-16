@@ -19,6 +19,7 @@ class QTableWidget;
 class QPushButton;
 class QLabel;
 class QKeyEvent;
+class Mx2dGuiDocument;
 QT_END_NAMESPACE
 
 /**
@@ -29,12 +30,13 @@ QT_END_NAMESPACE
  * to toggle their visibility. It supports multiple open documents and can restore
  * the initial layer state for each.
  */
-    class Mx2dLayerManagerDialog : public QDialog
+class Mx2dLayerManagerDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit Mx2dLayerManagerDialog(QWidget* parent = nullptr);
+    Mx2dLayerManagerDialog(Mx2dGuiDocument* guiDoc, QWidget* parent = nullptr);
+    void updateLayerTable(const Mx2d::LayerInfo& info);
 
 protected:
     // We keep keyPressEvent to prevent closing with the Escape key.
@@ -44,19 +46,14 @@ private:
     void setupUi();
     void setButtonToolTips();
     void connectSignals();
-    void updateLayerTable(const Mx2d::Mx2dLayerInfo& info);
+    
 
-    // Original logic for interacting with the CAD engine
-    static resbuf* makeLayersStatusResbuf(const QList<McDbObjectId>& ids, const QList<bool>& offStatus);
-    void setSomeLayersOffStatus(QWidget* tab, const QList<McDbObjectId>& ids, const QList<bool>& offStatus);
-    void setAllLayersOffStatus(QWidget* tab, bool isOff);
-    void restoreInitialLayerState(QWidget* tab);
+    void setSomeLayersOffStatus(const Mx2d::LayerInfo& info);
+    void setAllLayersOffStatus(bool isOff);
+    void restoreInitialLayerState();
 
 private slots:
-    // Slot to receive layer information from the CAD document
-    void onLayerInformationReceived(const Mx2d::Mx2dLayerInfo& info);
-    // Slot to handle a layer's visibility toggle from the table
-    void onLayerVisibilityToggled(int row, int column);
+    void onSwitchCellClicked(int row, int column);
 
 private:
     // --- UI Member Widgets ---
@@ -68,8 +65,10 @@ private:
     QPushButton* m_btnKeepSelected;
     QLabel* m_statusLabel;
 
-    // Stores the initial layer information for each document tab to allow for restoration.
-    QMap<QWidget*, Mx2d::Mx2dLayerInfo> m_originLayerInfoMap;
-    // Stores the current layer information for each document tab.
-    QMap<QWidget*, Mx2d::Mx2dLayerInfo> m_currentLayerInfoMap;
+    Mx2dGuiDocument* m_guiDoc;
+private:
+    Mx2d::LayerInfo m_originLayerInfo;
+    Mx2d::LayerInfo m_currentLayerInfo;
+private:
+	Mx2d::LayerInfo getAllLayersInfo();
 };

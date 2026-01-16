@@ -136,7 +136,7 @@ void MxAboutMeDialog::setupHeader(QVBoxLayout* mainLayout)
     m_widgetHeader->setObjectName(QStringLiteral("widget_header"));
     m_widgetHeader->setStyleSheet(QStringLiteral(
         "#widget_header {"
-        "background-color: rgb( 36, 50, 76);"
+        "background-color: #2A6A74;"
         "border-top-left-radius: 12px;"
         "border-top-right-radius: 12px;"
         "border: 1px solid #3C968E;"
@@ -156,7 +156,7 @@ void MxAboutMeDialog::setupHeader(QVBoxLayout* mainLayout)
     headerLayout->addWidget(m_labelMxlogo);
 
     m_labelWindowTitle = new QLabel(tr("About"), m_widgetHeader);
-    m_labelWindowTitle->setStyleSheet(QStringLiteral("color: #D0D0D0;"));
+    m_labelWindowTitle->setStyleSheet(QStringLiteral("color: white;"));
     headerLayout->addWidget(m_labelWindowTitle);
 
     headerLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
@@ -171,11 +171,10 @@ void MxAboutMeDialog::setupHeader(QVBoxLayout* mainLayout)
         "	border-top-right-radius: 12px;"
         "   border-top: 1px solid #3C968E;"
         "   border-right: 1px solid #3C968E;"
-        "	image: url(:/resources/images/close_normal.svg);"
+        "	image: url(:/resources/images/close_hover.svg);"
         "}"
         "QPushButton:hover {"
         "	background-color: #C42B1C;"
-        "	image: url(:/resources/images/close_hover.svg);"
         "}"
     ));
     headerLayout->addWidget(m_buttonClose);

@@ -35,7 +35,7 @@ Mx2dDimCategoryManagerDialog::Mx2dDimCategoryManagerDialog(QWidget* parent)
 void Mx2dDimCategoryManagerDialog::initUI()
 {
 	m_pBtnNewCategory = new QPushButton(QIcon(":/resources/images2d/2d_newDimCategory.svg"), tr("New Category"));
-	m_pLblCurrentCategory = new QLabel(tr("Current Category: Unclassified"));
+	m_pLblCurrentCategory = new QLabel(tr("Current Category:") + tr("Default"));
 	m_pBtnShowAll = new QPushButton(tr("Show All"));
 	m_pBtnHideAll = new QPushButton(tr("Hide All"));
 

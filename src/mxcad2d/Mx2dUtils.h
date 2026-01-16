@@ -122,7 +122,14 @@ namespace Mx2d {
 		QWidget* pTab;
 	};
 
+	struct LayerInfoDetail {
+		McDbObjectId id;
+		bool isOff;
+		QString name;
+		McCmColor color;
+	};
 
+	using LayerInfo = QList<LayerInfoDetail> ;
 
 	void recursiveExplodeBlock(McDbBlockReference* block, McDbVoidPtrArray& entitySet);
 
@@ -198,5 +205,9 @@ namespace Mx2d {
 	McDbObjectId addEntityToAnnotationLayerAndClose(McDbEntity* pEnt);
 
 	void execCmd2d(QWidget* tab, QString cmdStr, struct resbuf* param = nullptr);
+
+	QString getEntityLayoutName(McDbObjectId entId);
+
+	QString getBlockTableRecordLayoutName(McDbObjectId btrId);
 
 } // namespace Mx2d

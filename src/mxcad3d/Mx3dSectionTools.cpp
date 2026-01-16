@@ -53,7 +53,6 @@ void Mx3dSectionTools::initUi()
 	if (objectName().isEmpty())
 		setObjectName("Mx3dSectionToolsClass");
 	resize(450, 206);
-	setWindowTitle(tr("Mx3dSectionTools"));
 
 	QString checkBoxStyle = R"(
 		QCheckBox {
@@ -309,19 +308,19 @@ void Mx3dSectionTools::initUi()
 	doubleSpinBox_custom_xDir = new QDoubleSpinBox(widget_Custom);
 	doubleSpinBox_custom_xDir->setObjectName("doubleSpinBox_custom_xDir");
 	doubleSpinBox_custom_xDir->setSingleStep(0.1);
-	doubleSpinBox_custom_xDir->setPrefix(tr("X "));
+	doubleSpinBox_custom_xDir->setPrefix("X ");
 	horizontalLayout_4->addWidget(doubleSpinBox_custom_xDir);
 
 	doubleSpinBox_custom_yDir = new QDoubleSpinBox(widget_Custom);
 	doubleSpinBox_custom_yDir->setObjectName("doubleSpinBox_custom_yDir");
 	doubleSpinBox_custom_yDir->setSingleStep(0.1);
-	doubleSpinBox_custom_yDir->setPrefix(tr("Y "));
+	doubleSpinBox_custom_yDir->setPrefix("Y ");
 	horizontalLayout_4->addWidget(doubleSpinBox_custom_yDir);
 
 	doubleSpinBox_custom_zDir = new QDoubleSpinBox(widget_Custom);
 	doubleSpinBox_custom_zDir->setObjectName("doubleSpinBox_custom_zDir");
 	doubleSpinBox_custom_zDir->setSingleStep(0.1);
-	doubleSpinBox_custom_zDir->setPrefix(tr("Z "));
+	doubleSpinBox_custom_zDir->setPrefix("Z ");
 	horizontalLayout_4->addWidget(doubleSpinBox_custom_zDir);
 
 	gridLayout->addLayout(horizontalLayout_4, 1, 0, 1, 3);

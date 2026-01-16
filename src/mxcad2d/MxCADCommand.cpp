@@ -42,6 +42,7 @@ for the use of this software, its documentation or related materials.
 #include "Mx2dSignalTransfer.h"
 #include "MxSignalTransfer.h"
 #include "MxUtils.h"
+#include "MxLogger.h"
 
 
 #define HIDE_PROMPT_MESSAGE \
@@ -209,6 +210,9 @@ void MxCADCommand::worldDrawRect(const McGePoint3d& corner1, McEdGetPointWorldDr
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
+	McCmColor color;
+	color.setRGB(230, 81, 0);
+	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spRect = std::make_unique<Mx2dCustomRect>(corner1, curPoint, 1.0);
 	spRect->worldDraw(pWorldDraw);
 }
@@ -220,6 +224,9 @@ void MxCADCommand::worldDrawPolygon(const McGePoint3dArray& pts, McEdGetPointWor
 
 	if (pts.length() > 0)
 	{
+		McCmColor color;
+		color.setRGB(230, 81, 0);
+		pWorldDraw->subEntityTraits().setTrueColor(color);
 		auto spPoly = std::make_unique<McDbPolyline>();
 		for (int i = 0; i < pts.length(); i++)
 		{
@@ -288,7 +295,9 @@ void MxCADCommand::worldDrawText(const QString& str, double textHeight, McDbObje
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
-
+	McCmColor color;
+	color.setRGB(230, 81, 0);
+	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spText = std::make_unique<Mx2dCustomText>(str, curPoint, textHeight);
 	spText->worldDraw(pWorldDraw);
 }
@@ -502,6 +511,9 @@ void MxCADCommand::worldDrawArcPolyArea(const Mx2d::PLVertexList& pts, double te
 	McGePoint3d curPoint = pData->curPoint;
 	if (pts.length() >= 2)
 	{
+		McCmColor color;
+		color.setRGB(230, 81, 0);
+		pWorldDraw->subEntityTraits().setTrueColor(color);
 		auto spCustomArcPolyArea = std::make_unique<Mx2dCustomArcPolyArea>(pts, curPoint, textHeight);
 		spCustomArcPolyArea->worldDraw(pWorldDraw);
 	}
@@ -1265,8 +1277,7 @@ void MxCADCommand::Mx_ZoomWin()
 // Get all layer information
 void MxCADCommand::Mx_GetAllLayer()
 {
-	McDbLayerTablePointer spLayerTable(acdbHostApplicationServices()->workingDatabase(),
-		McDb::kForRead);
+	McDbLayerTablePointer spLayerTable(Mx::mcdbCurDwg(), McDb::kForRead);
 	if (spLayerTable.openStatus() != Mcad::eOk)
 		return;
 
@@ -1274,8 +1285,7 @@ void MxCADCommand::Mx_GetAllLayer()
 	spLayerTable->newIterator(pLayerIter);
 	if (pLayerIter)
 	{
-		Mx2d::Mx2dLayerInfo layerInfo;
-		layerInfo.pTab = MxUtils::gCurrentTab;
+		Mx2d::LayerInfo layerInfo;
 
 		for (pLayerIter->start(); !pLayerIter->done(); pLayerIter->step())
 		{
@@ -1294,7 +1304,7 @@ void MxCADCommand::Mx_GetAllLayer()
 				}
 
 				// Collect layer data: ID, visibility, name, color
-				layerInfo.datas.append({ pRecord->objectId(), pRecord->isOff(), qsName, pRecord->color() });
+				layerInfo.append({ pRecord->objectId(), pRecord->isOff(), qsName, pRecord->color() });
 				pRecord->close();
 			}
 		}
@@ -1344,7 +1354,6 @@ void MxCADCommand::Mx_SetSomeLayersOffStatus()
 
 		spLayerRecord->setIsOff(status);
 	}
-	MxDrawApp::UpdateLayerDisplayStatus();
 	emit Mx2dSignalTransfer::getInstance().signalLayersOffStatusSetted(MxUtils::gCurrentTab);
 }
 
@@ -1389,7 +1398,6 @@ void MxCADCommand::Mx_SetSelectedLayersOff()
 
 	// Update display and notify UI of layer status change
 	MXAPP.CallMain([=]() {
-		MxDrawApp::UpdateLayerDisplayStatus();
 		emit Mx2dSignalTransfer::getInstance().signalLayersOffStatusSetted(MxUtils::gCurrentTab);
 		});
 }
@@ -1417,27 +1425,30 @@ void MxCADCommand::Mx_SetNotSelectedLayersOff()
 	HIDE_PROMPT_MESSAGE;
 
 	// Open layer table to get all layers
-	McDbLayerTablePointer spLayerTable(acdbHostApplicationServices()->workingDatabase(), McDb::kForRead);
+	McDbLayerTablePointer spLayerTable(Mx::mcdbCurDwg(), McDb::kForRead);
 	if (spLayerTable.openStatus() != Mcad::eOk)
 		return;
 
 	// Iterate layer table and collect all layer IDs
 	McDbLayerTableIterator* pLayerIter = nullptr;
 	spLayerTable->newIterator(pLayerIter);
-	std::unique_ptr<McDbLayerTableIterator> spIter(pLayerIter);
+	//std::unique_ptr<McDbLayerTableIterator> spIter(pLayerIter); // why can't use unique_ptr?
 	McDbObjectIdArray allLayerIds;
 
-	if (spIter)
+	if (pLayerIter)
 	{
-		for (spIter->start(); !spIter->done(); spIter->step())
+		for (pLayerIter->start(); !pLayerIter->done(); pLayerIter->step())
 		{
 			McDbLayerTableRecord* pRecord = nullptr;
-			spIter->getRecord(pRecord, McDb::kForRead);
+			pLayerIter->getRecord(pRecord, McDb::kForRead);
 			if (pRecord)
 			{
 				allLayerIds.append(pRecord->objectId());
+				pRecord->close();
 			}
 		}
+		delete pLayerIter;
+		pLayerIter = nullptr;
 	}
 
 	// Lambda: Get layers from arr1 that are NOT in arr2
@@ -1481,7 +1492,6 @@ void MxCADCommand::Mx_SetNotSelectedLayersOff()
 
 	// Update display and notify UI of layer status change
 	MXAPP.CallMain([=]() {
-		MxDrawApp::UpdateLayerDisplayStatus();
 		emit Mx2dSignalTransfer::getInstance().signalLayersOffStatusSetted(MxUtils::gCurrentTab);
 		});
 }
@@ -1876,7 +1886,7 @@ void MxCADCommand::Mx_ExtractTable()
 
 	if ((int)Xcoords.size() < 2 || (int)Ycoords.size() < 2)
 	{
-		qDebug() << "can not be a table";
+        LOG_ERROR(QString("can not be a table"));
 		return;
 	}
 
@@ -2320,7 +2330,6 @@ void MxCADCommand::Mx_ExtractTable()
 
 		if (saveFileDlg.exec() != QDialog::Accepted)
 		{
-			qDebug() << "\nTable export cancelled!";
 			return;
 		}
 
@@ -2366,10 +2375,10 @@ void MxCADCommand::Mx_ExtractTable()
 
 		lxw_error err = workbook_close(workbook);
 		if (LXW_NO_ERROR != err) {
-			qDebug() << "Failed to export table, please check if file is already open, close it and try again!";
+            LOG_ERROR(QString("Failed to export table, please check if file is already open, close it and try again!"));
+			// TODO: show error message
 			return;
 		}
-		qDebug() << "Table exported successfully!";
 		});
 }
 
@@ -2694,6 +2703,8 @@ void MxCADCommand::Mx_DrawPolyAreaMark()
 			break;
 		}
 	}
+	if (pts.length() < 3)
+		return;
 	if (isPolygonSelfIntersecting(pts))
 	{
 		MXAPP.CallMain([=]() {
@@ -2795,6 +2806,9 @@ void MxCADCommand::Mx_DrawArcPolyAreaMark()
 			pts.append({ pt ,0 });
 		}
 	}
+
+	if (pts.length() < 3)
+		return;
 
 	double scaled = Mx2d::getViewToDocScaleRatio();
 	double textHeight = 25 / scaled;
@@ -3118,6 +3132,8 @@ void MxCADCommand::Mx_DrawContinuousMeasurementMark()
 		}
 	}
 
+	if (polylineVertices.length() < 2)
+		return;
 	double viewToDocScale = Mx2d::getViewToDocScaleRatio();
 	double textHeight = 25 / viewToDocScale;
 	// Prompt to select text insertion point
@@ -4797,6 +4813,47 @@ void MxCADCommand::Mx_EraseAnnotation()
 
 void MxCADCommand::Mx_TestThread()
 {
+	// Continuous line drawing loop (repeat until user cancels)
+	while (true)
+	{
+		// Prompt user to select line start point
+		SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select start point"));
+		MrxDbgUiPrPoint getStartPoint(QCoreApplication::translate("MxCADCommand", "Select start point").toStdString().c_str());
+		MrxDbgUiPrBase::Status retStatus = getStartPoint.go();
 
+		// Exit command if user cancels or fails to select start point
+		if (retStatus != MrxDbgUiPrBase::kOk)
+		{
+			HIDE_PROMPT_MESSAGE;
+			return;
+		}
+		McGePoint3d startPoint = getStartPoint.value();
+
+		// Prompt user to select line end point
+		SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select end point"));
+		MrxDbgUiPrPoint getEndPoint(QCoreApplication::translate("MxCADCommand", "Select end point").toStdString().c_str());
+		// Set base point to start point for dynamic rubber band preview
+		getEndPoint.setBasePt(startPoint);
+		getEndPoint.setUseBasePt(true);
+		retStatus = getEndPoint.go();
+
+		// Exit command if user cancels or fails to select end point
+		if (retStatus != MrxDbgUiPrBase::kOk)
+		{
+			HIDE_PROMPT_MESSAGE;
+			return;
+		}
+		McGePoint3d endPoint = getEndPoint.value();
+
+		// Hide command prompt after selecting both points
+		HIDE_PROMPT_MESSAGE;
+
+		// Draw the line in main thread (ensure UI thread safety)
+		MXAPP.CallMain([=]() {
+			auto* pAnno = new Mx2dCustomLine(startPoint, endPoint, 1.0);
+			McDbObjectId id = Mx2d::addEntityToAnnotationLayerAndClose(pAnno);
+			emit Mx2dSignalTransfer::getInstance().signalAddAnnotation(MxUtils::gCurrentTab, id);
+			});
+	}
 }
 

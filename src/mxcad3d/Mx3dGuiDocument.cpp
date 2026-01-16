@@ -65,7 +65,6 @@ Mx3dGuiDocument::Mx3dGuiDocument(QWidget* parent)
 
 Mx3dGuiDocument::~Mx3dGuiDocument()
 {
-	qDebug() << "Mx3dGuiDocument::~Mx3dGuiDocument()";
 }
 
 
@@ -118,7 +117,7 @@ void Mx3dGuiDocument::setupUi()
 	
 	m_pMainSplitter->addWidget(m_pViewer);
 	m_pMainSplitter->setStretchFactor(0, 3);
-	m_pMainSplitter->setStretchFactor(1, 7);
+	m_pMainSplitter->setStretchFactor(1, 3);
 
 	QHBoxLayout* mainLayout = new QHBoxLayout(this);
 	mainLayout->setContentsMargins(0, 0, 0, 0);
