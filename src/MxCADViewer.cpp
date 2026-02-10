@@ -388,11 +388,13 @@ void MxCADViewer::addActionsTo2dViewToolBar()
 
 	m_undoAction = new QAction(QIcon(":/resources/images2d/2d_undo.svg"), tr("Undo"), this);
 	m_undoAction->setEnabled(false);
+	m_undoAction->setShortcut(QKeySequence::Undo);
 	m_tab2dViewActions.append(m_undoAction);
     connect(m_undoAction, &QAction::triggered, this, [this]() { emit Mx2dSignalTransfer::getInstance().signalUndo(MxUtils::gCurrentTab); });
 
 	m_redoAction = new QAction(QIcon(":/resources/images2d/2d_redo.svg"), tr("Redo"), this);
     m_redoAction->setEnabled(false);
+    m_redoAction->setShortcut(QKeySequence::Redo);
 	m_tab2dViewActions.append(m_redoAction);
     connect(m_redoAction, &QAction::triggered, this, [this]() { emit Mx2dSignalTransfer::getInstance().signalRedo(MxUtils::gCurrentTab); });
 
@@ -414,7 +416,7 @@ void MxCADViewer::addActionsTo2dViewToolBar()
 			}); 
 		});
 	auto* pActExtractTable = new QAction(QIcon(":/resources/images2d/2d_extractTable.svg"), tr("Extract Table"), this);
-	connect(pActExtractTable, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_ExtractTable"); }); });
+	connect(pActExtractTable, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { emit extractTable(currentGuiDoc2d()); }); });
 
 	auto* pActArcLength = new QAction(QIcon(":/resources/images2d/2d_arcLength.svg"), tr("Arc Length"), this);
 	connect(pActArcLength, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawArcLengthDimMark"); }); });
@@ -929,11 +931,18 @@ QAction* MxCADViewer::createSeparator()
 void MxCADViewer::newCADDocument(const QString& path)
 {
 	auto* guiDoc = new Mx2dGuiDocument(m_tabWidget);
+	connect(guiDoc, &Mx2dGuiDocument::startConvert, this, [this, path]() {
+		m_progressDialog->start();
+		m_progressDialog->setProgressPercent(20);
+		m_progressDialog->setProgressDetail(tr("Convert File: ") + path);
+		QApplication::processEvents();
+		});
 	connect(guiDoc, &Mx2dGuiDocument::startReadFile, this, [this, path]() {
 		m_progressDialog->start();
 		m_progressDialog->setProgressPercent(0);
 		m_progressDialog->setProgressDetail(tr("Reading: ") + path);
-});
+		QApplication::processEvents();
+		});
 	connect(guiDoc, &Mx2dGuiDocument::fileRead, this, [this, guiDoc, path](bool success) {
 		if (!success) 
 		{
@@ -945,6 +954,7 @@ void MxCADViewer::newCADDocument(const QString& path)
 	connect(guiDoc, &Mx2dGuiDocument::startRender, this, [this]() {
 		m_progressDialog->setProgressPercent(100);
 		m_progressDialog->setProgressDetail(tr("Rendering..."));
+		QApplication::processEvents();
 		});
 	connect(guiDoc, &Mx2dGuiDocument::fileReady, this, [this, guiDoc, path]() {
 		m_progressDialog->stop();
@@ -973,6 +983,7 @@ void MxCADViewer::newCADDocument(const QString& path)
 	connect(this, &MxCADViewer::showLeaderTextInputDialog, guiDoc, &Mx2dGuiDocument::showLeaderTextInputDialog);
 	connect(this, &MxCADViewer::showTextSearchDialog, guiDoc, &Mx2dGuiDocument::showTextSearchDialog);
 	connect(this, &MxCADViewer::extractText, guiDoc, &Mx2dGuiDocument::extractText);
+	connect(this, &MxCADViewer::extractTable, guiDoc, &Mx2dGuiDocument::extractTable);
 
 	guiDoc->openFile(path);
 }

@@ -9,6 +9,6 @@ for the use of this software, its documentation or related materials.
 #ifndef MXCADVIEWER_BUILD_DATE_H
 #define MXCADVIEWER_BUILD_DATE_H
 
-#define MXCADVIEWER_BUILD_DATE "20260112"
+#define MXCADVIEWER_BUILD_DATE "20260127"
 
 #endif // MXCADVIEWER_BUILD_DATE_H

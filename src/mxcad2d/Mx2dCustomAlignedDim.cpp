@@ -126,6 +126,27 @@ QJsonObject Mx2dCustomAlignedDim::toJson() const
 	return jsonObject;
 }
 
+Mx2d::TextInfoList Mx2dCustomAlignedDim::findText(const QString& text, bool isExactMatch) const
+{
+	assertReadEnabled();
+	McDbExtents ext;
+	McDbText* pText = createText();
+	pText->getGeomExtents(ext, false);
+	QString textStr = QString::fromLocal8Bit(pText->textString());
+	McGePoint3d minPt = ext.minPoint();
+	McGePoint3d maxPt = ext.maxPoint();
+	Mx2d::Extents extents{ minPt.x, minPt.y,maxPt.x, maxPt.y };
+	delete pText;
+	if ((isExactMatch && (text != textStr)) ||
+		(!isExactMatch && !textStr.contains(text, Qt::CaseInsensitive)))
+	{
+		return {};
+	}
+	
+	return { {textStr , extents} };
+}
+
+
 void Mx2dCustomAlignedDim::setStartPt(const McGePoint3d& pt)
 {
 	assertWriteEnabled();

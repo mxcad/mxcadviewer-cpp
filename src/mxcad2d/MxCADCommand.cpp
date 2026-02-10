@@ -62,6 +62,8 @@ void MxCADCommand::RegisterCommand()
 	Mx_AddCommand(Mx_TextSearch);
 	Mx_AddThreadCommand(Mx_TextSearchRect);
 	Mx_AddThreadCommand(Mx_TextSearchPolygon);
+	Mx_AddThreadCommand(Mx_GetRectArea);
+	Mx_AddThreadCommand(Mx_GetPolyArea);
 	Mx_AddThreadCommand(Mx_DrawLine);
 	Mx_AddCommand(Mx_MoveViewCenterTo);
 	Mx_AddCommand(Mx_ZoomAll);
@@ -105,11 +107,12 @@ void MxCADCommand::RegisterCommand()
 	Mx_AddThreadCommand(Mx_MoveAnnotation);
 	Mx_AddThreadCommand(Mx_CopyAnnotation);
 	Mx_AddThreadCommand(Mx_EraseAnnotation);
+	Mx_AddThreadCommand(Mx_GetDrawingLength);
 	Mx_AddCommand(Mx_UpdateDisplay);
 }
 
 
-void MxCADCommand::textFilter(QList<QPair<QString, Mx2d::Mx2dExtents>>& result, const McDbObjectIdArray& ids, const QString& containStr, bool isFull)
+void MxCADCommand::textFilter(Mx2d::TextInfoList& result, const McDbObjectIdArray& ids, const QString& containStr, bool isFull)
 {
 	for (int i = 0; i < ids.length(); i++)
 	{
@@ -132,7 +135,7 @@ void MxCADCommand::textFilter(QList<QPair<QString, Mx2d::Mx2dExtents>>& result, 
 					McGePoint3d maxPt = ext.maxPoint();
 					double minX, minY, maxX, maxY;
 					minX = minPt.x; minY = minPt.y; maxX = maxPt.x; maxY = maxPt.y;
-					Mx2d::Mx2dExtents ext2d(minX, minY, maxX, maxY);
+					Mx2d::Extents ext2d(minX, minY, maxX, maxY);
 
 					result.append({ str, ext2d });
 				}
@@ -147,7 +150,7 @@ void MxCADCommand::textFilter(QList<QPair<QString, Mx2d::Mx2dExtents>>& result, 
 					McGePoint3d maxPt = ext.maxPoint();
 					double minX, minY, maxX, maxY;
 					minX = minPt.x; minY = minPt.y; maxX = maxPt.x; maxY = maxPt.y;
-					Mx2d::Mx2dExtents ext2d(minX, minY, maxX, maxY);
+					Mx2d::Extents ext2d(minX, minY, maxX, maxY);
 
 					result.append({ str, ext2d });
 				}
@@ -174,7 +177,7 @@ void MxCADCommand::textFilter(QList<QPair<QString, Mx2d::Mx2dExtents>>& result, 
 						McGePoint3d maxPt = ext.maxPoint();
 						double minX, minY, maxX, maxY;
 						minX = minPt.x; minY = minPt.y; maxX = maxPt.x; maxY = maxPt.y;
-						Mx2d::Mx2dExtents ext2d(minX, minY, maxX, maxY);
+						Mx2d::Extents ext2d(minX, minY, maxX, maxY);
 
 						result.append({ str, ext2d });
 					}
@@ -189,7 +192,7 @@ void MxCADCommand::textFilter(QList<QPair<QString, Mx2d::Mx2dExtents>>& result, 
 						McGePoint3d maxPt = ext.maxPoint();
 						double minX, minY, maxX, maxY;
 						minX = minPt.x; minY = minPt.y; maxX = maxPt.x; maxY = maxPt.y;
-						Mx2d::Mx2dExtents ext2d(minX, minY, maxX, maxY);
+						Mx2d::Extents ext2d(minX, minY, maxX, maxY);
 
 						result.append({ str, ext2d });
 					}
@@ -204,6 +207,17 @@ void MxCADCommand::textFilter(QList<QPair<QString, Mx2d::Mx2dExtents>>& result, 
 			deepTextInBlockRef(result, *pBlkRef, curId, containStr, isFull);
 		}
 	}
+}
+
+void MxCADCommand::worldDrawLine(const McGePoint3d& startPoint, McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw)
+{
+	if (!pData->isValidCurPoint) return;
+	McGePoint3d curPoint = pData->curPoint;
+	McCmColor color;
+	color.setRGB(230, 81, 0);
+	pWorldDraw->subEntityTraits().setTrueColor(color);
+	auto spLine = std::make_unique<Mx2dCustomLine>(startPoint, curPoint, 1.0);
+	spLine->worldDraw(pWorldDraw);
 }
 
 void MxCADCommand::worldDrawRect(const McGePoint3d& corner1, McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw)
@@ -279,6 +293,9 @@ void MxCADCommand::worldDrawEllipse(const McGePoint3d& corner1, McEdGetPointWorl
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d corner2 = pData->curPoint;
+	McCmColor color;
+	color.setRGB(230, 81, 0);
+	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spEllipse = std::make_unique<Mx2dCustomEllipse>(corner1, corner2, 1.0);
 	spEllipse->worldDraw(pWorldDraw);
 }
@@ -287,6 +304,9 @@ void MxCADCommand::worldDrawRectCloud(const McGePoint3d& corner1, double textHei
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d corner2 = pData->curPoint;
+	McCmColor color;
+	color.setRGB(230, 81, 0);
+	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spRectCloud = std::make_unique<Mx2dCustomRectCloud>(corner1, corner2, textHeight);
 	spRectCloud->worldDraw(pWorldDraw);
 }
@@ -306,6 +326,9 @@ void MxCADCommand::worldDrawMText(const QString& str, double textHeight, McDbObj
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
+	McCmColor color;
+	color.setRGB(230, 81, 0);
+	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spMText = std::make_unique<Mx2dCustomMText>(str, curPoint, textHeight);
 	spMText->worldDraw(pWorldDraw);
 }
@@ -314,6 +337,9 @@ void MxCADCommand::worldDrawLeader(const McGePoint3d& startPt, const QString& te
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
+	McCmColor color;
+	color.setRGB(230, 81, 0);
+	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spLeader = std::make_unique<Mx2dCustomLeader>(startPt, curPoint, text, textHeight);
 	spLeader->worldDraw(pWorldDraw);
 }
@@ -324,6 +350,9 @@ void MxCADCommand::worldDrawPolyArea(const McGePoint3dArray& pts, double textHei
 	McGePoint3d curPoint = pData->curPoint;
 	if (pts.length() >= 3)
 	{
+		McCmColor color;
+		color.setRGB(230, 81, 0);
+		pWorldDraw->subEntityTraits().setTrueColor(color);
 		auto spPolyArea = std::make_unique<Mx2dCustomPolyArea>(pts, curPoint, textHeight);
 		spPolyArea->worldDraw(pWorldDraw);
 	}
@@ -333,6 +362,9 @@ void MxCADCommand::worldDrawRectArea(const McGePoint3d& corner1, const McGePoint
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
+	McCmColor color;
+	color.setRGB(230, 81, 0);
+	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spRectArea = std::make_unique<Mx2dCustomRectArea>(corner1, corner2, curPoint, textHeight);
 	spRectArea->worldDraw(pWorldDraw);
 }
@@ -341,6 +373,9 @@ void MxCADCommand::worldDrawCartesianCoord(const McGePoint3d& insertPt, double t
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
+	McCmColor color;
+	color.setRGB(230, 81, 0);
+	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spCoord = std::make_unique<Mx2dCustomCartesianCoord>(insertPt, curPoint, textHeight);
 	spCoord->worldDraw(pWorldDraw);
 }
@@ -349,6 +384,9 @@ void MxCADCommand::worldDrawAlignedDim(const McGePoint3d& p1, const McGePoint3d&
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
+	McCmColor color;
+	color.setRGB(230, 81, 0);
+	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spDim = std::make_unique<Mx2dCustomAlignedDim>(p1, p2, curPoint, textHeight);
 	spDim->worldDraw(pWorldDraw);
 }
@@ -357,6 +395,9 @@ void MxCADCommand::worldDrawLinearDim(Mx2dCustomLinearDim* pLinearDim, McEdGetPo
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
+	McCmColor color;
+	color.setRGB(230, 81, 0);
+	pWorldDraw->subEntityTraits().setTrueColor(color);
 	pLinearDim->setDimPt(curPoint);
 	pLinearDim->worldDraw(pWorldDraw);
 }
@@ -367,6 +408,9 @@ void MxCADCommand::worldDrawContinuousMeasurement(const Mx2d::PLVertexList& pts,
 	McGePoint3d curPoint = pData->curPoint;
 	if (pts.length() >= 2)
 	{
+		McCmColor color;
+		color.setRGB(230, 81, 0);
+		pWorldDraw->subEntityTraits().setTrueColor(color);
 		auto spMeasurement = std::make_unique<Mx2dCustomContinuousMeasurement>(pts, curPoint, textHeight);
 		spMeasurement->worldDraw(pWorldDraw);
 	}
@@ -464,6 +508,9 @@ void MxCADCommand::worldDrawSegmentLengths(Mx2dCustomContinuousMeasurement* pCon
 				spText->transformBy(McGeMatrix3d::rotation(rotAngle, McGeVector3d::kZAxis, mtAnchorPt));
 				spText->transformBy(McGeMatrix3d::translation(midPt - mtAnchorPt));
 			}
+			McCmColor color;
+			color.setRGB(230, 81, 0);
+			pWorldDraw->subEntityTraits().setTrueColor(color);
 			spText->worldDraw(pWorldDraw);
 		}
 
@@ -475,6 +522,9 @@ void MxCADCommand::worldDrawRadiusDim(Mx2dCustomRadiusDim* pRadiusDim, McEdGetPo
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
+	McCmColor color;
+	color.setRGB(230, 81, 0);
+	pWorldDraw->subEntityTraits().setTrueColor(color);
 	pRadiusDim->setDimPt(curPoint);
 	double scaled = Mx2d::getViewToDocScaleRatio();
 	pRadiusDim->setTextHeight(25.0 / scaled);
@@ -485,6 +535,9 @@ void MxCADCommand::worldDrawArcLengthDim(const McGePoint3d& startPt, const McGeP
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
+	McCmColor color;
+	color.setRGB(230, 81, 0);
+	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spCustomArcLengthDim = std::make_unique<Mx2dCustomArcLengthDim>(startPt, midPt, endPt, curPoint, textHeight);
 	spCustomArcLengthDim->worldDraw(pWorldDraw);
 }
@@ -493,6 +546,9 @@ void MxCADCommand::worldDrawCircleMeasurement(const McGePoint3d& centerPt, doubl
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
+	McCmColor color;
+	color.setRGB(230, 81, 0);
+	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spCustomCircleMeasurement = std::make_unique<Mx2dCustomCircleMeasurement>(centerPt, radius, curPoint, textHeight);
 	spCustomCircleMeasurement->worldDraw(pWorldDraw);
 }
@@ -501,6 +557,9 @@ void MxCADCommand::worldDrawAngleMeasurement(const McGePoint3d& l1s, const McGeP
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
+	McCmColor color;
+	color.setRGB(230, 81, 0);
+	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spCustomAngleMeasurement = std::make_unique<Mx2dCustomAngleMeasurement>(l1s, l1e, l2s, l2e, curPoint, textHeight, true);
 	spCustomAngleMeasurement->worldDraw(pWorldDraw);
 }
@@ -523,6 +582,9 @@ void MxCADCommand::worldDrawHatchArea2(const Mx2d::HatchPLList& polyArray, doubl
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
+	McCmColor color;
+	color.setRGB(230, 81, 0);
+	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spCustomHatchArea2 = std::make_unique<Mx2dCustomHatchArea2>(polyArray, curPoint, textHeight);
 	spCustomHatchArea2->worldDraw(pWorldDraw);
 }
@@ -751,7 +813,7 @@ int MxCADCommand::isEntityInPolygon(const McDbObjectId& id, const McGePoint3dArr
 	return isPointInPolygon(centralPoint, pts);
 }
 
-void MxCADCommand::getTextEntitiesInPolygon(QList<QPair<QString, Mx2d::Mx2dExtents>>& result, const McDbObjectIdArray& ids, const McGePoint3dArray& pts, const QString& containStr, bool isFull)
+void MxCADCommand::getTextEntitiesInPolygon(Mx2d::TextInfoList& result, const McDbObjectIdArray& ids, const McGePoint3dArray& pts, const QString& containStr, bool isFull)
 {
 	for (int i = 0; i < ids.length(); i++)
 	{
@@ -782,7 +844,7 @@ void MxCADCommand::getTextEntitiesInPolygon(QList<QPair<QString, Mx2d::Mx2dExten
 					McGePoint3d maxPt = ext.maxPoint();
 					double minX, minY, maxX, maxY;
 					minX = minPt.x; minY = minPt.y; maxX = maxPt.x; maxY = maxPt.y;
-					Mx2d::Mx2dExtents ext2d(minX, minY, maxX, maxY);
+					Mx2d::Extents ext2d(minX, minY, maxX, maxY);
 
 					result.append({ str, ext2d });
 				}
@@ -797,7 +859,7 @@ void MxCADCommand::getTextEntitiesInPolygon(QList<QPair<QString, Mx2d::Mx2dExten
 					McGePoint3d maxPt = ext.maxPoint();
 					double minX, minY, maxX, maxY;
 					minX = minPt.x; minY = minPt.y; maxX = maxPt.x; maxY = maxPt.y;
-					Mx2d::Mx2dExtents ext2d(minX, minY, maxX, maxY);
+					Mx2d::Extents ext2d(minX, minY, maxX, maxY);
 
 					result.append({ str, ext2d });
 				}
@@ -826,7 +888,7 @@ void MxCADCommand::getTextEntitiesInPolygon(QList<QPair<QString, Mx2d::Mx2dExten
 						McGePoint3d maxPt = ext.maxPoint();
 						double minX, minY, maxX, maxY;
 						minX = minPt.x; minY = minPt.y; maxX = maxPt.x; maxY = maxPt.y;
-						Mx2d::Mx2dExtents ext2d(minX, minY, maxX, maxY);
+						Mx2d::Extents ext2d(minX, minY, maxX, maxY);
 
 						result.append({ str, ext2d });
 					}
@@ -841,7 +903,7 @@ void MxCADCommand::getTextEntitiesInPolygon(QList<QPair<QString, Mx2d::Mx2dExten
 						McGePoint3d maxPt = ext.maxPoint();
 						double minX, minY, maxX, maxY;
 						minX = minPt.x; minY = minPt.y; maxX = maxPt.x; maxY = maxPt.y;
-						Mx2d::Mx2dExtents ext2d(minX, minY, maxX, maxY);
+						Mx2d::Extents ext2d(minX, minY, maxX, maxY);
 
 						result.append({ str, ext2d });
 					}
@@ -878,7 +940,7 @@ McDbObjectIdArray MxCADCommand::getTextInPolygon(const McDbObjectIdArray& ids, c
 	return result;
 }
 
-void MxCADCommand::deepTextInBlockRef(QList<QPair<QString, Mx2d::Mx2dExtents>>& result, const McDbBlockReference& blockRef, const McDbObjectId& curId, const QString& containStr, bool isFull)
+void MxCADCommand::deepTextInBlockRef(Mx2d::TextInfoList& result, const McDbBlockReference& blockRef, const McDbObjectId& curId, const QString& containStr, bool isFull)
 {
 	McDbVoidPtrArray explodeBlkRef;
 	if (blockRef.explode(explodeBlkRef) != Mcad::eOk)
@@ -901,7 +963,7 @@ void MxCADCommand::deepTextInBlockRef(QList<QPair<QString, Mx2d::Mx2dExtents>>& 
 					McGePoint3d maxPt = ext.maxPoint();
 					double minX, minY, maxX, maxY;
 					minX = minPt.x; minY = minPt.y; maxX = maxPt.x; maxY = maxPt.y;
-					Mx2d::Mx2dExtents ext2d(minX, minY, maxX, maxY);
+					Mx2d::Extents ext2d(minX, minY, maxX, maxY);
 
 					result.append({ str, ext2d });
 				}
@@ -916,7 +978,7 @@ void MxCADCommand::deepTextInBlockRef(QList<QPair<QString, Mx2d::Mx2dExtents>>& 
 					McGePoint3d maxPt = ext.maxPoint();
 					double minX, minY, maxX, maxY;
 					minX = minPt.x; minY = minPt.y; maxX = maxPt.x; maxY = maxPt.y;
-					Mx2d::Mx2dExtents ext2d(minX, minY, maxX, maxY);
+					Mx2d::Extents ext2d(minX, minY, maxX, maxY);
 
 					result.append({ str, ext2d });
 				}
@@ -942,7 +1004,7 @@ void MxCADCommand::deepTextInBlockRef(QList<QPair<QString, Mx2d::Mx2dExtents>>& 
 						McGePoint3d maxPt = ext.maxPoint();
 						double minX, minY, maxX, maxY;
 						minX = minPt.x; minY = minPt.y; maxX = maxPt.x; maxY = maxPt.y;
-						Mx2d::Mx2dExtents ext2d(minX, minY, maxX, maxY);
+						Mx2d::Extents ext2d(minX, minY, maxX, maxY);
 
 						result.append({ str, ext2d });
 					}
@@ -957,7 +1019,7 @@ void MxCADCommand::deepTextInBlockRef(QList<QPair<QString, Mx2d::Mx2dExtents>>& 
 						McGePoint3d maxPt = ext.maxPoint();
 						double minX, minY, maxX, maxY;
 						minX = minPt.x; minY = minPt.y; maxX = maxPt.x; maxY = maxPt.y;
-						Mx2d::Mx2dExtents ext2d(minX, minY, maxX, maxY);
+						Mx2d::Extents ext2d(minX, minY, maxX, maxY);
 
 						result.append({ str, ext2d });
 					}
@@ -1003,7 +1065,7 @@ void MxCADCommand::Mx_TextSearch()
 	ss.asArray(aryId);
 
 
-	QList<QPair<QString, Mx2d::Mx2dExtents>> result;
+	Mx2d::TextInfoList result;
 
 	textFilter(result, aryId, qstr, isFull);
 
@@ -1047,7 +1109,7 @@ void MxCADCommand::Mx_TextSearchRect()
 	McDbObjectIdArray aryId;
 	ss.asArray(aryId);
 
-	QList<QPair<QString, Mx2d::Mx2dExtents>> result;
+	Mx2d::TextInfoList result;
 	textFilter(result, aryId, qstr, isFull);
 
 	MXAPP.CallMain([=]() {
@@ -1147,13 +1209,111 @@ void MxCADCommand::Mx_TextSearchPolygon()
 	selectionSet.asArray(entityIds);
 
 	// Store final search results: (matched text content, entity 2D extents)
-	QList<QPair<QString, Mx2d::Mx2dExtents>> searchResults;
+	Mx2d::TextInfoList searchResults;
 	// Filter entities that are inside the polygon and match the search text
 	getTextEntitiesInPolygon(searchResults, entityIds, polygonPoints, qstr, isFullMatch);
 
 	// Trigger signal to pass results to main thread (UI update)
 	MXAPP.CallMain([=]() {
 		emit Mx2dSignalTransfer::getInstance().signalTextSearched(searchResults);
+		});
+}
+
+void MxCADCommand::Mx_GetRectArea()
+{
+	SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select first corner of rectangular area"));
+	MrxDbgUiPrPoint getCorner1(QCoreApplication::translate("MxCADCommand", "Select first corner of rectangular area").toStdString().c_str());
+	MrxDbgUiPrBase::Status ret = getCorner1.go();
+	if (ret != MrxDbgUiPrBase::kOk)
+	{
+		HIDE_PROMPT_MESSAGE; 
+		return;
+	}
+	McGePoint3d corner1 = getCorner1.value();
+
+	SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select second corner of rectangular area"));
+	MrxDbgUiPrPoint getCorner2(QCoreApplication::translate("MxCADCommand", "Select second corner of rectangular area").toStdString().c_str());
+	getCorner2.setUserDraw([=](McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw) {
+		worldDrawRect(corner1, pData, pWorldDraw);
+		});
+	ret = getCorner2.go();
+	if (ret != MrxDbgUiPrBase::kOk)
+	{
+		HIDE_PROMPT_MESSAGE;
+		return;
+	}
+	McGePoint3d corner2 = getCorner2.value();
+
+	HIDE_PROMPT_MESSAGE;
+	Mx2d::Rect2D result{ {corner1.x, corner1.y}, {corner2.x, corner2.y} };
+	MXAPP.CallMain([=]() {
+		emit Mx2dSignalTransfer::getInstance().signalTextSearchRect(MxUtils::gCurrentTab, result);
+		});
+}
+
+void MxCADCommand::Mx_GetPolyArea()
+{
+	// Prompt user to select polygon start point
+	SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select start point"));
+	MrxDbgUiPrPoint getStartPoint(QCoreApplication::translate("MxCADCommand", "Select start point").toStdString().c_str());
+	MrxDbgUiPrBase::Status retStatus = getStartPoint.go();
+	// Exit if user cancels or fails to select point
+	if (retStatus != MrxDbgUiPrBase::kOk)
+	{
+		HIDE_PROMPT_MESSAGE;
+		return;
+	}
+	McGePoint3d startPoint = getStartPoint.value();
+
+	// Array to store polygon vertices (starts with the first selected point)
+	McGePoint3dArray polygonPoints;
+	polygonPoints.append(startPoint);
+
+	// Prompt user to select subsequent polygon vertices
+	SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select next point"));
+	while (true)
+	{
+		MrxDbgUiPrPoint getNextPoint(QCoreApplication::translate("MxCADCommand", "Select next point").toStdString().c_str());
+		// Enable dynamic preview of the polygon while selecting points
+		getNextPoint.setUserDraw([=](McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw) {
+			worldDrawPolygon(polygonPoints, pData, pWorldDraw);
+			});
+		retStatus = getNextPoint.go();
+
+		// Handle user input status
+		if (retStatus == MrxDbgUiPrBase::kOk)
+		{
+			// Add selected point to polygon vertex array and continue selecting
+			polygonPoints.append(getNextPoint.value());
+			continue;
+		}
+		else if (retStatus == MrxDbgUiPrBase::kCancel)
+		{
+			// Hide prompt and exit if user cancels the operation
+			HIDE_PROMPT_MESSAGE;
+			return;
+		}
+		else if (retStatus == MrxDbgUiPrBase::kNone)
+		{
+			// Finish polygon selection when user click RightMouseKey (no more points)
+			HIDE_PROMPT_MESSAGE;
+			break;
+		}
+	}
+
+	if (polygonPoints.size() < 3)
+	{
+		return;
+	}
+
+	Mx2d::Point2DList polygonPoints2D;
+	for (int i = 0; i < polygonPoints.size(); i++)
+	{
+		polygonPoints2D.append(Mx2d::Point2D{ polygonPoints[i].x, polygonPoints[i].y });
+	}
+
+	MXAPP.CallMain([=]() {
+		emit Mx2dSignalTransfer::getInstance().signalTextSearchPoly(MxUtils::gCurrentTab, polygonPoints2D);
 		});
 }
 
@@ -1178,9 +1338,10 @@ void MxCADCommand::Mx_DrawLine()
 		// Prompt user to select line end point
 		SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select end point"));
 		MrxDbgUiPrPoint getEndPoint(QCoreApplication::translate("MxCADCommand", "Select end point").toStdString().c_str());
-		// Set base point to start point for dynamic rubber band preview
-		getEndPoint.setBasePt(startPoint);
-		getEndPoint.setUseBasePt(true);
+		// Dynamic rubber band preview
+		getEndPoint.setUserDraw([=](McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw) {
+			worldDrawLine(startPoint, pData, pWorldDraw);
+			});
 		retStatus = getEndPoint.go();
 
 		// Exit command if user cancels or fails to select end point
@@ -1220,7 +1381,7 @@ void MxCADCommand::Mx_MoveViewCenterTo()
 	double maxX = pRb->rbnext->rbnext->resval.rreal;
 	double maxY = pRb->rbnext->rbnext->rbnext->resval.rreal;
 
-	Mx2d::Mx2dExtents ext2d(minX, minY, maxX, maxY);
+	Mx2d::Extents ext2d(minX, minY, maxX, maxY);
 
 	double width = maxX - minX;
 	double height = maxY - minY;
@@ -1664,21 +1825,63 @@ void MxCADCommand::Mx_ExtractTextPoly()
 		emit Mx2dSignalTransfer::getInstance().signalExtractTextFinished(MxUtils::gCurrentTab, extractedTexts);
 		});
 }
-
-void MxCADCommand::Mx_ExtractTable()
+#if 1
+void MxCADCommand::Mx_ExtractTable() 
 {
 	double m_gap = 0.1;
 	MrxDbgUiPrPoint getCorner1(QCoreApplication::translate("MxCADCommand", "Select first corner of rectangular area").toStdString().c_str()), getCorner2(QCoreApplication::translate("MxCADCommand", "Select second corner of rectangular area").toStdString().c_str());
+	SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select first corner of rectangular area"));
 	MrxDbgUiPrBase::Status ret = getCorner1.go();
 	if (ret != MrxDbgUiPrBase::kOk)
+	{
+		HIDE_PROMPT_MESSAGE;
 		return;
+	}
 	McGePoint3d corner1 = getCorner1.value();
 	getCorner2.setUserDraw([=](McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw) {
 		worldDrawRect(corner1, pData, pWorldDraw);
 		});
+	SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select second corner of rectangular area"));
 	ret = getCorner2.go();
 	if (ret != MrxDbgUiPrBase::kOk)
+	{
+		HIDE_PROMPT_MESSAGE;
 		return;
+	}
+	HIDE_PROMPT_MESSAGE;
+	McGePoint3d corner2 = getCorner2.value();
+
+	McGePoint3d new_corner1(min(corner1.x, corner2.x) - m_gap, min(corner1.y, corner2.y) - m_gap, 0);
+	McGePoint3d new_corner2(max(corner1.x, corner2.x) + m_gap, max(corner1.y, corner2.y) + m_gap, 0);
+	MXAPP.CallMain([=]() {
+		emit Mx2dSignalTransfer::getInstance().signalTableRect(MxUtils::gCurrentTab, new_corner1, new_corner2);
+		});
+}
+
+#else
+void MxCADCommand::Mx_ExtractTable()
+{
+	double m_gap = 0.1;
+	MrxDbgUiPrPoint getCorner1(QCoreApplication::translate("MxCADCommand", "Select first corner of rectangular area").toStdString().c_str()), getCorner2(QCoreApplication::translate("MxCADCommand", "Select second corner of rectangular area").toStdString().c_str());
+	SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select first corner of rectangular area"));
+	MrxDbgUiPrBase::Status ret = getCorner1.go();
+	if (ret != MrxDbgUiPrBase::kOk)
+	{
+		HIDE_PROMPT_MESSAGE;
+		return;
+	}
+	McGePoint3d corner1 = getCorner1.value();
+	getCorner2.setUserDraw([=](McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw) {
+		worldDrawRect(corner1, pData, pWorldDraw);
+		});
+	SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select second corner of rectangular area"));
+	ret = getCorner2.go();
+	if (ret != MrxDbgUiPrBase::kOk)
+	{
+		HIDE_PROMPT_MESSAGE;
+		return;
+	}
+	HIDE_PROMPT_MESSAGE;
 	McGePoint3d corner2 = getCorner2.value();
 
 	McGePoint3d new_corner1(min(corner1.x, corner2.x) - m_gap, min(corner1.y, corner2.y) - m_gap, 0);
@@ -1886,7 +2089,7 @@ void MxCADCommand::Mx_ExtractTable()
 
 	if ((int)Xcoords.size() < 2 || (int)Ycoords.size() < 2)
 	{
-        LOG_ERROR(QString("can not be a table"));
+		LOG_ERROR(QString("can not be a table"));
 		return;
 	}
 
@@ -2375,12 +2578,14 @@ void MxCADCommand::Mx_ExtractTable()
 
 		lxw_error err = workbook_close(workbook);
 		if (LXW_NO_ERROR != err) {
-            LOG_ERROR(QString("Failed to export table, please check if file is already open, close it and try again!"));
+			LOG_ERROR(QString("Failed to export table, please check if file is already open, close it and try again!"));
 			// TODO: show error message
 			return;
 		}
 		});
 }
+
+#endif
 
 void MxCADCommand::Mx_DrawNumberedText()
 {
@@ -2958,8 +3163,9 @@ void MxCADCommand::Mx_DrawAlignedDimMark()
 		SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select aligned dimension end point"));
 		MrxDbgUiPrPoint getEndPoint(QCoreApplication::translate("MxCADCommand", "Select aligned dimension end point").toStdString().c_str());
 		// Set base point for rubber band preview
-		getEndPoint.setBasePt(startPoint);
-		getEndPoint.setUseBasePt(true);
+		getEndPoint.setUserDraw([=](McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw) {
+			worldDrawLine(startPoint, pData, pWorldDraw);
+			});
 		retStatus = getEndPoint.go();
 
 		if (retStatus != MrxDbgUiPrBase::kOk)
@@ -3016,8 +3222,9 @@ void MxCADCommand::Mx_DrawLinearDimMark()
 		SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select linear dimension end point"));
 		MrxDbgUiPrPoint getEndPoint(QCoreApplication::translate("MxCADCommand", "Select linear dimension end point").toStdString().c_str());
 		// Set base point for rubber band preview
-		getEndPoint.setBasePt(startPoint);
-		getEndPoint.setUseBasePt(true);
+		getEndPoint.setUserDraw([=](McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw) {
+			worldDrawLine(startPoint, pData, pWorldDraw);
+			});
 		retStatus = getEndPoint.go();
 
 		if (retStatus != MrxDbgUiPrBase::kOk)
@@ -4656,8 +4863,9 @@ void MxCADCommand::Mx_MoveAnnotation()
 	// Prompt to select placement point
 	SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select placement point"));
 	MrxDbgUiPrPoint getPoint(QCoreApplication::translate("MxCADCommand", "Select placement point").toStdString().c_str());
-	getPoint.setUseBasePt(true);
-	getPoint.setBasePt(basePt);
+	getPoint.setUserDraw([=](McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw) {
+		worldDrawLine(basePt, pData, pWorldDraw);
+		});
 	// Dynamic preview: Draw cloned annotations at current cursor position
 	getPoint.setUserDraw([&](McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw) {
 		if (!pData->isValidCurPoint) return;
@@ -4740,8 +4948,9 @@ void MxCADCommand::Mx_CopyAnnotation()
 		// Prompt to select placement point
 		SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select placement point"));
 		MrxDbgUiPrPoint getPoint(QCoreApplication::translate("MxCADCommand", "Select placement point").toStdString().c_str());
-		getPoint.setUseBasePt(true);
-		getPoint.setBasePt(basePt);
+		getPoint.setUserDraw([=](McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw) {
+			worldDrawLine(basePt, pData, pWorldDraw);
+			});
 		getPoint.setUserDraw([&](McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw) {
 			if (!pData->isValidCurPoint) return;
 			McGePoint3d curPoint = pData->curPoint;
@@ -4811,6 +5020,34 @@ void MxCADCommand::Mx_EraseAnnotation()
 		});
 }
 
+void MxCADCommand::Mx_GetDrawingLength()
+{
+	// prompt to select start point
+    SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select start point"));
+    MrxDbgUiPrPoint getStartPoint(QCoreApplication::translate("MxCADCommand", "Select start point").toStdString().c_str());
+    MrxDbgUiPrBase::Status retStatus = getStartPoint.go();
+    HIDE_PROMPT_MESSAGE;
+    if (retStatus != MrxDbgUiPrBase::kOk)
+    {
+        return;
+    }
+    McGePoint3d startPoint = getStartPoint.value();
+    SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select end point"));
+    MrxDbgUiPrPoint getEndPoint(QCoreApplication::translate("MxCADCommand", "Select end point").toStdString().c_str());
+    retStatus = getEndPoint.go();
+    HIDE_PROMPT_MESSAGE;
+    if (retStatus != MrxDbgUiPrBase::kOk)
+    {
+        return;
+    }
+    McGePoint3d endPoint = getEndPoint.value();
+	double length = startPoint.distanceTo(endPoint);
+    MXAPP.CallMain([=]() {
+		 emit Mx2dSignalTransfer::getInstance().signalDrawingLength(MxUtils::gCurrentTab, length);
+		});
+
+}
+
 void MxCADCommand::Mx_TestThread()
 {
 	// Continuous line drawing loop (repeat until user cancels)
@@ -4833,8 +5070,9 @@ void MxCADCommand::Mx_TestThread()
 		SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select end point"));
 		MrxDbgUiPrPoint getEndPoint(QCoreApplication::translate("MxCADCommand", "Select end point").toStdString().c_str());
 		// Set base point to start point for dynamic rubber band preview
-		getEndPoint.setBasePt(startPoint);
-		getEndPoint.setUseBasePt(true);
+		getEndPoint.setUserDraw([=](McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw) {
+			worldDrawLine(startPoint, pData, pWorldDraw);
+			});
 		retStatus = getEndPoint.go();
 
 		// Exit command if user cancels or fails to select end point

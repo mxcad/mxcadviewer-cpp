@@ -6,6 +6,8 @@ This application shall enter into an agreement with Chengdu Dreamkaide Technolog
 for the use of this software, its documentation or related materials.
 *******************************************************************************************/
 
+#pragma once
+
 #include <QObject>
 #include <QSettings>
 #include <QString>

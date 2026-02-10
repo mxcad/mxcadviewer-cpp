@@ -1,4 +1,4 @@
-/******************************************************************************************
+﻿/******************************************************************************************
 Copyright (c) 2025 Chengdu Dreamkaide Technology Co., Ltd. <https://www.webcadsdk.com/>
 All rights reserved.
 Applications incorporating this software must include the following copyright notice.
@@ -36,6 +36,8 @@ public:
 	virtual Mcad::ErrorStatus   transformBy(const McGeMatrix3d& xform) override;
 	virtual void fromJson(const QJsonObject& jsonObject) override;
 	virtual QJsonObject toJson() const override;
+
+	virtual Mx2d::TextInfoList findText(const QString& text, bool isExactMatch = false) const override;
 public:
 	void setTextString(const QString& textStr);
 	QString textString() const;

@@ -32,7 +32,7 @@ public:
 
 private slots:
 	void onSearchClicked();
-	void onSearchResults(const QList<QPair<QString, Mx2d::Mx2dExtents>>& result);
+	void onSearchResults(const Mx2d::TextInfoList& result);
 	void onSearchAreaChanged();
 	void onSelectAreaClicked();
 	void onToggleShowResult(bool checked);
@@ -56,7 +56,7 @@ private:
 	QLabel* m_pResultCountLabel;
 	QCheckBox* m_pMarkAllCheck;
 
-	QList<QPair<QString, Mx2d::Mx2dExtents>> m_results;
+	Mx2d::TextInfoList m_results;
 	QTableWidget* m_pResultTable;
 
 	QPushButton* m_pExportExcelBtn;
@@ -70,9 +70,19 @@ private:
 	Mx2dGuiDocument* m_guiDoc;
 	void initControls();
 	void initLayout();
-	void addToTable(int count, const QString& text, Mx2d::Mx2dExtents ext2d);
+	void addToTable(int count, const QString& text, Mx2d::Extents ext2d);
 	void updateSearchResult();
 
 protected:
 	void closeEvent(QCloseEvent* ) override;
+private:
+	Mx2d::Rect2D m_searchAreaRect;
+	Mx2d::Point2DList m_searchAreaIrregular;
+
+private:
+	int getCheckedButtonId(QButtonGroup* group);
+	Mx2d::TextInfoList searchText(const QString& text, bool isExactMatch, int searchArea, int searchScope, bool markAllResults);
+	Mx2d::TextInfoList traverseTextInBlockTableRecord(McDbObjectId btrId, const McGeMatrix3d& trsfMat);
+	void drawRectByCorner(const McGePoint3d& corner1, const McGePoint3d& corner2, MxColor color, bool isReserve = false);
+	void moveViewCenterTo(Mx2d::Extents ext2d);
 };

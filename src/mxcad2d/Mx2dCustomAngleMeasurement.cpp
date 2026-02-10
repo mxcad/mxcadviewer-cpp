@@ -208,6 +208,31 @@ QJsonObject Mx2dCustomAngleMeasurement::toJson() const
 	return jsonObject;
 }
 
+Mx2d::TextInfoList Mx2dCustomAngleMeasurement::findText(const QString& text, bool isExactMatch) const
+{
+	assertReadEnabled();
+	McDbExtents ext;
+	McDbVoidPtrArray arr = createAllEntities();
+	McDbText* pText = static_cast<McDbText*>(arr[3]);
+	pText->getGeomExtents(ext, false);
+	QString textStr = QString::fromLocal8Bit(pText->textString());
+	McGePoint3d minPt = ext.minPoint();
+	McGePoint3d maxPt = ext.maxPoint();
+	Mx2d::Extents extents{ minPt.x, minPt.y,maxPt.x, maxPt.y };
+	for (int i = 0; i < arr.length(); ++i)
+	{
+		delete arr[i];
+	}
+	arr.clear();
+	if ((isExactMatch && (text != textStr)) ||
+		(!isExactMatch && !textStr.contains(text, Qt::CaseInsensitive)))
+	{
+		return {};
+	}
+
+	return { {textStr , extents} };
+}
+
 void Mx2dCustomAngleMeasurement::setLine1Start(const McGePoint3d& line1Start)
 {
 	assertWriteEnabled();

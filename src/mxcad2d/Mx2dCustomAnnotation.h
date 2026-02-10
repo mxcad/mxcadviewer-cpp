@@ -11,6 +11,7 @@ for the use of this software, its documentation or related materials.
 #include "MxCADInclude.h"
 #include <QJsonObject>
 #include <QString>
+#include "Mx2dUtils.h"
 
 class Mx2dCustomAnnotation : public McDbEntity
 {
@@ -37,12 +38,18 @@ public:
 	void setType(const QString& type);
 	QString type() const;
 
+	void setLayout(const QString& layoutName);
+    QString layout() const;
+
 	virtual void fromJson(const QJsonObject& jsonObject);
 	virtual QJsonObject toJson() const;
+
+	virtual Mx2d::TextInfoList findText(const QString& text, bool isExactMatch = false) const;
 
 protected:
 	double m_textHeight;
 	double m_dimRatio = 1.0;
 	QString m_category = "default";
 	QString m_type = "annotation";
+	QString m_layout = "Model";
 };

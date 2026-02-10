@@ -173,7 +173,14 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
+# Translation files
+set(TS_FILES "${CMAKE_SOURCE_DIR}/src/${PROJECT_NAME}_zh_CN.ts")
 
+# Create qm files, if ts files not exists, also create them from sources
+qt5_create_translation(QM_FILES ${COMMON_SOURCES} ${MXCAD3D_SOURCES} ${MXLOGIN_SOURCES} ${MXCAD2D_SOURCES} ${TS_FILES})
+
+# Ensure create qm files
+target_sources(${PROJECT_NAME} PRIVATE ${QM_FILES})
 
 # Set link directories
 target_link_directories(${PROJECT_NAME} PRIVATE "$<IF:$<CONFIG:Debug>,${OpenCASCADE_LIBRARY_DIR_DEBUG},${OpenCASCADE_LIBRARY_DIR}>" ${FT_LIB_DIR} ${XLSXWRITER_LIB_DIR} ${ZLIB_LIB_DIR})

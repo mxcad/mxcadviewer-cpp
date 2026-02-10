@@ -240,10 +240,18 @@ void Mx2dLayerManagerDialog::onSwitchCellClicked(int row, int column)
         return;
     if (row < 0 || row >= m_currentLayerInfo.length())
         return;
-	Mx2d::LayerInfoDetail& ly = m_currentLayerInfo[row];
-    ly.isOff = !ly.isOff;
-	Mx2d::LayerInfo layerInfo;
-	layerInfo.append(ly);
+    QString qsName = m_layerTable->item(row, 2)->text();
+    // find layer info detail from m_currentLayerInfo(QList) by name
+    Mx2d::LayerInfo layerInfo;
+    for (auto& layer : m_currentLayerInfo)
+    {
+        if (layer.name == qsName)
+        {
+            layer.isOff = !layer.isOff;
+            layerInfo.append(layer);
+            break;
+        }
+    }
 	setSomeLayersOffStatus(layerInfo);
     updateLayerTable(m_currentLayerInfo);
 }

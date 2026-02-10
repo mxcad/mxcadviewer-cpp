@@ -20,6 +20,7 @@ for the use of this software, its documentation or related materials.
 #include "Mx2dSignalTransfer.h"
 #include "MxUtils.h"
 #include "Mx2dGuiDocument.h"
+#include "Mx2dCustomAnnotation.h"
 
 Mx2dTextSearchDialog::Mx2dTextSearchDialog(Mx2dGuiDocument* guiDoc)
 	: QDialog(guiDoc), m_guiDoc(guiDoc)
@@ -54,6 +55,22 @@ void Mx2dTextSearchDialog::initControls()
 	m_pSearchBtn = new QPushButton(tr("Search"), this);
 	connect(m_pSearchBtn, &QPushButton::clicked, this, &Mx2dTextSearchDialog::onSearchClicked); // Execute text search command
 	connect(&Mx2dSignalTransfer::getInstance(), &Mx2dSignalTransfer::signalTextSearched, this, &Mx2dTextSearchDialog::onSearchResults); // Display search results
+	connect(&Mx2dSignalTransfer::getInstance(), &Mx2dSignalTransfer::signalTextSearchRect, this, [this](QWidget* tab, const Mx2d::Rect2D& rect) {
+		if (tab != m_guiDoc)
+			return;
+		m_searchAreaRect = rect;
+		});
+	connect(&Mx2dSignalTransfer::getInstance(), &Mx2dSignalTransfer::signalTextSearchPoly, this, [this](QWidget* tab, const Mx2d::Point2DList& poly) {
+		if (tab != m_guiDoc)
+			return;
+		if (Mx2d::isPolygonSelfIntersecting(poly))
+		{
+            m_searchAreaIrregular.clear();
+            QMessageBox::information(this, tr("Prompt"), tr("The irregular area cannot be a self-intersecting polygon."));
+			return;
+		}
+		m_searchAreaIrregular = poly;
+		});
 
 	// Search conditions
 	m_pFullMatchCheck = new QCheckBox(tr("Exact match"), this);
@@ -67,9 +84,27 @@ void Mx2dTextSearchDialog::initControls()
 	m_pWholePaperRadio->setChecked(true);
 	// Search area button group
 	m_pAreaButtonGroup = new QButtonGroup(this);
-	m_pAreaButtonGroup->addButton(m_pWholePaperRadio);
-	m_pAreaButtonGroup->addButton(m_pRectAreaRadio);
-	m_pAreaButtonGroup->addButton(m_pIrregularAreaRadio);
+	m_pAreaButtonGroup->setExclusive(false);
+	m_pAreaButtonGroup->addButton(m_pWholePaperRadio, 0);
+	m_pAreaButtonGroup->addButton(m_pRectAreaRadio, 1);
+	m_pAreaButtonGroup->addButton(m_pIrregularAreaRadio, 2);
+	connect(m_pAreaButtonGroup, QOverload<int>::of(&QButtonGroup::buttonClicked), this, [this](int id) {
+		auto checkButton = [this](int id) {
+			for (auto* btn : m_pAreaButtonGroup->buttons()) {
+				btn->setChecked(false);
+			}
+			m_pAreaButtonGroup->button(id)->setChecked(true);
+		};
+		if (id == 0)
+		{
+			checkButton(id);
+			return;
+		}
+		checkButton(0);
+		MxUtils::doAction([checkButton, id]() {
+			checkButton(id);
+			});
+		});
 
 	m_pSelectAreaBtn = new QPushButton(QIcon(":/resources/images2d/2d_textSearchRegion.svg"), tr("Select Area"), this);
 	m_pSelectAreaBtn->setEnabled(false);
@@ -86,8 +121,26 @@ void Mx2dTextSearchDialog::initControls()
 	m_pPaperTextRadio->setChecked(true);
 	// Search scope button group
 	m_pScopeButtonGroup = new QButtonGroup(this);
-	m_pScopeButtonGroup->addButton(m_pPaperTextRadio);
-	m_pScopeButtonGroup->addButton(m_pAppTextRadio);
+	m_pScopeButtonGroup->setExclusive(false);
+	m_pScopeButtonGroup->addButton(m_pPaperTextRadio, 0);
+	m_pScopeButtonGroup->addButton(m_pAppTextRadio, 1);
+	connect(m_pScopeButtonGroup, QOverload<int>::of(&QButtonGroup::buttonClicked), this, [this](int id) {
+		auto checkButton = [this](int id) {
+			for (auto* btn : m_pScopeButtonGroup->buttons()) {
+				btn->setChecked(false);
+			}
+			m_pScopeButtonGroup->button(id)->setChecked(true);
+			};
+		if (id == 0)
+		{
+			checkButton(id);
+			return;
+		}
+		checkButton(0);
+		MxUtils::doAction([checkButton, id]() {
+			checkButton(id);
+			});
+		});
 
 	// Result related controls
 	m_pShowResultCheck = new QCheckBox(tr("Show results"), this);
@@ -129,7 +182,11 @@ void Mx2dTextSearchDialog::initControls()
 
 	// Connect slot functions for buttons
 	connect(m_pNextResultBtn, &QPushButton::clicked, this, &Mx2dTextSearchDialog::onNextResultClicked);
-	connect(m_pExportExcelBtn, &QPushButton::clicked, this, &Mx2dTextSearchDialog::onExportToExcelClicked);
+	connect(m_pExportExcelBtn, &QPushButton::clicked, this, [this]() {
+		MxUtils::doAction([this]() {
+			onExportToExcelClicked();
+			});
+		});
 	connect(m_pCompleteBtn, &QPushButton::clicked, this, &QDialog::close);
 }
 
@@ -194,7 +251,7 @@ void Mx2dTextSearchDialog::initLayout()
 	resize(700, height());
 }
 
-void Mx2dTextSearchDialog::addToTable(int count, const QString& text, Mx2d::Mx2dExtents ext2d)
+void Mx2dTextSearchDialog::addToTable(int count, const QString& text, Mx2d::Extents ext2d)
 {
 	QTableWidgetItem* numberItem = new QTableWidgetItem(QString::number(count + 1));
 	numberItem->setTextAlignment(Qt::AlignCenter);
@@ -202,10 +259,10 @@ void Mx2dTextSearchDialog::addToTable(int count, const QString& text, Mx2d::Mx2d
 
 	QTableWidgetItem* textItem = new QTableWidgetItem(text);
 
-	textItem->setData(Qt::UserRole, ext2d.m_minX);
-	textItem->setData(Qt::UserRole + 1, ext2d.m_minY);
-	textItem->setData(Qt::UserRole + 2, ext2d.m_maxX);
-	textItem->setData(Qt::UserRole + 3, ext2d.m_maxY);
+	textItem->setData(Qt::UserRole, ext2d.minX);
+	textItem->setData(Qt::UserRole + 1, ext2d.minY);
+	textItem->setData(Qt::UserRole + 2, ext2d.maxX);
+	textItem->setData(Qt::UserRole + 3, ext2d.maxY);
 	m_pResultTable->setItem(count, 1, textItem);
 }
 
@@ -248,8 +305,242 @@ void Mx2dTextSearchDialog::closeEvent(QCloseEvent*)
 	MxDrawApp::UpdateDisplay(m_guiDoc->cadView().GetOcxHandle());
 }
 
+int Mx2dTextSearchDialog::getCheckedButtonId(QButtonGroup* group)
+{
+	auto btns = group->buttons();
+	for (auto & btn : btns)
+	{
+		if (btn->isChecked())
+			return group->id(btn);
+	}
+    return -1;
+}
+
+Mx2d::TextInfoList Mx2dTextSearchDialog::searchText(const QString& text, bool isExactMatch, int searchArea, int searchScope, bool markAllResults)
+{
+	MrxDbgSelSet ss;
+	MrxDbgRbList spFilter = Mx::mcutBuildList(RTDXF0, searchScope == 0 ? "TEXT,MTEXT,INSERT" : "AnnotationMark,RectCloudMark,RectMark,LineMark,EllipseMark,LeaderMark,TextMark,MTextMark,PolyAreaMark,RectAreaMark,CartesianCoordMark,AlignedDimMark,LinearDimMark,ContinuousMeasurementMark,RadiusDimMark,ArcLengthDimMark,CircleMeasurementMark,AngleMeasurementMark,ArcPolyAreaMark,HatchAreaMark,HatchArea2Mark,BatchMeasurementMark", 0);
+	if (searchArea == 1)
+	{
+		McGePoint3d pt1(m_searchAreaRect.first.x, m_searchAreaRect.first.y, 0);
+		McGePoint3d pt2(m_searchAreaRect.second.x, m_searchAreaRect.second.y, 0);
+
+		if (ss.windowSelect(pt1, pt2, spFilter.data()) != MrxDbgSelSet::kSelected) 
+		{
+			qDebug() << "windowSelect failed!";
+			qDebug() << QString("(%1, %2)").arg(pt1.x).arg(pt1.y);
+			qDebug() << QString("(%1, %2)").arg(pt2.x).arg(pt2.y);
+			return {};
+		}
+	}
+	else if (searchArea == 2)
+	{
+		if (m_searchAreaIrregular.empty())
+			return {};
+		McGePoint3dArray ary;
+		for (auto& pt2d : m_searchAreaIrregular)
+		{
+			ary.append(McGePoint3d(pt2d.x, pt2d.y, 0));
+			//qDebug() << QString("(%1, %2)").arg(pt2d.x).arg(pt2d.y);
+		}
+		Mx2d::Extents ext2d = Mx2d::getPolygonGeomExtents(ary);
+		MrxDbgSelSet::SelSetStatus status = ss.crossingSelect(ext2d.bottomRight3d(), ext2d.topLeft3d(), spFilter.data());
+		qDebug() << "crossingSelect status:" << status;
+		if (status != MrxDbgSelSet::kSelected)
+		{
+			return {};
+		}
+	}
+	else
+	{
+		if (ss.allSelect(spFilter.data()) != MrxDbgSelSet::kSelected)
+		{
+			qDebug() << "allSelect failed!";
+			return {};
+		}
+	}
+	
+	McDbObjectIdArray aryId;
+	ss.asArray(aryId);
+
+	qDebug() << "Selected entities:" << aryId.length();
+
+	Mx2d::TextInfoList res;
+	for (int i = 0; i < aryId.length(); i++)
+	{
+		McDbObjectPointer<McDbEntity> spEntity(aryId[i], McDb::kForRead);
+		if (spEntity.openStatus() != Mcad::eOk)
+			continue;
+		if (spEntity->isKindOf(Mx2dCustomAnnotation::desc()))
+		{
+            Mx2dCustomAnnotation* pAnnotation = Mx2dCustomAnnotation::cast(spEntity.object());
+			res.append(pAnnotation->findText(text, isExactMatch));
+		}
+		else if (spEntity->isA() == McDbText::desc())
+		{
+			McDbText* pText = McDbText::cast(spEntity.object());
+			QString textStr = QString::fromLocal8Bit(pText->textString());
+			McDbExtents ext;
+			pText->getGeomExtents(ext, false);
+			McGePoint3d minPt = ext.minPoint();
+            McGePoint3d maxPt = ext.maxPoint();
+			Mx2d::Extents ext2d{ minPt.x, minPt.y, maxPt.x,maxPt.y };
+
+			if ((isExactMatch && (textStr != text)) || (!isExactMatch && !textStr.contains(text, Qt::CaseInsensitive)))
+			{
+				continue;
+			}
+			res.append({ textStr , ext2d });
+		}
+		else if (spEntity->isA() == McDbText::desc())
+		{
+            McDbMText* pMText = McDbMText::cast(spEntity.object());
+            QString textStr = QString::fromLocal8Bit(pMText->contents());
+            McDbExtents ext;
+            pMText->getGeomExtents(ext, false);
+            McGePoint3d minPt = ext.minPoint();
+            McGePoint3d maxPt = ext.maxPoint();
+            Mx2d::Extents ext2d{ minPt.x, minPt.y, maxPt.x,maxPt.y };
+            if ((isExactMatch && (textStr != text)) || (!isExactMatch && !textStr.contains(text, Qt::CaseInsensitive)))
+            {
+                continue;
+            }
+            res.append({ textStr , ext2d });
+		}
+		else if (spEntity->isA() == McDbBlockReference::desc())
+		{
+            McDbBlockReference* pBlockRef = McDbBlockReference::cast(spEntity.object());
+			McGeMatrix3d mat = pBlockRef->blockTransform(true);
+			McDbObjectId blockId = pBlockRef->blockTableRecord();
+			Mx2d::TextInfoList res2 = traverseTextInBlockTableRecord(blockId, mat);
+			for (const auto& info : res2)
+			{
+				QString textStr = info.first;
+				if ((isExactMatch && (textStr != text)) || (!isExactMatch && !textStr.contains(text, Qt::CaseInsensitive)))
+				{
+					continue;
+				}
+				res.append(info);
+			}
+		}
+	}
+	if (searchArea == 2)
+	{
+		Mx2d::TextInfoList resInPolygon;
+		for (const auto& info : res)
+		{
+			Mx2d::Extents ext = info.second;
+			if (Mx2d::isPointInPolygon(ext.center(), m_searchAreaIrregular) != 0)
+				resInPolygon.append(info);
+		}
+        return resInPolygon;
+	}
+	return res;
+}
+
+Mx2d::TextInfoList Mx2dTextSearchDialog::traverseTextInBlockTableRecord(McDbObjectId btrId, const McGeMatrix3d& trsfMat)
+{
+	McDbBlockTableRecordPointer spBTR(btrId, McDb::kForRead);
+	McDbBlockTableRecordIterator* pIterator = nullptr;
+	Mcad::ErrorStatus es = spBTR->newIterator(pIterator);
+	if (es != Mcad::eOk || pIterator == nullptr)
+	{
+		return {};
+	}
+	Mx2d::TextInfoList res;
+	for (; !pIterator->done(); pIterator->step())
+	{
+		McDbEntity* pEntity = nullptr;
+		es = pIterator->getEntity(pEntity, McDb::kForRead);
+		if (es != Mcad::eOk || !pEntity)
+		{
+			continue;
+		}
+		if (pEntity->isA() == McDbText::desc())
+		{
+			McDbText* pText = McDbText::cast(pEntity);
+			if (pText)
+			{
+				QString textStr = QString::fromLocal8Bit(pText->textString());
+                McDbExtents ext;
+                pText->getGeomExtents(ext, false);
+                McGePoint3d minPt = ext.minPoint();
+                McGePoint3d maxPt = ext.maxPoint();
+                minPt.transformBy(trsfMat);
+                maxPt.transformBy(trsfMat);
+                Mx2d::Extents ext2d{ minPt.x, minPt.y, maxPt.x,maxPt.y };
+                res.append({ textStr , ext2d });
+			}
+		}
+		else if (pEntity->isA() == McDbMText::desc())
+		{
+			McDbMText* pMText = McDbMText::cast(pEntity);
+			if (pMText)
+			{
+				QString textStr = QString::fromLocal8Bit(pMText->contents());
+                McDbExtents ext;
+                pMText->getGeomExtents(ext, false);
+                McGePoint3d minPt = ext.minPoint();
+                McGePoint3d maxPt = ext.maxPoint();
+				minPt.transformBy(trsfMat);
+				maxPt.transformBy(trsfMat);
+                Mx2d::Extents ext2d{ minPt.x, minPt.y, maxPt.x,maxPt.y };
+                res.append({ textStr , ext2d });
+			}
+		}
+		else if (pEntity->isA() == McDbBlockReference::desc())
+		{
+			McDbBlockReference* pBlockRef = McDbBlockReference::cast(pEntity);
+			McGeMatrix3d mat = pBlockRef->blockTransform(true);
+			McDbObjectId blockId = pBlockRef->blockTableRecord();
+			Mx2d::TextInfoList res2 = traverseTextInBlockTableRecord(blockId, mat);
+			res.append(res2);
+		}
+		pEntity->close();
+	}
+
+	delete pIterator;
+	pIterator = nullptr;
+	return res;
+}
+
+void Mx2dTextSearchDialog::drawRectByCorner(const McGePoint3d& corner1, const McGePoint3d& corner2, MxColor color, bool isReserve)
+{
+	double minX = corner1.x < corner2.x ? corner1.x : corner2.x;
+	double maxX = corner1.x < corner2.x ? corner2.x : corner1.x;
+	double minY = corner1.y < corner2.y ? corner1.y : corner2.y;
+	double maxY = corner1.y < corner2.y ? corner2.y : corner1.y;
+
+	McGePoint3d pt1(minX, maxY, 0);
+	McGePoint3d pt2(maxX, maxY, 0);
+	McGePoint3d pt3(maxX, minY, 0);
+	McGePoint3d pt4(minX, minY, 0);
+	MxDrawApp::DrawVectorLine(pt1, pt2, color, isReserve);
+	MxDrawApp::DrawVectorLine(pt2, pt3, color, isReserve);
+	MxDrawApp::DrawVectorLine(pt3, pt4, color, isReserve);
+	MxDrawApp::DrawVectorLine(pt4, pt1, color, isReserve);
+}
+
+void Mx2dTextSearchDialog::moveViewCenterTo(Mx2d::Extents ext2d)
+{
+	MxDrawApp::ClearVectorLine(m_guiDoc->cadView().GetOcxHandle());
+
+	double minX = ext2d.minX;
+	double minY = ext2d.minY;
+	double maxX = ext2d.maxX;
+	double maxY = ext2d.maxY;
+
+	double width = maxX - minX;
+	double height = maxY - minY;
+	McGePoint3d centerPoint(ext2d.centerX(), ext2d.centerY(), 0);
+
+	MxDrawApp::ZoomW(centerPoint.x - width * 1, centerPoint.y - height * 6, centerPoint.x + width * 1, centerPoint.y + height * 6);
+	drawRectByCorner(McGePoint3d(minX, minY, 0), McGePoint3d(maxX, maxY, 0), 0xE65100, true);
+	MxDrawApp::UpdateDisplay(m_guiDoc->cadView().GetOcxHandle());
+}
+
 // Call with id parameter
-void Mx2dTextSearchDialog::onSearchResults(const QList<QPair<QString, Mx2d::Mx2dExtents>>& result)
+void Mx2dTextSearchDialog::onSearchResults(const Mx2d::TextInfoList& result)
 {
 	m_results = result;
 
@@ -259,27 +550,37 @@ void Mx2dTextSearchDialog::onSearchResults(const QList<QPair<QString, Mx2d::Mx2d
 	}
 }
 
+
 void Mx2dTextSearchDialog::onSearchClicked()
 {
-	QString searchText = m_pSearchContentCombo->currentText().trimmed();
-	if (searchText.isEmpty())
+	MxDrawApp::ClearVectorLine(m_guiDoc->cadView().GetOcxHandle());
+	MxDrawApp::UpdateDisplay(m_guiDoc->cadView().GetOcxHandle());
+	QString text = m_pSearchContentCombo->currentText().trimmed();
+	if (text.isEmpty())
 	{
+		m_pResultTable->setRowCount(0);
+		m_pResultCountLabel->setText(QString(tr("(Found %1)")).arg(0));
+		m_pExportExcelBtn->setEnabled(false);
+		m_pNextResultBtn->setEnabled(false);
 		QMessageBox::information(this, tr("Prompt"), tr("Please enter search content"));
 		return;
 	}
+	m_results = searchText(text, m_pFullMatchCheck->isChecked(), getCheckedButtonId(m_pAreaButtonGroup), getCheckedButtonId(m_pScopeButtonGroup), m_pMarkAllCheck->isChecked());
 
-	if (m_pWholePaperRadio->isChecked())
+	if (m_results.isEmpty())
 	{
-		QString s = m_pSearchContentCombo->currentText();
-		std::string sAscii = s.toLocal8Bit().constData();
-		MrxDbgRbList spParam = Mx::mcutBuildList(RTSTR, sAscii.c_str(), RTSHORT, m_pFullMatchCheck->isChecked() ? 1 : 0, 0);
+		m_pResultTable->setRowCount(0);
+		m_pResultCountLabel->setText(QString(tr("(Found %1)")).arg(0));
+		m_pExportExcelBtn->setEnabled(false);
+		m_pNextResultBtn->setEnabled(false);
+		QMessageBox::information(this, tr("Prompt"), tr("Search completed, no results found"));
 
-		m_guiDoc->executeCommand("Mx_TextSearch", spParam.orphanData());
+		return;
 	}
-	else {
-		updateSearchResult();
-	}
+	updateSearchResult();
+	m_pSearchContentCombo->insertItem(0, text);
 }
+
 
 void Mx2dTextSearchDialog::onSearchAreaChanged()
 {
@@ -288,18 +589,13 @@ void Mx2dTextSearchDialog::onSearchAreaChanged()
 
 void Mx2dTextSearchDialog::onSelectAreaClicked()
 {
-	QString s = m_pSearchContentCombo->currentText();
-	std::string sAscii = s.toLocal8Bit().constData();
-	MrxDbgRbList spParam = Mx::mcutBuildList(RTSTR, sAscii.c_str(), RTSHORT, m_pFullMatchCheck->isChecked() ? 1 : 0, 0);
-
-	// Determine area selection method
-	if (m_pRectAreaRadio->isChecked())
+	if (getCheckedButtonId(m_pAreaButtonGroup) == 1)
 	{
-		m_guiDoc->executeCommand("Mx_TextSearchRect", spParam.orphanData());
+		m_guiDoc->executeCommand("Mx_GetRectArea");
 	}
-	else if (m_pIrregularAreaRadio->isChecked())
+	else if (getCheckedButtonId(m_pAreaButtonGroup) == 2)
 	{
-		m_guiDoc->executeCommand("Mx_TextSearchPolygon", spParam.orphanData());
+		m_guiDoc->executeCommand("Mx_GetPolyArea");
 	}
 }
 
@@ -363,9 +659,7 @@ void Mx2dTextSearchDialog::onCurrentItemChanged(QTableWidgetItem* current, QTabl
 		double minY = textItem->data(Qt::UserRole + 1).toDouble();
 		double maxX = textItem->data(Qt::UserRole + 2).toDouble();
 		double maxY = textItem->data(Qt::UserRole + 3).toDouble();
-
-		MrxDbgRbList spParam = Mx::mcutBuildList(RTREAL, minX, RTREAL, minY, RTREAL, maxX, RTREAL, maxY, 0);
-		m_guiDoc->executeCommand("Mx_MoveViewCenterTo", spParam.orphanData());
+		moveViewCenterTo({minX, minY, maxX, maxY});
 	}
 }
 

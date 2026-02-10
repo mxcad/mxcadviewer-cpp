@@ -235,4 +235,5 @@ signals:
     void showLeaderTextInputDialog(QWidget* guiDoc2d);
     void showTextSearchDialog(QWidget* guiDoc2d);
     void extractText(QWidget* guiDoc2d);
+    void extractTable(QWidget* guiDoc2d);
 };

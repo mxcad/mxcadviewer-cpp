@@ -88,27 +88,99 @@ namespace Mx2d {
 	QList<TextLine> findAllTextsInBlockRef(const McDbObjectId& blockRefId);
 
 
-	struct Mx2dExtents
+	
+	struct Point2D
 	{
-		double m_minX;
-		double m_minY;
-		double m_maxX;
-		double m_maxY;
-		Mx2dExtents(double minX, double minY, double maxX, double maxY) {
-			m_minX = minX;
-			m_minY = minY;
-			m_maxX = maxX;
-			m_maxY = maxY;
+		double x;
+		double y;
+		Point2D() {
+            x = 0;
+            y = 0;
+		}
+		Point2D(double x_, double y_) {
+			x = x_;
+			y = y_;
+		}
+	};
+	using Point2DList = QList<Point2D>;
+
+	// Calculate cross product of vectors (p1-p0) × (p2-p0)
+	// This helps determine the relative position of point p2 with respect to line p0->p1
+	double crossProduct(const Point2D& p0, const Point2D& p1, const Point2D& p2);
+	// Check if point p lies on line segment ab (collinear and within bounding box)
+	// Uses epsilon (1e-8) to handle floating-point precision errors
+	bool isPointOnSegment(const Point2D& p, const Point2D& a, const Point2D& b);
+	// Check if two line segments ab and cd intersect
+	// Implements the "straddle test" for segment intersection with edge case handling
+	bool isSegmentsIntersect(const Point2D& a, const Point2D& b, const Point2D& c, const Point2D& d);
+	// Core function: Check if a closed polygon (Point2DList) is self-intersecting
+	// A self-intersecting polygon is also known as a complex/non-simple polygon
+	bool isPolygonSelfIntersecting(const Point2DList& polygon);
+	using Rect2D = QPair<Point2D, Point2D>;
+
+	struct Extents
+	{
+		double minX;
+		double minY;
+		double maxX;
+		double maxY;
+		Extents() {
+			minX = 0;
+			minY = 0;
+			maxX = 0;
+			maxY = 0;
+		}
+		Extents(double _minX, double _minY, double _maxX, double _maxY) {
+			minX = _minX;
+			minY = _minY;
+			maxX = _maxX;
+			maxY = _maxY;
 		}
 
 		double centerX() {
-			return (m_minX + m_maxX) / 2;
+			return (minX + maxX) / 2;
 		}
 
 		double centerY() {
-			return (m_minY + m_maxY) / 2;
+			return (minY + maxY) / 2;
+		}
+
+		Point2D center() {
+			return {centerX(), centerY()};
+		}
+
+		Point2D topLeft() {
+			return { qMin(minX, maxX), qMax(minY,maxY) };
+		}
+		Point2D topRight() {
+			return { qMax(minX, maxX), qMax(minY, maxY) };
+		}
+        Point2D bottomLeft() {
+			return { qMin(minX, maxX), qMin(minY, maxY) };
+		}
+        Point2D bottomRight() {
+			return { qMax(minX, maxX), qMin(minY, maxY) };
+		}
+
+		McGePoint3d center3d() {
+			return { centerX(), centerY(), 0 };
+		}
+
+		McGePoint3d topLeft3d() {
+			return { qMin(minX, maxX), qMax(minY,maxY), 0 };
+		}
+		McGePoint3d topRight3d() {
+			return { qMax(minX, maxX), qMax(minY, maxY), 0 };
+		}
+		McGePoint3d bottomLeft3d() {
+			return { qMin(minX, maxX), qMin(minY, maxY), 0 };
+		}
+		McGePoint3d bottomRight3d() {
+			return { qMax(minX, maxX), qMin(minY, maxY), 0 };
 		}
 	};
+	using TextInfo = QPair<QString, Mx2d::Extents>;
+	using TextInfoList = QList<TextInfo>;
 
 	struct Mx2dLayerInfoDetail {
 		McDbObjectId id;
@@ -209,5 +281,9 @@ namespace Mx2d {
 	QString getEntityLayoutName(McDbObjectId entId);
 
 	QString getBlockTableRecordLayoutName(McDbObjectId btrId);
+
+	Extents getPolygonGeomExtents(const McGePoint3dArray& pts);
+
+	int isPointInPolygon(const Point2D& pt, const Point2DList& pts);
 
 } // namespace Mx2d

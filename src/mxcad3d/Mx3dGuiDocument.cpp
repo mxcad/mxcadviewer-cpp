@@ -293,6 +293,16 @@ void Mx3dGuiDocument::createViewToolBar()
 	m_pActionGroup_1->addAction(actSection);
 	m_pActionGroup_1->addAction(actMeasure);
 	m_pActionGroup_1->setExclusionPolicy(QActionGroup::ExclusionPolicy::ExclusiveOptional);
+	connect(m_pActionGroup_1, &QActionGroup::triggered, this, [this](QAction* action) {
+		auto rValue = MxUtils::doAction([](){ /* Do Nothing! */});
+		if (rValue != 2)
+		{
+			for (auto act : m_pActionGroup_1->actions())
+			{
+				act->setChecked(false);
+			}
+		}
+		});
 }
 
 void Mx3dGuiDocument::initDocument()

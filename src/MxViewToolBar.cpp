@@ -65,7 +65,7 @@ void MxViewToolBar::paintEvent(QPaintEvent* event)
 	
 }
 
-void MxViewToolBar::addAction(QAction* action)
+QToolButton* MxViewToolBar::addAction(QAction* action)
 {
 	QToolButton* button = new QToolButton();
 	button->setStyleSheet(R"(
@@ -85,7 +85,7 @@ void MxViewToolBar::addAction(QAction* action)
 	button->setDefaultAction(action);
 	button->setPopupMode(QToolButton::InstantPopup);
 	adjustSize();
-
+	return button;
 }
 
 void MxViewToolBar::addWidget(QWidget* widget)

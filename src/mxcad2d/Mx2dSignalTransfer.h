@@ -31,7 +31,14 @@ private:
 
 signals:
 
-	void signalTextSearched(const QList<QPair<QString, Mx2d::Mx2dExtents>>& result);
+	void signalTextSearchRect(QWidget* target, const Mx2d::Rect2D& rect);
+	void signalTextSearchPoly(QWidget* target, const Mx2d::Point2DList& poly);
+	void signalTextSearched(const Mx2d::TextInfoList& result);
+
+	void signalTableRect(QWidget* target, const McGePoint3d& new_corner1, const McGePoint3d& new_corner2);
+
+	void signalDrawingLength(QWidget* target, double length);
+
 	void signalLayerInformation(const Mx2d::LayerInfo& info); 
 	void signalLayersOffStatusSetted(QWidget* target); 
 	void signalExtractTextFinished(QWidget* target, const QStringList& textList); 

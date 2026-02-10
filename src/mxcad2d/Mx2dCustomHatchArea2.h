@@ -39,6 +39,7 @@ public:
 
 	virtual void fromJson(const QJsonObject& jsonObject) override;
 	virtual QJsonObject toJson() const override;
+	virtual Mx2d::TextInfoList findText(const QString& text, bool isExactMatch = false) const override;
 public:
 	void setPolys(const Mx2d::HatchPLList& polys);
 	Mx2d::HatchPLList polys() const;

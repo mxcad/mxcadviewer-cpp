@@ -63,10 +63,11 @@ Mx2dMeasurementDialog::Mx2dMeasurementDialog(Mx2dGuiDocument* guiDoc, QWidget* p
 void Mx2dMeasurementDialog::initWindowFlags()
 {
 	setWindowTitle(tr("Measurement"));
-	Qt::WindowFlags flags = Qt::Dialog;
-	flags |= Qt::CustomizeWindowHint;
-	flags |= Qt::WindowTitleHint;
-	flags |= Qt::WindowCloseButtonHint;
+	Qt::WindowFlags flags = Qt::Tool;
+	//flags |= Qt::CustomizeWindowHint;
+	//flags |= Qt::WindowTitleHint;
+	//flags |= Qt::WindowCloseButtonHint;
+	//flags |= Qt::Tool;
 	setWindowFlags(flags);
 }
 
@@ -135,7 +136,9 @@ void Mx2dMeasurementDialog::onButtonArcLengthClicked()
 
 void Mx2dMeasurementDialog::onButtonCircleMeasurementClicked()
 {
-	m_guiDoc->executeCommand("Mx_DrawCircleMeasurementMark");
+	MxUtils::doAction([this]() {
+		m_guiDoc->executeCommand("Mx_DrawCircleMeasurementMark");
+		});
 }
 
 void Mx2dMeasurementDialog::onButtonDistPointToLineClicked()

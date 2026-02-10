@@ -202,6 +202,38 @@ QJsonObject Mx2dCustomLeader::toJson() const
 	return jsonObject;
 }
 
+Mx2d::TextInfoList Mx2dCustomLeader::findText(const QString& text, bool isExactMatch) const
+{
+	assertReadEnabled();
+	Mx2d::TextInfoList res;
+	McDbVoidPtrArray arr = createFrameAndTexts();
+	for (int i = 0; i < arr.length(); ++i)
+	{
+		if (i == 0)
+		{
+			delete arr[0];
+			continue;
+		}
+		McDbExtents ext;
+		McDbText* pText = (McDbText*)arr[i];
+		pText->getGeomExtents(ext, false);
+		QString textStr = QString::fromLocal8Bit(pText->textString());
+		McGePoint3d minPt = ext.minPoint();
+		McGePoint3d maxPt = ext.maxPoint();
+		Mx2d::Extents extents{ minPt.x, minPt.y,maxPt.x, maxPt.y };
+		delete pText;
+		if ((isExactMatch && (text != textStr)) ||
+			(!isExactMatch && !textStr.contains(text, Qt::CaseInsensitive)))
+		{
+			continue;;
+		}
+		res.append({ textStr , extents });
+	}
+	arr.clear();
+
+	return res;
+}
+
 void Mx2dCustomLeader::setStartPt(const McGePoint3d& pt)
 {
 	assertWriteEnabled();

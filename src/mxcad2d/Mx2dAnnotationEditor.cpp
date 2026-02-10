@@ -56,7 +56,7 @@ void Mx2dAnnotationEditor::loadFromFile(const QString& fileName)
             LOG_ERROR(QString("Annotation does not contain a type"));
 			continue;
 		}
-		if (!annotationObj.contains("space")) {
+		if (!annotationObj.contains("layout")) {
 			LOG_ERROR(QString("Annotation does not contain a space"));
 			continue;
 		}
@@ -69,7 +69,7 @@ void Mx2dAnnotationEditor::loadFromFile(const QString& fileName)
 			pAnnotation->setColor(newColor);
 			McDbObjectId id;
 			
-			QString spaceName = annotationObj["space"].toString();
+			QString spaceName = annotationObj["layout"].toString();
 			McDbObjectId layoutId = MrxDbgUtils::getLayoutId(Mx::mcdbCurDwg(), spaceName.toLocal8Bit().constData());
 			McDbObjectPointer<McDbLayout> spLayout(layoutId, McDb::kForRead);
 			if (!spLayout.openStatus() == Mcad::eOk) {
@@ -206,27 +206,6 @@ void Mx2dAnnotationEditor::saveToFile(const QString& fileName)
 		}
 		if (!spAnnotation->isErased()) {
 			QJsonObject annotationObj = spAnnotation->toJson();
-#if 0
-			McDbObjectId blockTableRecordId = spAnnotation->ownerId();
-			McDbBlockTableRecordPointer spSpace(blockTableRecordId, McDb::kForRead);
-			if (spSpace.openStatus() != Mcad::eOk) {
-				LOG_ERROR(QString("Failed to open block table record when get layout name."));
-				continue;
-			}
-			McDbObjectId layoutId = spSpace->getLayoutId();
-			McDbObjectPointer<McDbLayout> spLayout(layoutId, McDb::kForRead);
-			if (spLayout.openStatus() != Mcad::eOk) {
-				LOG_ERROR(QString("Failed to open layout, id: %1").arg(spAnnotation->objectId().asOldId()));
-				continue;
-			}
-			MxString layoutName;
-			spLayout->getLayoutName(layoutName);
-			QString qsLayoutName = QString::fromLocal8Bit(layoutName.c_str());
-#else
-			McDbObjectId blockTableRecordId = spAnnotation->ownerId();
-			QString qsLayoutName = Mx2d::getBlockTableRecordLayoutName(blockTableRecordId);
-#endif
-			annotationObj["space"] = qsLayoutName;
 			annotations.append(annotationObj);
 		}
 	}

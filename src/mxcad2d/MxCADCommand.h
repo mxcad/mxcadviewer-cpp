@@ -31,6 +31,9 @@ public:
 	// Search within a polygonal area
 	static void Mx_TextSearchPolygon();
 
+	static void Mx_GetRectArea();
+	static void Mx_GetPolyArea();
+
 	// Draw a line
 	static void Mx_DrawLine();
 
@@ -167,11 +170,14 @@ public:
 	// Erase an annotation object
 	static void Mx_EraseAnnotation();
 
+	static void Mx_GetDrawingLength();
+
 	// Register CAD command functions
 	static void RegisterCommand();
 
 private:
-	static void textFilter(QList<QPair<QString, Mx2d::Mx2dExtents>>& result, const McDbObjectIdArray& ids, const QString& containStr = QString(), bool isFull = false);
+	static void textFilter(Mx2d::TextInfoList& result, const McDbObjectIdArray& ids, const QString& containStr = QString(), bool isFull = false);
+	static void worldDrawLine(const McGePoint3d& startPoint, McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw);
 	static void worldDrawRect(const McGePoint3d& corner1, McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw);
 
 	static void worldDrawPolygon(const McGePoint3dArray& pts, McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw);
@@ -238,11 +244,11 @@ private:
 
 	static int isEntityInPolygon(const McDbObjectId& id, const McGePoint3dArray& pts);
 
-	static void getTextEntitiesInPolygon(QList<QPair<QString, Mx2d::Mx2dExtents>>& result, const McDbObjectIdArray& ids, const McGePoint3dArray& pts, const QString& containStr = QString(), bool isFull = false);
+	static void getTextEntitiesInPolygon(Mx2d::TextInfoList& result, const McDbObjectIdArray& ids, const McGePoint3dArray& pts, const QString& containStr = QString(), bool isFull = false);
 
 	// Get [single-line/multi-line] text objects within a polygonal area
 	static McDbObjectIdArray getTextInPolygon(const McDbObjectIdArray& ids, const McGePoint3dArray& pts);
 
-	static void deepTextInBlockRef(QList<QPair<QString, Mx2d::Mx2dExtents>>& result, const McDbBlockReference& blockRef, const McDbObjectId& curId, const QString& containStr, bool isFull);
+	static void deepTextInBlockRef(Mx2d::TextInfoList& result, const McDbBlockReference& blockRef, const McDbObjectId& curId, const QString& containStr, bool isFull);
 
 };

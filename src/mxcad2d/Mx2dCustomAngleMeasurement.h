@@ -37,6 +37,8 @@ public:
 
 	virtual void fromJson(const QJsonObject& jsonObject) override;
 	virtual QJsonObject toJson() const override;
+
+	virtual Mx2d::TextInfoList findText(const QString& text, bool isExactMatch = false) const override;
 public:
 
 	void setLine1Start(const McGePoint3d& line1Start);

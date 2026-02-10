@@ -11,6 +11,7 @@ for the use of this software, its documentation or related materials.
 #include <QDebug>
 #include "Mx2dGuiDocument.h"
 #include "MxLogger.h"
+#include "Mx2dCustomAnnotation.h"
 namespace {
 
 	bool isSameLineText(McDbText* text, McDbText* other) {
@@ -195,6 +196,82 @@ namespace Mx2d {
 		textLine.text = str;
 
 		return textLine;
+	}
+	double crossProduct(const Point2D& p0, const Point2D& p1, const Point2D& p2)
+	{
+		return (p1.x - p0.x) * (p2.y - p0.y) - (p1.y - p0.y) * (p2.x - p0.x);
+	}
+	bool isPointOnSegment(const Point2D& p, const Point2D& a, const Point2D& b)
+	{
+		// Check if p's coordinates are within the bounding box of a and b
+		if (qMin(a.x, b.x) - 1e-8 <= p.x && p.x <= qMax(a.x, b.x) + 1e-8 &&
+			qMin(a.y, b.y) - 1e-8 <= p.y && p.y <= qMax(a.y, b.y) + 1e-8)
+		{
+			// Cross product near zero means collinear (allow minor precision error)
+			return qAbs(crossProduct(a, b, p)) < 1e-8;
+		}
+		return false;
+	}
+	bool isSegmentsIntersect(const Point2D& a, const Point2D& b, const Point2D& c, const Point2D& d)
+	{
+		double cp1 = crossProduct(a, b, c);
+		double cp2 = crossProduct(a, b, d);
+		double cp3 = crossProduct(c, d, a);
+		double cp4 = crossProduct(c, d, b);
+
+		// Straddle test: segments straddle each other (cross products have opposite signs)
+		// Epsilon (1e-8) avoids false positives from floating-point precision issues
+		if (((cp1 > 1e-8 && cp2 < -1e-8) || (cp1 < -1e-8 && cp2 > 1e-8)) &&
+			((cp3 > 1e-8 && cp4 < -1e-8) || (cp3 < -1e-8 && cp4 > 1e-8)))
+		{
+			return true;
+		}
+
+		// Handle edge cases where endpoints lie on the other segment (collinear intersection)
+		if (isPointOnSegment(c, a, b)) return true;
+		if (isPointOnSegment(d, a, b)) return true;
+		if (isPointOnSegment(a, c, d)) return true;
+		if (isPointOnSegment(b, c, d)) return true;
+
+		return false;
+	}
+	bool isPolygonSelfIntersecting(const Point2DList& polygon)
+	{
+		// A polygon needs at least 4 vertices to be self-intersecting (triangle can't self-intersect)
+		if (polygon.size() < 4)
+		{
+			return false;
+		}
+
+		int n = polygon.size();
+		// Iterate through each edge of the polygon (i -> i+1)
+		for (int i = 0; i < n; ++i)
+		{
+			Point2D a = polygon[i];
+			Point2D b = polygon[(i + 1) % n]; // Last vertex connects back to first (closed polygon)
+
+			// Iterate through other edges to check intersection (avoid adjacent/duplicate checks)
+			for (int j = i + 2; j < n; ++j)
+			{
+				// Skip the last edge when i=0 (avoids checking adjacent edges: n-1 -> 0 and 0 -> 1)
+				if (i == 0 && j == n - 1)
+				{
+					continue;
+				}
+
+				Point2D c = polygon[j];
+				Point2D d = polygon[(j + 1) % n];
+
+				// Check if current edge (a-b) intersects with edge (c-d)
+				if (isSegmentsIntersect(a, b, c, d))
+				{
+					return true; // Self-intersection found, return immediately
+				}
+			}
+		}
+
+		// No self-intersections found in any edge pairs
+		return false;
 	}
 	void recursiveExplodeBlock(McDbBlockReference* block, McDbVoidPtrArray& entitySet)
 	{
@@ -717,9 +794,15 @@ namespace Mx2d {
 			pEnt->setColor(newColor);
 			McDbObjectId id, curSpaceId;
 			curSpaceId = Mx::mcdbCurDwg()->currentSpaceId();
+			QString layoutName = Mx2d::getBlockTableRecordLayoutName(curSpaceId);
 			McDbBlockTableRecordPointer spCurSpace(curSpaceId, McDb::kForWrite);
 			if (spCurSpace.openStatus() == Mcad::eOk) {
 				spCurSpace->appendAcDbEntity(id, pEnt);
+				if (pEnt->isKindOf(Mx2dCustomAnnotation::desc()))
+				{
+                    Mx2dCustomAnnotation* pAnnotation = Mx2dCustomAnnotation::cast(pEnt);
+					pAnnotation->setLayout(layoutName);
+				}
 				pEnt->close();
 				McDbEntityPointer spEntity(id, McDb::kForWrite);
 				spEntity->setLayer("MxCADAnnotationLayer");
@@ -816,6 +899,73 @@ namespace Mx2d {
 		delete pIter;
 
 		return qsLayoutName;
+	}
+
+	Extents getPolygonGeomExtents(const McGePoint3dArray& pts)
+	{
+		McDbPolyline pline;
+		for (int i = 0; i < pts.length(); i++)
+		{
+			pline.addVertexAt(pts[i]);
+		}
+		pline.setClosed(true);
+		McDbExtents ext;
+		pline.getGeomExtents(ext, false);
+		Extents ext2d{ ext.minPoint().x,ext.minPoint().y,ext.maxPoint().x,ext.maxPoint().y };
+		return ext2d;
+	}
+
+	int isPointInPolygon(const Point2D& pt, const Point2DList& pts)
+	{
+		int vertexCount = pts.size();
+		// A valid polygon requires at least 3 vertices; return 0 (outside) if not met
+		if (vertexCount < 3) return 0;
+
+		int windingNumber = 0;
+
+		for (int i = 0; i < vertexCount; ++i) {
+			const Point2D& a = pts[i];
+			const Point2D& b = pts[(i + 1) % vertexCount];
+
+			if (isPointOnSegment(pt, a, b)) {
+				return -1;  // Point is on boundary
+			}
+
+			double dx1 = a.x - pt.x;
+			double dy1 = a.y - pt.y;
+			double dx2 = b.x - pt.x;
+			double dy2 = b.y - pt.y;
+
+			double cross = dx1 * dy2 - dy1 * dx2;
+
+			double dot = dx1 * dx2 + dy1 * dy2;
+
+			if (qAbs(cross) < 1e-8) {
+				if (dot < -1e-8) {
+					if (qMin(a.x, b.x) - 1e-8 <= pt.x && pt.x <= qMax(a.x, b.x) + 1e-8 &&
+						qMin(a.y, b.y) - 1e-8 <= pt.y && pt.y <= qMax(a.y, b.y) + 1e-8) {
+						return -1;  // Point is on boundary extension (treated as on polygon)
+					}
+				}
+				continue;
+			}
+			bool isCrossing = (a.y <= pt.y + 1e-8 && pt.y < b.y + 1e-8) ||
+				(b.y <= pt.y + 1e-8 && pt.y < a.y + 1e-8);
+
+			if (isCrossing) {
+				double xIntersect = ((pt.y - a.y) * (b.x - a.x)) / (b.y - a.y) + a.x;
+
+				if (pt.x < xIntersect - 1e-8) {
+					if (b.y > a.y + 1e-8)
+						windingNumber++;
+					else
+						windingNumber--;
+				}
+			}
+		}
+
+		// Determine final position: non-zero winding number means inside, zero means outside
+		return (windingNumber != 0) ? 1 : 0;
 	}
 
 	

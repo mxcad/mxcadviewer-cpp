@@ -10,6 +10,7 @@ for the use of this software, its documentation or related materials.
 
 #include <QWidget>
 class QHBoxLayout;
+class QToolButton;
 class MxViewToolBar : public QWidget
 {
 	Q_OBJECT
@@ -24,7 +25,7 @@ protected:
 public:
 	QHBoxLayout* m_pHBoxLayout;
 public:
-	void addAction(QAction* action);
+	QToolButton* addAction(QAction* action);
 	void addWidget(QWidget* widget);
 private:
     bool m_isTranslucent = false;

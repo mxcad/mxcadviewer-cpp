@@ -10,9 +10,11 @@ for the use of this software, its documentation or related materials.
 
 #include <QWidget>
 #include <QString>
+#include <QProcess>
 #include "MxCADInclude.h"
 #include "Mx2dAnnotationEditor.h"
 #include "MxRecentFile.h"
+#include "Mx2dView.h"
 #ifdef Q_OS_LINUX
 class MxOpenGLView;
 #endif
@@ -21,12 +23,14 @@ class MxViewToolBar;
 class QLabel;
 class QHBoxLayout;
 class QButtonGroup;
+class QTimer;
 
 class Mx2dLayerManagerDialog;
 class Mx2dMeasurementDialog;
 class Mx2dLeaderTextInputDialog;
 class Mx2dTextSearchDialog;
 class Mx2dExtractTextDialog;
+
 class Mx2dGuiDocument : public QWidget
 {
 	Q_OBJECT
@@ -60,7 +64,7 @@ private:
 
 private:
 	MxCADView		m_cadView;
-	QWidget*		m_pViewWidget = nullptr;
+	Mx2dView*		m_pViewWidget = nullptr;
 	MxViewToolBar*	m_p2dViewToolBar = nullptr;
 	QLabel*			m_pPromptLabel = nullptr;
 	QString			m_filePath;
@@ -68,6 +72,11 @@ private:
 	std::unique_ptr<Mx2dAnnotationEditor> m_pAnnoEditor;
 	QStringList m_spaceNames;
 	QButtonGroup* m_pSpaceBtnGroup = nullptr;
+	QProcess* m_mxConvertProcess;
+	QTimer* m_convertTimeoutTimer;
+	QString m_convertSrcFilePath;
+	QString m_convertOutFilePath;
+	QString m_originalOpenFilePath;
 signals:
 	void transferDone();
 private slots:
@@ -76,11 +85,17 @@ private slots:
 	void onShowPromptMessage(QWidget* target,const QString& message);
 	void onHidePromptMessage(QWidget* target);
 	void onMessageBoxInformation(QWidget* target, const QString& message);
+
+	void onProcessStarted();
+	void onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
+	void onProcessErrorOccurred(QProcess::ProcessError error);
+	void onConvertTimeout();
 private:
 	void computeToolBarPosition();
 	void computePromptLabelPosition();
 	void connectSignals();
 	QStringList getSpaceNames();
+	void readMxwebFile(const QString& mxwebPath, const QString& originalFilePath);
 public:
 	double m_devicePixelRatio;
 	bool m_updatePending;
@@ -89,6 +104,7 @@ public:
 	MxOpenGLView* m_pGLView;
 #endif
 signals:
+	void startConvert();
 	void startReadFile();
 	void fileRead(bool success);
 	void startRender();
@@ -109,4 +125,7 @@ public:
 	void showLeaderTextInputDialog(QWidget* guiDoc2d);
 	void showTextSearchDialog(QWidget* guiDoc2d);
 	void extractText(QWidget* guiDoc2d);
+	void extractTable(QWidget* guiDoc2d);
+private:
+	void onExtractTable(QWidget* guiDoc2d, const McGePoint3d& new_corner1, const McGePoint3d& new_corner2);
 };

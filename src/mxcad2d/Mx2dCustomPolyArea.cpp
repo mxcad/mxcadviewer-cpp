@@ -219,6 +219,31 @@ QJsonObject Mx2dCustomPolyArea::toJson() const
 	return jsonObject;
 }
 
+Mx2d::TextInfoList Mx2dCustomPolyArea::findText(const QString& text, bool isExactMatch) const
+{
+	assertReadEnabled();
+	McDbPolyline* pPoly = createPoly();
+	double area = getPolyArea(pPoly);
+	double perimeter = getPerimeter(pPoly);
+	delete pPoly;
+
+	McDbExtents ext;
+	McDbText* pText = createText(area, perimeter);
+	pText->getGeomExtents(ext, false);
+	QString textStr = QString::fromLocal8Bit(pText->textString());
+	McGePoint3d minPt = ext.minPoint();
+	McGePoint3d maxPt = ext.maxPoint();
+	Mx2d::Extents extents{ minPt.x, minPt.y,maxPt.x, maxPt.y };
+	delete pText;
+	if ((isExactMatch && (text != textStr)) ||
+		(!isExactMatch && !textStr.contains(text, Qt::CaseInsensitive)))
+	{
+		return {};
+	}
+
+	return { {textStr , extents} };
+}
+
 void Mx2dCustomPolyArea::setPoints(const McGePoint3dArray& points)
 {
 	assertWriteEnabled();

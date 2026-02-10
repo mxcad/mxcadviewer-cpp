@@ -49,6 +49,8 @@ Mcad::ErrorStatus Mx2dCustomAnnotation::dwgInFields(McDbDwgFiler* pFiler)
 	m_category = QString::fromLocal8Bit(mxStr.c_str());
 	pFiler->readString(mxStr);
 	m_type = QString::fromLocal8Bit(mxStr.c_str());
+    pFiler->readString(mxStr);
+    m_layout = QString::fromLocal8Bit(mxStr.c_str());
 
 	return Mcad::eOk;
 }
@@ -71,6 +73,7 @@ Mcad::ErrorStatus Mx2dCustomAnnotation::dwgOutFields(McDbDwgFiler* pFiler) const
 	pFiler->writeDouble(m_dimRatio);
 	pFiler->writeString(MxString(m_category.toLocal8Bit().constData()));
 	pFiler->writeString(MxString(m_type.toLocal8Bit().constData()));
+    pFiler->writeString(MxString(m_layout.toLocal8Bit().constData()));
 	return Mcad::eOk;
 }
 
@@ -122,6 +125,18 @@ QString Mx2dCustomAnnotation::type() const
 	return m_type;
 }
 
+void Mx2dCustomAnnotation::setLayout(const QString& layoutName)
+{
+    assertWriteEnabled();
+	m_layout = layoutName;
+}
+
+QString Mx2dCustomAnnotation::layout() const
+{
+    assertReadEnabled();
+    return m_layout;
+}
+
 void Mx2dCustomAnnotation::fromJson(const QJsonObject& jsonObject)
 {
 	assertWriteEnabled();
@@ -129,6 +144,7 @@ void Mx2dCustomAnnotation::fromJson(const QJsonObject& jsonObject)
 	m_dimRatio = jsonObject["dimRatio"].toDouble();
 	m_category = jsonObject["category"].toString();
 	m_type = jsonObject["type"].toString();
+    m_layout = jsonObject["layout"].toString();
 }
 
 QJsonObject Mx2dCustomAnnotation::toJson() const
@@ -139,5 +155,11 @@ QJsonObject Mx2dCustomAnnotation::toJson() const
 	jsonObject["dimRatio"] = m_dimRatio;
 	jsonObject["category"] = m_category;
 	jsonObject["type"] = m_type;
+    jsonObject["layout"] = m_layout;
 	return jsonObject;
+}
+
+Mx2d::TextInfoList Mx2dCustomAnnotation::findText(const QString& text, bool isExactMatch) const
+{
+	return {};
 }
