@@ -1,8 +1,8 @@
 # MxCAD WinForms Test Project Setup Guide
 ## Prerequisites
 1. Download and extract dependencies as specified in the files:
-   - `../mx/code/download_address.txt`
-   - `../3rdparty/download_address.txt`
+   - `../../mx/code/download_address.txt`
+   - `../../3rdparty/download_address.txt`
 
 ## Step-by-Step Project Creation
 ### 1. Create a New Project
@@ -23,8 +23,8 @@ Save all project files and build the project to generate executable files.
 
 ### 5. Copy Dependencies to Output Directory
 Copy the following files to the directory where the project’s executable is generated:
-- All contents from `../mx/code/build_mxcadlib/bin/Release`
-- The executable `../3rdparty/mxconvert/mxconvert.exe`
+- All contents from `../../mx/code/build_mxcadlib/bin/Release`
+- The executable `../../3rdparty/mxconvert/mxconvert.exe`
 - The DLL `./MxCADWrapperLib.dll`
 
 ### 6. Run the Application
@@ -33,4 +33,4 @@ Execute the generated program to test opening CAD files (supports `mxweb`, `dwg`
 ### Summary
 1. Download dependencies via the specified `download_address.txt` files and extract them.
 2. Set up the WinForms project with wrapper classes and test code, then build it.
-3. Copy required runtime dependencies (Release folder contents + `mxconvert.exe`) to the output directory and run the app to test CAD file opening.
+3. Copy required runtime dependencies (Release folder contents + `mxconvert.exe` + `MxCADWrapperLib.dll`) to the output directory and run the app to test CAD file opening.
