@@ -3,8 +3,10 @@
   <p></p>
   <p align="center"><strong>mxcadviewer</strong> An Open-Source 2D/3D Graphics Viewer</p>
   <p></p>
-  <img src="src/resources/screenshot/2d_screenshot.png"/>
-  <img src="src/resources/screenshot/3d_screenshot.png"/>
+  <img src="src/resources/screenshot/operation_layer.gif"/>
+  <img src="src/resources/screenshot/operation_meas_shape.gif"/>
+  <img src="src/resources/screenshot/operation_text_search.gif"/>
+  <img src="src/resources/screenshot/operation_3d.gif"/>
 </div>
 
 # 👓 Feature Overview
