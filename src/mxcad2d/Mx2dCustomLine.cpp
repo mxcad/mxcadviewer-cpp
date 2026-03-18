@@ -42,6 +42,7 @@ Mdesk::Boolean Mx2dCustomLine::worldDraw(McGiWorldDraw* wd)
 Mcad::ErrorStatus Mx2dCustomLine::getGripPoints(McGePoint3dArray& gripPoints, McGeIntArray& osnapModes, McGeIntArray& geomIds) const
 {
 	assertReadEnabled();
+	return Mcad::eOk;
 	gripPoints.append(m_startPt);
 	gripPoints.append(m_endPt);
 	return Mcad::eOk;
@@ -50,6 +51,7 @@ Mcad::ErrorStatus Mx2dCustomLine::getGripPoints(McGePoint3dArray& gripPoints, Mc
 Mcad::ErrorStatus Mx2dCustomLine::moveGripPointsAt(const McGeIntArray& indices, const McGeVector3d& offset)
 {
 	assertWriteEnabled();
+	return Mcad::eOk;
 	int iIndex = indices[0];
 	switch (iIndex)
 	{
@@ -127,11 +129,30 @@ Mcad::ErrorStatus Mx2dCustomLine::transformBy(const McGeMatrix3d& xform)
 	return Mcad::eOk;
 }
 
+Mcad::ErrorStatus Mx2dCustomLine::getOsnapPoints(McDb::OsnapMode osnapMode, int gsSelectionMark, const McGePoint3d& pickPoint, const McGePoint3d& lastPoint, const McGeMatrix3d& viewXform, McGePoint3dArray& snapPoints, McDbIntArray& geomIds) const
+{
+	assertReadEnabled();
+
+	if (osnapMode == McDb::kOsModeEnd)
+	{
+		snapPoints.append(m_startPt);
+		snapPoints.append(m_endPt);
+	}
+	else if (osnapMode == McDb::kOsModeMid)
+	{
+		McGePoint3d midPt((m_startPt.x + m_endPt.x) / 2.0, (m_startPt.y + m_endPt.y) / 2.0, 0);
+		snapPoints.append(midPt);
+	}
+	return Mcad::eOk;
+}
+
 void Mx2dCustomLine::fromJson(const QJsonObject& jsonObject)
 {
 	assertWriteEnabled();
 	Mx2dCustomAnnotation::fromJson(jsonObject);
+	if (!jsonObject.contains("startPoint")) return;
 	m_startPt = Mx2d::jsonArray2dToPoint3d(jsonObject["startPoint"].toArray());
+	if (!jsonObject.contains("endPoint")) return;
 	m_endPt = Mx2d::jsonArray2dToPoint3d(jsonObject["endPoint"].toArray());
 }
 
@@ -144,6 +165,11 @@ QJsonObject Mx2dCustomLine::toJson() const
 	jsonObject["endPoint"] = Mx2d::point3dToJsonArray2d(m_endPt);
 
 	return jsonObject;
+}
+
+DimPropertyFlags Mx2dCustomLine::dimPropertyFlags() const
+{
+	return Prop_Color | Prop_Category;
 }
 
 void Mx2dCustomLine::setStartPt(const McGePoint3d& startPt)

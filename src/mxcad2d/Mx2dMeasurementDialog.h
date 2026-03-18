@@ -25,7 +25,7 @@ private:
 	QVBoxLayout* m_buttonLayout;
 	Mx2dGuiDocument* m_guiDoc;
 	void initWindowFlags();
-	void addButton(const QString& iconPath, const QString& text, const char* slot = nullptr);
+	void addButton(const QString& iconPath, const QString& text, const QString& objName, const char* slot);
 
 protected slots:
 	void onButtonPolyAreaClicked();

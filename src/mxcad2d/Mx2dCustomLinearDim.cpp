@@ -24,7 +24,7 @@ Mx2dCustomLinearDim::Mx2dCustomLinearDim(void)
 }
 
 Mx2dCustomLinearDim::Mx2dCustomLinearDim(const McGePoint3d& startPt, const McGePoint3d& endPt, const McGePoint3d& dimPt, double textHeight)
-	: Mx2dCustomAnnotation(textHeight), m_startPt(startPt), m_endPt(endPt), m_dimPt(dimPt)
+	: Mx2dCustomAnnotation(textHeight), m_startPt(startPt), m_endPt(endPt)
 {
 	double dx = fabs(m_endPt.x - m_startPt.x);
 	double dy = fabs(m_endPt.y - m_startPt.y);
@@ -37,6 +37,7 @@ Mx2dCustomLinearDim::Mx2dCustomLinearDim(const McGePoint3d& startPt, const McGeP
 		m_bHorizontal = false;
 	}
 	setType("linearDim");
+	setDimPt(dimPt);
 }
 
 #define LINEARDIM_VERSION 1
@@ -57,7 +58,6 @@ Mcad::ErrorStatus Mx2dCustomLinearDim::dwgInFields(McDbDwgFiler* pFiler)
 	pFiler->readInt(&lVar);
 	pFiler->readPoint3d(&m_startPt);
 	pFiler->readPoint3d(&m_endPt);
-	pFiler->readPoint3d(&m_dimPt);
 	pFiler->readBool(&m_bHorizontal);
 
 	return Mcad::eOk;
@@ -79,7 +79,6 @@ Mcad::ErrorStatus Mx2dCustomLinearDim::dwgOutFields(McDbDwgFiler* pFiler) const
 	pFiler->writeInt(LINEARDIM_VERSION);
 	pFiler->writePoint3d(m_startPt);
 	pFiler->writePoint3d(m_endPt);
-	pFiler->writePoint3d(m_dimPt);
 	pFiler->writeBool(m_bHorizontal);
 
 	return Mcad::eOk;
@@ -118,9 +117,11 @@ void Mx2dCustomLinearDim::fromJson(const QJsonObject& jsonObject)
 {
 	assertWriteEnabled();
 	Mx2dCustomAnnotation::fromJson(jsonObject);
+	if(!jsonObject.contains("startPoint")) return;
 	m_startPt = Mx2d::jsonArray2dToPoint3d(jsonObject["startPoint"].toArray());
+    if(!jsonObject.contains("endPoint")) return;
 	m_endPt = Mx2d::jsonArray2dToPoint3d(jsonObject["endPoint"].toArray());
-	m_dimPt = Mx2d::jsonArray2dToPoint3d(jsonObject["dimPoint"].toArray());
+    if(!jsonObject.contains("isHorizontal")) return;
 	m_bHorizontal = jsonObject["isHorizontal"].toBool();
 }
 
@@ -131,7 +132,6 @@ QJsonObject Mx2dCustomLinearDim::toJson() const
 
 	jsonObject["startPoint"] = Mx2d::point3dToJsonArray2d(m_startPt);
 	jsonObject["endPoint"] = Mx2d::point3dToJsonArray2d(m_endPt);
-	jsonObject["dimPoint"] = Mx2d::point3dToJsonArray2d(m_dimPt);
 	jsonObject["isHorizontal"] = m_bHorizontal;
 
 	return jsonObject;
@@ -155,6 +155,11 @@ Mx2d::TextInfoList Mx2dCustomLinearDim::findText(const QString& text, bool isExa
 	}
 
 	return { {textStr , extents} };
+}
+
+DimPropertyFlags Mx2dCustomLinearDim::dimPropertyFlags() const
+{
+	return Prop_Color | Prop_Category | Prop_TextHeight | Prop_Ratio;
 }
 
 void Mx2dCustomLinearDim::setStartPt(const McGePoint3d& startPt)
@@ -181,17 +186,6 @@ McGePoint3d Mx2dCustomLinearDim::endPt() const
 	return m_endPt;
 }
 
-void Mx2dCustomLinearDim::setDimPt(const McGePoint3d& dimPt)
-{
-	assertWriteEnabled();
-	m_dimPt = dimPt;
-}
-
-McGePoint3d Mx2dCustomLinearDim::dimPt() const
-{
-	assertReadEnabled();
-	return m_dimPt;
-}
 
 void Mx2dCustomLinearDim::setIsHorizontal(bool bHorizontal)
 {
@@ -465,6 +459,7 @@ Mdesk::Boolean Mx2dCustomLinearDim::worldDraw(McGiWorldDraw* wd)
 Mcad::ErrorStatus Mx2dCustomLinearDim::getGripPoints(McGePoint3dArray& gripPoints, McGeIntArray& osnapModes, McGeIntArray& geomIds) const
 {
 	assertReadEnabled();
+	return Mcad::eOk;
 	gripPoints.append(m_startPt);
 	gripPoints.append(m_endPt);
 	gripPoints.append(m_dimPt);
@@ -474,6 +469,7 @@ Mcad::ErrorStatus Mx2dCustomLinearDim::getGripPoints(McGePoint3dArray& gripPoint
 Mcad::ErrorStatus Mx2dCustomLinearDim::moveGripPointsAt(const McGeIntArray& indices, const McGeVector3d& offset)
 {
 	assertWriteEnabled();
+	return Mcad::eOk;
 	int iIndex = indices[0];
 	switch (iIndex)
 	{

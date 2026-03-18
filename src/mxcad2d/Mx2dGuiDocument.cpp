@@ -34,12 +34,17 @@ for the use of this software, its documentation or related materials.
 #include <QButtonGroup>
 #include <QJsonDocument>
 #include <QFileDialog>
+#include <QStandardPaths>
+#include <QDir>
 
 #include "Mx2dLayerManagerDialog.h"
 #include "Mx2dMeasurementDialog.h"
 #include "Mx2dLeaderTextInputDialog.h"
 #include "Mx2dTextSearchDialog.h"
 #include "Mx2dExtractTextDialog.h"
+#include "Mx2dDimPropertyDialog.h"
+#include "Mx2dCustomAnnotation.h"
+#include "Mx2dRatioDialog.h"
 #include "xlsxwriter.h"
 
 Mx2dGuiDocument::Mx2dGuiDocument(QWidget* parent) 
@@ -53,48 +58,34 @@ Mx2dGuiDocument::Mx2dGuiDocument(QWidget* parent)
 
 	m_p2dViewToolBar = new MxViewToolBar(this);
 	m_p2dViewToolBar->setMaximumWidth(150);
-#ifdef MX_DEVELOPING
+//#ifdef MX_DEVELOPING
 	QAction* actDimClassify = new QAction(QIcon(":/resources/images2d/2d_dimClassify.svg"), tr("Annotation Category Management"), this);
+    connect(actDimClassify, &QAction::triggered, [this]() {
+		showDimCategoryManagerDialog(this);
+		});
 	m_p2dViewToolBar->addAction(actDimClassify);
-#endif
+//#endif
 	QLabel* pLabel = new QLabel(tr("Annotation Category"), this);
 	pLabel->setContentsMargins(10, 0, 10, 0);
 
 	m_p2dViewToolBar->addWidget(pLabel);
 
-	QComboBox* pComboBox = new QComboBox(this);
-	pComboBox->setStyleSheet(R"(
-		QComboBox {
-			border: 1px solid gray;
-			padding: 1px 18px 1px 3px;
-			min-width: 6em;
-			combobox-popup: 0;
-		}
-		QComboBox::drop-down {
-			subcontrol-origin: padding;
-			subcontrol-position: top right;
-			width: 25px;
-			border-left-width: 1px;
-		}
-		QComboBox::down-arrow {
-			image: url(:/resources/images2d/2d_dropdown.svg);
-		}
-	)");
-	pComboBox->setFixedHeight(40);
-	pComboBox->addItem(tr("default"));
-	m_p2dViewToolBar->addWidget(pComboBox);
+	initCategoryComboBox();
+	m_p2dViewToolBar->addWidget(m_pCategoryComboBox);
 #ifdef MX_DEVELOPING
 	QAction* actDimModify = new QAction(QIcon(":/resources/images2d/2d_modifyDim.svg"), tr("Select one or more annotations to modify properties in batch"), this);
 	m_p2dViewToolBar->addAction(actDimModify);
 #endif
 
 	QAction* actDimMove = new QAction(QIcon(":/resources/images2d/2d_moveDim.svg"), tr("Move Annotation"), this);
+	actDimMove->setObjectName("Move Annotation");
 	m_p2dViewToolBar->addAction(actDimMove);
 	connect(actDimMove, &QAction::triggered, [this]() {
 		Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_MoveAnnotation");
 		});
 
 	QAction* actDimCopy = new QAction(QIcon(":/resources/images2d/2d_copyDim.svg"), tr("Copy Annotation"), this);
+    actDimCopy->setObjectName("Copy Annotation");
 	m_p2dViewToolBar->addAction(actDimCopy);
 	connect(actDimCopy, &QAction::triggered, [this]() {
 		Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_CopyAnnotation");
@@ -252,6 +243,21 @@ void Mx2dGuiDocument::closeAllModelessDialogs()
 			}
 		}
 	}
+}
+
+QList<DimCategoryData> Mx2dGuiDocument::getCategoryDataFromTable()
+{
+    return m_dimCategoryManagerDialog->getCategoryDataFromTable();
+}
+
+DimCategoryData Mx2dGuiDocument::getCurrentDimCategoryData()
+{
+	return m_dimCategoryManagerDialog->getCurrentCategoryData();
+}
+
+double Mx2dGuiDocument::getGlobalRatio()
+{
+	return m_ratioDialog->dimRatio();
 }
 
 void Mx2dGuiDocument::resizeEvent(QResizeEvent* event)
@@ -430,7 +436,7 @@ void Mx2dGuiDocument::computeToolBarPosition()
 	int toolBarW = m_p2dViewToolBar->size().width();
 	int toolBarH = m_p2dViewToolBar->size().height();
 	int targetX = tabW / 2 - toolBarW / 2;
-	int targetY = tabH - 80 - toolBarH;
+	int targetY = tabH - 40 - toolBarH;
 	m_p2dViewToolBar->move(targetX, targetY);
 }
 
@@ -450,6 +456,13 @@ void Mx2dGuiDocument::connectSignals()
 		if (success)
 		{
 			m_spaceNames = getSpaceNames();
+			m_dimTextStyleId = addTextStyle("mx_dim_default_textstyle", "txt.shx", "hztxt.shx", 0.7);
+			
+			if (!m_dimTextStyleId.isNull() && m_dimTextStyleId.isValid())
+			{
+				Mx::mcdbCurDwg()->setTextstyle(m_dimTextStyleId);
+			}
+			
 			renderShape();
 		}
 		});
@@ -571,6 +584,16 @@ void Mx2dGuiDocument::connectSignals()
 	connect(m_convertTimeoutTimer, &QTimer::timeout, this, &Mx2dGuiDocument::onConvertTimeout);
 
 	connect(&Mx2dSignalTransfer::getInstance(), &Mx2dSignalTransfer::signalTableRect, this, &Mx2dGuiDocument::onExtractTable);
+	connect(&Mx2dSignalTransfer::getInstance(), &Mx2dSignalTransfer::signalDrawingLength, this, &Mx2dGuiDocument::showRatioDialog);
+	connect(&Mx2dSignalTransfer::getInstance(), &Mx2dSignalTransfer::signalGotAnnotationProperty, this, &Mx2dGuiDocument::onSetAnnotationProperty);
+	connect(&Mx2dSignalTransfer::getInstance(), &Mx2dSignalTransfer::signalMoveDimPt, this, [this](QWidget* target, McDbObjectId id, const McGePoint3d& oldPt, const McGePoint3d& newPt) {
+		if (target != this)
+		{
+			return;
+		}
+		m_pAnnoEditor->modifyAnnotationDimPt(id, oldPt, newPt);
+		MxDrawApp::UpdateDisplay();
+		});
 }
 
 QStringList Mx2dGuiDocument::getSpaceNames()
@@ -585,8 +608,22 @@ QStringList Mx2dGuiDocument::getSpaceNames()
 		spaceNames.append(currentLayoutName);
 		QPushButton* btn = new QPushButton(currentLayoutName, this);
 		// set btn checked style
-        btn->setStyleSheet("QPushButton{ padding: 10px;}"
-            "QPushButton:checked{background-color: white; color: #57b8ff;}");
+        btn->setStyleSheet(R"(
+        QPushButton {
+            background-color: #DDDDDD;
+			color: #000000;
+            border: none;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+            padding: 8px 16px;
+            min-width: 80px;
+        }
+
+        QPushButton:checked {
+            background-color: #000000;
+            color: #FFFFFF;
+        }
+		)");
 		btn->setCheckable(true);
 		m_spaceBtnLayout->insertWidget(i, btn, 0);
 		m_pSpaceBtnGroup->addButton(btn, i);
@@ -601,6 +638,51 @@ QStringList Mx2dGuiDocument::getSpaceNames()
 		}
 		});
 	return spaceNames;
+}
+
+McDbObjectId Mx2dGuiDocument::addTextStyle(const QString& name, const QString& fontFileName, const QString& bigFontFileName, double dXScale)
+{
+	if (name.isEmpty())
+		return McDbObjectId::kNull;
+
+	if (fontFileName.isEmpty())
+		return McDbObjectId::kNull;
+
+	if (bigFontFileName.isEmpty())
+		return McDbObjectId::kNull;
+
+	if (dXScale < 0.1)
+		dXScale = 1.0;
+
+
+
+	{
+		McDbTextStyleTableRecordPointer spTextTabRec(name.toLocal8Bit().constData(),
+			Mx::mcdbCurDwg(), McDb::kForRead);
+		if (spTextTabRec.openStatus() == Mcad::eOk)
+		{
+			// exists
+			return McDbObjectId::kNull;
+		}
+	}
+
+	McDbTextStyleTablePointer spTextStyleTable(Mx::mcdbCurDwg(), McDb::kForWrite);
+	if (spTextStyleTable.openStatus() != Mcad::eOk)
+	{
+		return McDbObjectId::kNull;
+	}
+
+	McDbTextStyleTableRecord* pRecord = new McDbTextStyleTableRecord;
+	pRecord->setName(name.toLocal8Bit().constData());
+	pRecord->setFileName(fontFileName.toLocal8Bit().constData());
+	pRecord->setBigFontFileName(bigFontFileName.toLocal8Bit().constData());
+	pRecord->setXScale(dXScale);
+
+	spTextStyleTable->add(pRecord);
+
+	McDbObjectId recId = pRecord->objectId();
+	pRecord->close();
+	return recId;
 }
 
 void Mx2dGuiDocument::readMxwebFile(const QString& mxwebPath, const QString& originalFilePath)
@@ -622,6 +704,77 @@ void Mx2dGuiDocument::readMxwebFile(const QString& mxwebPath, const QString& ori
 			}
 			emit fileRead(false);
 		});
+}
+
+
+
+void Mx2dGuiDocument::initCategoryManager()
+{
+	if (!m_dimCategoryManagerDialog)
+	{
+		m_dimCategoryManagerDialog = new Mx2dDimCategoryManagerDialog(m_pAnnoEditor.get(), this);
+		m_dimCategoryManagerDialog->setProperty("modeless_dialog", false);
+		QString docPath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+		QString subDir = "MxCADViewer";
+		QString pathHash = MxUtils::calculateHash(m_filePath + "category");
+		QString fullPath = QDir(QDir(docPath).filePath(subDir)).filePath(pathHash + ".json");
+		m_dimCategoryManagerDialog->setFileName(fullPath);
+		m_dimCategoryManagerDialog->loadConfig(fullPath);
+	}
+}
+
+void Mx2dGuiDocument::initCategoryComboBox()
+{
+	m_pCategoryComboBox = new QComboBox(this);
+	m_pCategoryComboBox->setStyleSheet(R"(
+		QComboBox {
+			border: 1px solid gray;
+			padding: 1px 18px 1px 3px;
+			min-width: 6em;
+			combobox-popup: 0;
+		}
+		QComboBox::drop-down {
+			subcontrol-origin: padding;
+			subcontrol-position: top right;
+			width: 25px;
+			border-left-width: 1px;
+		}
+		QComboBox::down-arrow {
+			image: url(:/resources/images2d/2d_dropdown.svg);
+		}
+	)");
+	m_pCategoryComboBox->setFixedHeight(40);
+}
+
+void Mx2dGuiDocument::initRatioDialog()
+{
+	if (!m_ratioDialog)
+	{
+		m_ratioDialog = new Mx2dRatioDialog(this);
+		QString docPath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+		QString subDir = "MxCADViewer";
+		QString pathHash = MxUtils::calculateHash(m_filePath + "dimRatio");
+		QString fullPath = QDir(QDir(docPath).filePath(subDir)).filePath(pathHash + ".json");
+		m_ratioDialog->loadFromFile(fullPath);
+	}
+}
+
+void Mx2dGuiDocument::setCategoryComboBoxData(QList<DimCategoryData> datas)
+{
+    m_pCategoryComboBox->clear();
+	int currentIndex = 0;
+    for (auto& item : datas)
+    {
+        m_pCategoryComboBox->addItem(item.name);
+        QIcon icon = createComboBoxIcon(item.color);
+		int index = m_pCategoryComboBox->count() - 1;
+        m_pCategoryComboBox->setItemIcon(index, icon);
+		if (item.isCurrent)
+		{
+            currentIndex = index;
+		}
+    }
+    m_pCategoryComboBox->setCurrentIndex(currentIndex);
 }
 
 void Mx2dGuiDocument::mousePressEvent(QMouseEvent* theEvent)
@@ -654,21 +807,17 @@ MxRecentFile Mx2dGuiDocument::createRecentFile()
 	return recentFile;
 }
 
-
-#include <QCryptographicHash>
-namespace {
-	QString calculatePathHash(const QString& filePath)
-	{
-		QCryptographicHash hash(QCryptographicHash::Sha1);
-		QByteArray pathBytes = filePath.toUtf8();
-		hash.addData(pathBytes);
-		return hash.result().toHex();
-	}
+QIcon Mx2dGuiDocument::createComboBoxIcon(const QColor& color)
+{
+    QPixmap pixmap(24, 24);
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    painter.setPen(QPen(Qt::gray));
+    painter.drawRect(0, 0, 23, 23);
+    painter.fillRect(1, 1, 22, 22, color);
+    return QIcon(pixmap);
 }
 
-
-#include <QStandardPaths>
-#include <QDir>
 void Mx2dGuiDocument::renderShape()
 {
 	emit startRender();
@@ -682,7 +831,7 @@ void Mx2dGuiDocument::renderShape()
 
 	QString docPath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
 	QString subDir = "MxCADViewer";
-	QString pathHash = calculatePathHash(m_filePath);
+	QString pathHash = MxUtils::calculateHash(m_filePath);
 
 	QDir dir(docPath);
 
@@ -693,6 +842,16 @@ void Mx2dGuiDocument::renderShape()
 	QString fullPath = QDir(QDir(docPath).filePath(subDir)).filePath(pathHash + ".json");
 
 	m_pAnnoEditor->loadFromFile(fullPath);
+
+	initCategoryManager();
+	initRatioDialog();
+	setCategoryComboBoxData(m_dimCategoryManagerDialog->getCategoryDataFromTable());
+	connect(m_pCategoryComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), m_dimCategoryManagerDialog, &Mx2dDimCategoryManagerDialog::setCurrentCategory);
+	connect(m_dimCategoryManagerDialog, &::Mx2dDimCategoryManagerDialog::categoryDataChanged, this, [this]() {
+		disconnect(m_pCategoryComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), m_dimCategoryManagerDialog, &Mx2dDimCategoryManagerDialog::setCurrentCategory);
+		this->setCategoryComboBoxData(m_dimCategoryManagerDialog->getCategoryDataFromTable());
+		connect(m_pCategoryComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), m_dimCategoryManagerDialog, &Mx2dDimCategoryManagerDialog::setCurrentCategory);
+		});
 
 }
 
@@ -709,7 +868,7 @@ void Mx2dGuiDocument::openFile(const QString& filePath) {
 		QDateTime lastModified = fileInfo.lastModified();
 		qint64 timestampMs = lastModified.toMSecsSinceEpoch();
 		QString modifiedStr = QString::number(timestampMs);
-		QString outname = calculatePathHash(filePath + modifiedStr);
+		QString outname = MxUtils::calculateHash(filePath + modifiedStr);
 		QString docPath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
 		QString subDir = "MxCADViewer";
 		QDir dir(docPath);
@@ -859,6 +1018,28 @@ void Mx2dGuiDocument::extractTable(QWidget* guiDoc2d)
     if (guiDoc2d != this)
         return;
 	executeCommand("Mx_ExtractTable");
+}
+
+void Mx2dGuiDocument::showDimCategoryManagerDialog(QWidget* guiDoc2d)
+{
+    if (guiDoc2d != this)
+        return;
+    
+    if (!m_dimCategoryManagerDialog->isVisible())
+    {
+        m_dimCategoryManagerDialog->exec();
+    }
+}
+
+void Mx2dGuiDocument::showRatioDialog(QWidget* guiDoc2d, double length)
+{
+    if (guiDoc2d != this)
+        return;
+	if (!m_ratioDialog->isVisible())
+	{
+		m_ratioDialog->setValue(length);
+		m_ratioDialog->exec();
+	}
 }
 
 void Mx2dGuiDocument::onExtractTable(QWidget* guiDoc2d, const McGePoint3d& new_corner1, const McGePoint3d& new_corner2)
@@ -1567,4 +1748,23 @@ void Mx2dGuiDocument::onExtractTable(QWidget* guiDoc2d, const McGePoint3d& new_c
 		QMessageBox::information(this, tr("Prompt"), tr("Failed to export table, please check if file is already open, close it and try again!"));
 		return;
 	}
+}
+
+
+
+void Mx2dGuiDocument::onSetAnnotationProperty(QWidget* guiDoc2d, McDbObjectId id)
+{
+	if (guiDoc2d != this)
+		return;
+	McDbEntityPointer spEntity(id, McDb::kForRead);
+	if (spEntity.openStatus() != Mcad::eOk)
+		return;
+
+	if (!spEntity->isKindOf(Mx2dCustomAnnotation::desc()))
+		return;
+	//Mx2dCustomAnnotation* pAnnotation = Mx2dCustomAnnotation::cast(spEntity.object());
+	//DimPropertyFlags dimFlags = pAnnotation->dimPropertyFlags();
+
+	Mx2dDimPropertyDialog dimPropertyDialog(id, m_pAnnoEditor.get(), this);
+    dimPropertyDialog.exec();
 }

@@ -23,16 +23,18 @@ Mx2dCustomRadiusDim::Mx2dCustomRadiusDim(void)
 }
 
 Mx2dCustomRadiusDim::Mx2dCustomRadiusDim(const McGePoint3d& startPt, const McGePoint3d& midPt, const McGePoint3d& endPt, const McGePoint3d& dimPt, double textHeight)
-	:Mx2dCustomAnnotation(textHeight), m_startPt(startPt), m_midPt(midPt), m_endPt(endPt), m_dimPt(dimPt), m_isArc(true)
+	:Mx2dCustomAnnotation(textHeight), m_startPt(startPt), m_midPt(midPt), m_endPt(endPt), m_isArc(true)
 {
 	setType("radiusDim");
 	calculateArc(m_centerPt, m_radius);
+	setDimPt(dimPt);
 }
 
 Mx2dCustomRadiusDim::Mx2dCustomRadiusDim(const McGePoint3d& centerPt, double radius, const McGePoint3d& dimPt, double textHeight)
-	:Mx2dCustomAnnotation(textHeight), m_centerPt(centerPt), m_radius(radius), m_dimPt(dimPt), m_isArc(false)
+	:Mx2dCustomAnnotation(textHeight), m_centerPt(centerPt), m_radius(radius), m_isArc(false)
 {
 	setType("radiusDim");
+	setDimPt(dimPt);
 }
 
 Mx2dCustomRadiusDim::~Mx2dCustomRadiusDim(void)
@@ -69,6 +71,7 @@ Mdesk::Boolean Mx2dCustomRadiusDim::worldDraw(McGiWorldDraw* wd)
 Mcad::ErrorStatus Mx2dCustomRadiusDim::getGripPoints(McGePoint3dArray& gripPoints, McGeIntArray& osnapModes, McGeIntArray& geomIds) const
 {
 	assertReadEnabled();
+	return Mcad::eOk;
 	gripPoints.append(m_dimPt);
 	return Mcad::eOk;
 }
@@ -76,6 +79,7 @@ Mcad::ErrorStatus Mx2dCustomRadiusDim::getGripPoints(McGePoint3dArray& gripPoint
 Mcad::ErrorStatus Mx2dCustomRadiusDim::moveGripPointsAt(const McGeIntArray& indices, const McGeVector3d& offset)
 {
 	assertWriteEnabled();
+	return Mcad::eOk;
 	int iIndex = indices[0];
 	switch (iIndex)
 	{
@@ -130,7 +134,6 @@ Mcad::ErrorStatus Mx2dCustomRadiusDim::dwgInFields(McDbDwgFiler* pFiler)
 	pFiler->readPoint3d(&m_midPt);
 	pFiler->readPoint3d(&m_endPt);
 	pFiler->readPoint3d(&m_centerPt);
-	pFiler->readPoint3d(&m_dimPt);
 	pFiler->readDouble(&m_radius);
 	pFiler->readBool(&m_isArc);
 
@@ -154,7 +157,6 @@ Mcad::ErrorStatus Mx2dCustomRadiusDim::dwgOutFields(McDbDwgFiler* pFiler) const
 	pFiler->writePoint3d(m_midPt);
 	pFiler->writePoint3d(m_endPt);
 	pFiler->writePoint3d(m_centerPt);
-	pFiler->writePoint3d(m_dimPt);
 	pFiler->writeDouble(m_radius);
 	pFiler->writeBool(m_isArc);
 	return Mcad::eOk;
@@ -218,12 +220,17 @@ void Mx2dCustomRadiusDim::fromJson(const QJsonObject& jsonObject)
 {
 	assertWriteEnabled();
 	Mx2dCustomAnnotation::fromJson(jsonObject);
+	if(!jsonObject.contains("startPoint")) return;
 	m_startPt = Mx2d::jsonArray2dToPoint3d(jsonObject["startPoint"].toArray());
+    if(!jsonObject.contains("midPoint")) return;
 	m_midPt = Mx2d::jsonArray2dToPoint3d(jsonObject["midPoint"].toArray());
+    if(!jsonObject.contains("endPoint")) return;
 	m_endPt = Mx2d::jsonArray2dToPoint3d(jsonObject["endPoint"].toArray());
+    if(!jsonObject.contains("centerPoint")) return;
 	m_centerPt = Mx2d::jsonArray2dToPoint3d(jsonObject["centerPoint"].toArray());
-	m_dimPt = Mx2d::jsonArray2dToPoint3d(jsonObject["dimPoint"].toArray());
+    if(!jsonObject.contains("radius")) return;
 	m_radius = jsonObject["radius"].toDouble();
+    if(!jsonObject.contains("isArc")) return;
 	m_isArc = jsonObject["isArc"].toBool();
 }
 
@@ -235,7 +242,6 @@ QJsonObject Mx2dCustomRadiusDim::toJson() const
 	jsonObject["midPoint"] = Mx2d::point3dToJsonArray2d(m_midPt);
 	jsonObject["endPoint"] = Mx2d::point3dToJsonArray2d(m_endPt);
 	jsonObject["centerPoint"] = Mx2d::point3dToJsonArray2d(m_centerPt);
-	jsonObject["dimPoint"] = Mx2d::point3dToJsonArray2d(m_dimPt);
 	jsonObject["radius"] = m_radius;
 	jsonObject["isArc"] = m_isArc;
 
@@ -260,6 +266,11 @@ Mx2d::TextInfoList Mx2dCustomRadiusDim::findText(const QString& text, bool isExa
 	}
 
 	return { {textStr , extents} };
+}
+
+DimPropertyFlags Mx2dCustomRadiusDim::dimPropertyFlags() const
+{
+	return Prop_Color | Prop_Category | Prop_TextHeight | Prop_Ratio;
 }
 
 void Mx2dCustomRadiusDim::setStartPt(const McGePoint3d& startPt)
@@ -308,18 +319,6 @@ McGePoint3d Mx2dCustomRadiusDim::centerPt() const
 {
 	assertReadEnabled();
 	return m_centerPt;
-}
-
-void Mx2dCustomRadiusDim::setDimPt(const McGePoint3d& dimPt)
-{
-	assertWriteEnabled();
-	m_dimPt = dimPt;
-}
-
-McGePoint3d Mx2dCustomRadiusDim::dimPt() const
-{
-	assertReadEnabled();
-	return m_dimPt;
 }
 
 void Mx2dCustomRadiusDim::setRadius(double radius)

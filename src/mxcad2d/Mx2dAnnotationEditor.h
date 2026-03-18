@@ -44,6 +44,24 @@ public:
 
 	void modifyAnnotation(McDbObjectId id, const QJsonObject& oldJson, const QJsonObject& newJson);
 
+
+	void modifyAnnotationColor(McDbObjectId id, const QColor& oldColor, const QColor& newColor);
+
+	void modifyAnnotationCategory(McDbObjectId id, const QString& oldCategory, const QString& newCategory);
+
+	void modifyAnnotationTextHeight(McDbObjectId id, double oldHeight, double newHeight);
+
+	void modifyAnnotationRatio(McDbObjectId id, double oldRatio, double newRatio);
+
+	void modifyAnnotationsCategory(const QString& oldCategory, const QString& newCategory);
+
+	void modifyAnnotationDimPt(McDbObjectId id, const McGePoint3d& oldPt, const McGePoint3d& newPt);
+
+	void setAnnotationsVisable(const QString& cat, bool visible);
+	bool hasAnnotationInCategory(const QString& cat) const;
+
+	std::set<McDbObjectId> getAllAnnotations() const;
+
 public:
 	bool undo();
 	bool redo();

@@ -15,6 +15,7 @@ for the use of this software, its documentation or related materials.
 #include "Mx2dAnnotationEditor.h"
 #include "MxRecentFile.h"
 #include "Mx2dView.h"
+#include "Mx2dDimCategoryManagerDialog.h"
 #ifdef Q_OS_LINUX
 class MxOpenGLView;
 #endif
@@ -24,12 +25,14 @@ class QLabel;
 class QHBoxLayout;
 class QButtonGroup;
 class QTimer;
+class QComboBox;
 
 class Mx2dLayerManagerDialog;
 class Mx2dMeasurementDialog;
 class Mx2dLeaderTextInputDialog;
 class Mx2dTextSearchDialog;
 class Mx2dExtractTextDialog;
+class Mx2dRatioDialog;
 
 class Mx2dGuiDocument : public QWidget
 {
@@ -49,7 +52,9 @@ public:
 
 
 	void closeAllModelessDialogs();
-
+	QList<DimCategoryData> getCategoryDataFromTable();
+	DimCategoryData getCurrentDimCategoryData();
+	double getGlobalRatio();
 protected:
 	void resizeEvent(QResizeEvent* event) override;
 	void paintEvent(QPaintEvent* event) override;
@@ -61,7 +66,7 @@ protected:
 	void keyPressEvent(QKeyEvent* event) override;
 private:
 	MxRecentFile createRecentFile();
-
+	QIcon createComboBoxIcon(const QColor& color);
 private:
 	MxCADView		m_cadView;
 	Mx2dView*		m_pViewWidget = nullptr;
@@ -69,6 +74,7 @@ private:
 	QLabel*			m_pPromptLabel = nullptr;
 	QString			m_filePath;
 	QHBoxLayout*	m_spaceBtnLayout = nullptr;
+	QComboBox*	    m_pCategoryComboBox = nullptr;
 	std::unique_ptr<Mx2dAnnotationEditor> m_pAnnoEditor;
 	QStringList m_spaceNames;
 	QButtonGroup* m_pSpaceBtnGroup = nullptr;
@@ -95,7 +101,12 @@ private:
 	void computePromptLabelPosition();
 	void connectSignals();
 	QStringList getSpaceNames();
+	McDbObjectId addTextStyle(const QString& name, const QString& fontFileName, const QString& bigFontFileName, double dXScale);
 	void readMxwebFile(const QString& mxwebPath, const QString& originalFilePath);
+	void initCategoryManager();
+	void initCategoryComboBox();
+	void initRatioDialog();
+	void setCategoryComboBoxData(QList<DimCategoryData> datas);
 public:
 	double m_devicePixelRatio;
 	bool m_updatePending;
@@ -119,6 +130,9 @@ private:
 	Mx2dLeaderTextInputDialog* m_leaderTextInputDialog = nullptr;
 	Mx2dTextSearchDialog* m_textSearchDialog = nullptr;
 	Mx2dExtractTextDialog* m_extractTextDialog = nullptr;
+	Mx2dDimCategoryManagerDialog* m_dimCategoryManagerDialog = nullptr;
+	Mx2dRatioDialog* m_ratioDialog = nullptr;
+	McDbObjectId m_dimTextStyleId;
 public:
 	void showLayerManagerDialog(QWidget* guiDoc2d);
 	void showMeasurementDialog(QWidget* guiDoc2d);
@@ -126,6 +140,10 @@ public:
 	void showTextSearchDialog(QWidget* guiDoc2d);
 	void extractText(QWidget* guiDoc2d);
 	void extractTable(QWidget* guiDoc2d);
+    void showDimCategoryManagerDialog(QWidget* guiDoc2d);
+	void showRatioDialog(QWidget* guiDoc2d, double length);
 private:
 	void onExtractTable(QWidget* guiDoc2d, const McGePoint3d& new_corner1, const McGePoint3d& new_corner2);
+	//void onDrawingLength(QWidget* guiDoc2d, double length);
+	void onSetAnnotationProperty(QWidget* guiDoc2d, McDbObjectId id);
 };

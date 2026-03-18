@@ -61,6 +61,7 @@ Mdesk::Boolean Mx2dCustomLeader::worldDraw(McGiWorldDraw* wd)
 Mcad::ErrorStatus Mx2dCustomLeader::getGripPoints(McGePoint3dArray& gripPoints, McGeIntArray& osnapModes, McGeIntArray& geomIds) const
 {
 	assertReadEnabled();
+	return Mcad::eOk;
 	gripPoints.append(m_startPt);
 	gripPoints.append(m_endPt);
 	return Mcad::eOk;
@@ -69,6 +70,7 @@ Mcad::ErrorStatus Mx2dCustomLeader::getGripPoints(McGePoint3dArray& gripPoints, 
 Mcad::ErrorStatus Mx2dCustomLeader::moveGripPointsAt(const McGeIntArray& indices, const McGeVector3d& offset)
 {
 	assertWriteEnabled();
+	return Mcad::eOk;
 	int iIndex = indices[0];
 	switch (iIndex)
 	{
@@ -185,8 +187,11 @@ void Mx2dCustomLeader::fromJson(const QJsonObject& jsonObject)
 {
 	assertWriteEnabled();
 	Mx2dCustomAnnotation::fromJson(jsonObject);
+	if(!jsonObject.contains("startPoint")) return;
 	m_startPt = Mx2d::jsonArray2dToPoint3d(jsonObject["startPoint"].toArray());
+    if(!jsonObject.contains("endPoint")) return;
 	m_endPt = Mx2d::jsonArray2dToPoint3d(jsonObject["endPoint"].toArray());
+    if(!jsonObject.contains("text")) return;
 	m_text = jsonObject["text"].toString();
 }
 
@@ -232,6 +237,11 @@ Mx2d::TextInfoList Mx2dCustomLeader::findText(const QString& text, bool isExactM
 	arr.clear();
 
 	return res;
+}
+
+DimPropertyFlags Mx2dCustomLeader::dimPropertyFlags() const
+{
+	return Prop_Color | Prop_Category | Prop_TextHeight | Prop_Content;
 }
 
 void Mx2dCustomLeader::setStartPt(const McGePoint3d& pt)

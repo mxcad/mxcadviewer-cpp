@@ -54,4 +54,6 @@ namespace MxUtils {
 	int doAction(std::function<void()> func);
 
 	extern QWidget* gCurrentTab;
+
+	QString calculateHash(const QString& str);
 }

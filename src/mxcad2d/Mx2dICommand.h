@@ -14,6 +14,7 @@ for the use of this software, its documentation or related materials.
 #include <QString>
 #include "Mx2dUtils.h"
 #include <QJsonObject>
+#include <QColor>
 
 class Mx2dICommand
 {
@@ -157,4 +158,71 @@ private:
     McDbObjectId m_id;
     QJsonObject m_oldJson;
     QJsonObject m_newJson;
+};
+
+
+class Mx2dModifyAnnotationColorCommand : public Mx2dICommand
+{
+public:
+    Mx2dModifyAnnotationColorCommand(McDbObjectId id, const QColor& oldColor, const QColor& newColor);
+    void execute() override;
+    void undo() override;
+
+private:
+    McDbObjectId m_id;
+    QColor m_oldColor;
+    QColor m_newColor;
+};
+
+class Mx2dModifyAnnotationCategoryCommand : public Mx2dICommand
+{
+public:
+    Mx2dModifyAnnotationCategoryCommand(McDbObjectId id, const QString& oldCategory, const QString& newCategory);
+    void execute() override;
+    void undo() override;
+
+private:
+    McDbObjectId m_id;
+    QString m_oldCategory;
+    QString m_newCategory;
+};
+
+
+class Mx2dModifyAnnotationTextHeightCommand : public Mx2dICommand
+{
+public:
+    Mx2dModifyAnnotationTextHeightCommand(McDbObjectId id, double oldTextHeight, double newTextHeight);
+    void execute() override;
+    void undo() override;
+
+private:
+    McDbObjectId m_id;
+    double m_oldTextHeight;
+    double m_newTextHeight;
+};
+
+class Mx2dModifyAnnotationRatioCommand : public Mx2dICommand
+{
+public:
+    Mx2dModifyAnnotationRatioCommand(McDbObjectId id, double oldRatio, double newRatio);
+    void execute() override;
+    void undo() override;
+
+private:
+    McDbObjectId m_id;
+    double m_oldRatio;
+    double m_newRatio;
+};
+
+class Mx2dModifyAnnotationDimPtCommand : public Mx2dICommand
+{
+public:
+    Mx2dModifyAnnotationDimPtCommand(McDbObjectId id, const McGePoint3d& oldPt, const McGePoint3d& newPt);
+    void execute() override;
+    void undo() override;
+
+private:
+    McDbObjectId m_id;
+    McGePoint3d m_oldPt;
+    McGePoint3d m_newPt;
 };

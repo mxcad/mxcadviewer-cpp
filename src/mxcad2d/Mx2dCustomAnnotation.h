@@ -12,6 +12,7 @@ for the use of this software, its documentation or related materials.
 #include <QJsonObject>
 #include <QString>
 #include "Mx2dUtils.h"
+#include "DimPropertyFlag.h"
 
 class Mx2dCustomAnnotation : public McDbEntity
 {
@@ -21,9 +22,9 @@ public:
 	Mx2dCustomAnnotation(double textHeight);
 	virtual ~Mx2dCustomAnnotation(void);
 
-	virtual Mcad::ErrorStatus dwgInFields(McDbDwgFiler* pFiler) override;
+	Mcad::ErrorStatus dwgInFields(McDbDwgFiler* pFiler) override;
 
-	virtual Mcad::ErrorStatus dwgOutFields(McDbDwgFiler* pFiler) const override;
+	Mcad::ErrorStatus dwgOutFields(McDbDwgFiler* pFiler) const override;
 
 public:
 	void setTextHeight(double textHeight);
@@ -31,6 +32,9 @@ public:
 
 	void setDimRatio(double dimRatio);
 	double dimRatio() const;
+
+	void setDimPt(const McGePoint3d& pt);
+	McGePoint3d dimPt() const;
 
 	void setCategory(const QString& category);
 	QString category() const;
@@ -46,9 +50,12 @@ public:
 
 	virtual Mx2d::TextInfoList findText(const QString& text, bool isExactMatch = false) const;
 
+	virtual DimPropertyFlags dimPropertyFlags() const;
+
 protected:
 	double m_textHeight;
 	double m_dimRatio = 1.0;
+	McGePoint3d m_dimPt;
 	QString m_category = "default";
 	QString m_type = "annotation";
 	QString m_layout = "Model";

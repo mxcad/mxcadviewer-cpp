@@ -68,4 +68,7 @@ signals:
 	void signalModifyArcPolyArea(QWidget* target, McDbObjectId id, const Mx2d::PLVertexList& oldPoints, const Mx2d::PLVertexList& newPoints);
 	void signalModifyRectArea(QWidget* target, McDbObjectId id, const McGePoint3d& oldCorner1, const McGePoint3d& oldCorner2, const McGePoint3d& newCorner1, const McGePoint3d& newCorner2);
 	void signalModifyAnnotation(QWidget* target, McDbObjectId id, const QJsonObject& oldJson, const QJsonObject& newJson);
+
+	void signalGotAnnotationProperty(QWidget* target, McDbObjectId id);
+	void signalMoveDimPt(QWidget* target, McDbObjectId id, const McGePoint3d& oldPt, const McGePoint3d& newPt);
 };

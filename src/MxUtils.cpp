@@ -21,7 +21,7 @@ for the use of this software, its documentation or related materials.
 #include <QFileInfo>
 #include <QRegularExpression>
 #include <regex>
-
+#include <QCryptographicHash>
 #ifdef MX_BUILD_LOGIN
 #include "MxNetworkManager.h"
 #endif
@@ -228,6 +228,14 @@ namespace MxUtils {
 		func();
 		return 2;
 #endif
+	}
+
+	QString calculateHash(const QString& str)
+	{
+		QCryptographicHash hash(QCryptographicHash::Sha1);
+		QByteArray pathBytes = str.toUtf8();
+		hash.addData(pathBytes);
+		return hash.result().toHex();
 	}
 
 	QWidget* gCurrentTab = nullptr;

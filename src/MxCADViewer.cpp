@@ -24,6 +24,9 @@ for the use of this software, its documentation or related materials.
 #include <QDir>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QDragEnterEvent>
+#include <QJsonDocument>
+#include <QShortcut>
 
 
 #include "MxRecentFileWidget.h"
@@ -59,18 +62,20 @@ for the use of this software, its documentation or related materials.
 #include "Mx2dModifySingleLineTextDialog.h"
 #include "Mx2dModifyMultiLineTextDialog.h"
 #include "Mx2dAreaOffsetDialog.h"
+#include "Mx2dRatioDialog.h"
 #include "MxUtils.h"
 #include "Mx2dSignalTransfer.h"
 #include "Mx2dGuiDocument.h"
 #ifdef MX_BUILD_3D
 #include "Mx3dGuiDocument.h"
+#include "Mx3dProgressIndicator.h"
 #endif
 #include "MxSignalTransfer.h"
 #include <thread>
 #include "MxAboutMeDialog.h"
 
 #include "MxLanguageManager.h"
-#include "Mx3dProgressIndicator.h"
+
 #ifdef MX_BUILD_LOGIN
 #include "mxloginscene.h"
 #include "mxpersonalcenterwidget.h"
@@ -86,6 +91,9 @@ MxCADViewer::MxCADViewer(QWidget* parent)
 	connectSignalSlots();
 
 	updateToolBar(m_tabWidget->currentIndex());
+	initShortcutsFilePath();
+	loadShortcutsFromJson();
+	applyShortcuts();
 }
 
 MxCADViewer::~MxCADViewer()
@@ -404,6 +412,7 @@ void MxCADViewer::addActionsTo2dViewToolBar()
 	// --- VIP Menu (fully populated) ---
 	auto* pVipMenu = new QMenu(this);
 	auto* pActExtractText = new QAction(QIcon(":/resources/images2d/2d_extractText.svg"), tr("Extract Text"), this);
+	pActExtractText->setObjectName("Extract Text");
 	connect(pActExtractText, &QAction::triggered, this, [this]() { 
 		MxUtils::doAction([this]() { 
 			emit extractText(currentGuiDoc2d());
@@ -416,40 +425,58 @@ void MxCADViewer::addActionsTo2dViewToolBar()
 			}); 
 		});
 	auto* pActExtractTable = new QAction(QIcon(":/resources/images2d/2d_extractTable.svg"), tr("Extract Table"), this);
+    pActExtractTable->setObjectName("Extract Table");
 	connect(pActExtractTable, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { emit extractTable(currentGuiDoc2d()); }); });
 
 	auto* pActArcLength = new QAction(QIcon(":/resources/images2d/2d_arcLength.svg"), tr("Arc Length"), this);
+    pActArcLength->setObjectName("Arc Length");
 	connect(pActArcLength, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawArcLengthDimMark"); }); });
 
 	auto* pActPt2LineDist = new QAction(QIcon(":/resources/images2d/2d_pt2lineDist.svg"), tr("Point to Line Distance"), this);
+    pActPt2LineDist->setObjectName("Point to Line Distance");
 	connect(pActPt2LineDist, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawDistPointToLineMark"); }); });
 
 	auto* pActContinuousMeasurement = new QAction(QIcon(":/resources/images2d/2d_continuousMeasurement.svg"), tr("Continuous Measurement"), this);
+	pActContinuousMeasurement->setObjectName("Continuous Measurement");
     connect(pActContinuousMeasurement, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawContinuousMeasurementMark"); }); });
 
 	auto* pActBatchMeasurement = new QAction(QIcon(":/resources/images2d/2d_batchMeasurement.svg"), tr("Batch Measurement"), this);
+    pActBatchMeasurement->setObjectName("Batch Measurement");
     connect(pActBatchMeasurement, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_BatchMeasure"); }); });
 
 	auto* pActViewSegmentLength = new QAction(QIcon(":/resources/images2d/2d_segLength.svg"), tr("Show Segment Length"), this);
     connect(pActViewSegmentLength, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_ShowSegmentLengths"); }); });
 
+	auto* pActModifyProperty = new QAction(QIcon(":/resources/images2d/2d_modifyProperty.svg"), tr("Modify Annotation Property"), this);
+    pActModifyProperty->setObjectName("Modify Annotation Property");
+    connect(pActModifyProperty, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_ModifyAnnotationProperty"); }); });
+
 	auto* pActAreaWithArc = new QAction(QIcon(":/resources/images2d/2d_areaWithArc.svg"), tr("Area(with arcs)"), this);
+    pActAreaWithArc->setObjectName("Area(with arcs)");
     connect(pActAreaWithArc, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawArcPolyAreaMark"); }); });
 
 	auto* pActMeasureFillArea = new QAction(QIcon(":/resources/images2d/2d_fillArea.svg"), tr("Hatch Area"), this);
+    pActMeasureFillArea->setObjectName("Hatch Area");
     connect(pActMeasureFillArea, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawHatchArea2Mark"); }); });
 
 	auto* pActCalculateSideArea = new QAction(QIcon(":/resources/images2d/2d_sideArea.svg"), tr("Calculate Side Area"), this);
+    pActCalculateSideArea->setObjectName("Calculate Side Area");
     connect(pActCalculateSideArea, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_CalculateSiderArea"); }); });
 
 	auto* pActAreaOffset = new QAction(QIcon(":/resources/images2d/2d_areaOffset.svg"), tr("Area Offset"), this);
+    pActAreaOffset->setObjectName("Area Offset");
     connect(pActAreaOffset, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_SelectAreaToOffset"); }); });
 
 	auto* pActMeasureCircle = new QAction(QIcon(":/resources/images2d/2d_measureCircle.svg"), tr("Circle"), this);
+    pActMeasureCircle->setObjectName("Circle");
     connect(pActMeasureCircle, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawCircleMeasurementMark"); }); });
 
 	auto* pActMeasureAngle = new QAction(QIcon(":/resources/images2d/2d_measureAngle.svg"), tr("Angle"), this);
+    pActMeasureAngle->setObjectName("Angle");
     connect(pActMeasureAngle, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawAngleMeasurementMark"); }); });
+
+	auto* pActShortcutSettings = new QAction(QIcon(":/resources/images2d/2d_shortcutSetting.svg"), tr("Shortcut Settings"), this);
+	connect(pActShortcutSettings, &QAction::triggered, this, &MxCADViewer::openShortcutDialog);
 
 	pVipMenu->addAction(pActExtractText);
 	pVipMenu->addAction(pActExtractTable);
@@ -458,12 +485,14 @@ void MxCADViewer::addActionsTo2dViewToolBar()
 	pVipMenu->addAction(pActContinuousMeasurement);
 	pVipMenu->addAction(pActBatchMeasurement);
 	pVipMenu->addAction(pActViewSegmentLength);
+	pVipMenu->addAction(pActModifyProperty);
 	pVipMenu->addAction(pActAreaWithArc);
 	pVipMenu->addAction(pActMeasureFillArea);
 	pVipMenu->addAction(pActCalculateSideArea);
 	pVipMenu->addAction(pActAreaOffset);
 	pVipMenu->addAction(pActMeasureCircle);
 	pVipMenu->addAction(pActMeasureAngle);
+	pVipMenu->addAction(pActShortcutSettings);
 #ifdef MX_DEVELOPING
 	auto* pActCADSplitExport = new QAction(tr("Split and Export CAD"), this);
 	connect(pActCADSplitExport, &QAction::triggered, this, [this]() { onCADSplitExport(MxPageType::PAGE_2D); });
@@ -473,9 +502,6 @@ void MxCADViewer::addActionsTo2dViewToolBar()
 	connect(pActExportPDF, &QAction::triggered, this, [this]() { onExportPDF(MxPageType::PAGE_2D); });
 	auto* pActBatchExportPDF = new QAction(tr("Batch Export PDF"), this);
 	connect(pActBatchExportPDF, &QAction::triggered, this, [this]() { onBatchExportPDF(MxPageType::PAGE_2D); });
-	auto* pActShortcutSettings = new QAction(tr("Shortcut Settings"), this);
-	connect(pActShortcutSettings, &QAction::triggered, this, [this]() { onShortcutSettings(MxPageType::PAGE_2D); });
-	pVipMenu->addAction(new QAction(tr("Modify Single Dimension"), this));
 	pVipMenu->addAction(new QAction(tr("External Reference Manager"), this));
 	pVipMenu->addAction(new QAction(tr("CAD Gray Display"), this));
 	pVipMenu->addAction(new QAction(tr("T-Arch Convert (to T3)"), this));
@@ -485,7 +511,6 @@ void MxCADViewer::addActionsTo2dViewToolBar()
 	pVipMenu->addAction(pActPDFToCAD);
 	pVipMenu->addAction(pActExportPDF);
 	pVipMenu->addAction(pActBatchExportPDF);
-	pVipMenu->addAction(pActShortcutSettings);
 #endif
 	
 	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_vip.svg", tr("VIP"), tr("VIP functions"), MxPageType::PAGE_2D, [this](MxPageType type) { onDoNothing(type); }, pVipMenu);
@@ -514,10 +539,13 @@ void MxCADViewer::addActionsTo2dViewToolBar()
 	// --- Text Menu ---
 	auto* pTextMenu = new QMenu(this);
 	auto* pActSingleLineText = new QAction(QIcon(":/resources/images2d/2d_singleLineText.svg"), tr("Single Line Text"), this);
+	pActSingleLineText->setObjectName("Single Line Text");
 	connect(pActSingleLineText, &QAction::triggered, this, [this]() { onInsertSingleLineText(MxPageType::PAGE_2D); });
 	auto* pActMultLinesText = new QAction(QIcon(":/resources/images2d/2d_multiLineText.svg"), tr("Multi Line Text"), this);
+    pActMultLinesText->setObjectName("Multi Line Text");
 	connect(pActMultLinesText, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() { onMultiLineInput(MxPageType::PAGE_2D); }); });
 	auto* pActNumberText = new QAction(QIcon(":/resources/images2d/2d_numberedText.svg"), tr("Numbered Text"), this);
+    pActNumberText->setObjectName("Numbered Text");
 	connect(pActNumberText, &QAction::triggered, this, [this]() { MxUtils::doAction([this]() {onNumberedText(MxPageType::PAGE_2D); }); });
 	auto* pActModText = new QAction(QIcon(":/resources/images2d/2d_modifyText.svg"), tr("Modify Text"), this);
 	connect(pActModText, &QAction::triggered, this, []() { MxUtils::doAction([]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_SelectTextToModify"); }); });
@@ -534,17 +562,27 @@ void MxCADViewer::addActionsTo2dViewToolBar()
 	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_text.svg", tr("Text"), tr("Create or modify text"), MxPageType::PAGE_2D, [this](MxPageType type) { onDoNothing(type); }, pTextMenu);
 
 	// --- Draw Line ---
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_line.svg", tr("Draw Line"), tr("Draw Line"), MxPageType::PAGE_2D, [](MxPageType) { MxUtils::doAction([]() {Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawLine"); }); });
+	auto* pActDrawLine= new QAction(QIcon(":/resources/images2d/2d_line.svg"), tr("Draw Line"), this);
+	pActDrawLine->setToolTip(tr("Draw Line"));
+	pActDrawLine->setObjectName("Draw Line");
+	m_tab2dViewActions.append(pActDrawLine);
+	connect(pActDrawLine, &QAction::triggered, this, [this]() {
+		MxUtils::doAction([this]() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawLine"); });
+		});
 
 	// --- Shapes Menu ---
 	auto* pShapeMenu = new QMenu(this);
 	auto* pActRectangle = new QAction(QIcon(":/resources/images2d/2d_dimRectangle.svg"), tr("Rectangle"), this);
+    pActRectangle->setObjectName("Rectangle");
 	connect(pActRectangle, &QAction::triggered, this, []() { MxUtils::doAction([]() {Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawRectMark"); }); });
 	auto* pActEllipse = new QAction(QIcon(":/resources/images2d/2d_dimEllipse.svg"), tr("Ellipse"), this);
+    pActEllipse->setObjectName("Ellipse");
 	connect(pActEllipse, &QAction::triggered, this, []() { MxUtils::doAction([]() {Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawEllipseMark"); }); });
 	auto* pActCloudLine = new QAction(QIcon(":/resources/images2d/2d_dimCloud.svg"), tr("Cloud"), this);
+    pActCloudLine->setObjectName("Cloud");
 	connect(pActCloudLine, &QAction::triggered, this, []() { MxUtils::doAction([]() {Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_DrawRectCloudMark"); }); });
 	auto* pActLeadLine = new QAction(QIcon(":/resources/images2d/2d_dimLeader.svg"), tr("Leader"), this);
+    pActLeadLine->setObjectName("Leader");
 	connect(pActLeadLine, &QAction::triggered, this, [this]() { 
 		MxUtils::doAction([this]() {
 
@@ -561,6 +599,7 @@ void MxCADViewer::addActionsTo2dViewToolBar()
 	// --- Delete Menu ---
 	auto* pDeleteMenu = new QMenu(this);
 	auto* pActDelDim = new QAction(QIcon(":/resources/images2d/2d_dimAnnotations.svg"), tr("Delete Annotation"), this);
+    pActDelDim->setObjectName("Delete Annotation");
 	connect(pActDelDim, &QAction::triggered, this, []() { Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_EraseAnnotation"); });
 	auto* pActDelAllDim = new QAction(QIcon(":/resources/images2d/2d_dimAllAnnotations.svg"), tr("Delete All Annotations"), this);
 	connect(pActDelAllDim, &QAction::triggered, this, [this]() {
@@ -592,11 +631,18 @@ void MxCADViewer::addActionsTo2dViewToolBar()
 
 	// --- More Tools ---
 	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_dimSetting.svg", tr("Annotation Settings"), tr("Annotation settings"), MxPageType::PAGE_2D, [this](MxPageType type) { onDimSetting(type); });
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_proportion.svg", tr("Ratio"), tr("Annotation ratio setting"), MxPageType::PAGE_2D, [](MxPageType) { /* TODO: Implement scale logic */ });
 #endif // MX_DEVELOPING
+
+	auto* pActMeasureRatio = new QAction(QIcon(":/resources/images2d/2d_proportion.svg"), tr("Ratio"), this);
+	pActMeasureRatio->setToolTip(tr("Annotation ratio setting"));
+	m_tab2dViewActions.append(pActMeasureRatio);
+	connect(pActMeasureRatio, &QAction::triggered, this, [this]() {
+		Mx2d::execCmd2d(MxUtils::gCurrentTab, "Mx_GetDrawingLength");
+		});
 
 	auto* pActTextSearch = new QAction(QIcon(":/resources/images2d/2d_textSearch.svg"), tr("Text Search"), this);
 	pActTextSearch->setToolTip(tr("Locate text in drawings or annotations"));
+	pActTextSearch->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
     m_tab2dViewActions.append(pActTextSearch);
     connect(pActTextSearch, &QAction::triggered, this, [this]() {
 		emit showTextSearchDialog(currentGuiDoc2d());
@@ -616,7 +662,6 @@ void MxCADViewer::addActionsTo2dViewToolBar()
 
 	// --- Final Tools ---
 	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_print.svg", tr("Print"), tr("Print"), MxPageType::PAGE_2D, [this](MxPageType type) { onPrint(type); });
-	createAndAddAction(m_tab2dViewActions, ":/resources/images2d/2d_dimClassify.svg", tr("Annotation Categories"), tr("Open annotation categories manager"), MxPageType::PAGE_2D, [this](MxPageType type) { onDimCategoryManager(type); });
 #endif // MX_DEVELOPING
 }
 
@@ -780,6 +825,71 @@ void MxCADViewer::restartApp()
 	{
 		QMessageBox::critical(this, tr("Error"), tr("Failed to start new application process. Restart aborted."));
 	}
+}
+
+void MxCADViewer::openShortcutDialog()
+{
+	struct ActionDef {
+		QString id;
+		QString displayName;
+	};
+
+	QList<ActionDef> actionDefs = {
+		{"Draw Line", tr("Draw Line")},
+		{"Continuous Measurement", tr("Continuous Measurement")},
+		{"Batch Measurement", tr("Batch Measurement")},
+		{"Arc Length", tr("Arc Length")},
+		{"Point to Line Distance", tr("Point to Line Distance")},
+        {"Area(with arcs)", tr("Area(with arcs)")},
+        {"Circle", tr("Circle")},
+        {"Angle", tr("Angle")},
+        {"Hatch Area", tr("Hatch Area")},
+        {"Modify Annotation Property", tr("Modify Annotation Property")},
+        {"Extract Text", tr("Extract Text")},
+        {"Extract Table", tr("Extract Table")},
+        {"Calculate Side Area", tr("Calculate Side Area")},
+        {"Area Offset", tr("Area Offset")},
+        {"Single Line Text", tr("Single Line Text")},
+        {"Multi Line Text", tr("Multi Line Text")},
+        {"Numbered Text", tr("Numbered Text")},
+        {"Ellipse", tr("Ellipse")},
+        {"Rectangle", tr("Rectangle")},
+        {"Cloud", tr("Cloud")},
+        {"Leader", tr("Leader")},
+        {"Delete Annotation", tr("Delete Annotation")},
+		{"Move Annotation", tr("Move Annotation")},
+        {"Copy Annotation", tr("Copy Annotation")},
+        {"Aligned", tr("Aligned")},
+        {"Linear", tr("Linear")},
+        {"Area", tr("Area")},
+        {"Rectangular Area", tr("Rectangular Area")},
+        {"Coordinate", tr("Coordinate")},
+        {"Radius", tr("Radius")}
+	};
+
+
+	QList<ShortcutData> dialogData;
+	for (const auto& def : actionDefs) {
+		ShortcutData data;
+		data.id = def.id;
+		data.displayName = def.displayName;
+
+		data.shortcut = m_shortcutsMap.value(def.id, "");
+		dialogData.append(data);
+	}
+
+
+	Mx2dShortcutSettingsDialog dlg(dialogData, this);
+	if (dlg.exec() == QDialog::Accepted) {
+		m_shortcutsMap = dlg.getSavedShortcuts();
+		saveShortcutsToJson();
+		applyShortcuts();
+	}
+}
+
+void MxCADViewer::executeAction(const QString& actionName)
+{
+	qDebug() << "executeAction:" << actionName;
 }
 
 void MxCADViewer::onTabChanged(int index)
@@ -1046,6 +1156,101 @@ void MxCADViewer::openFolderAndSelectFile(const QString& filePath)
 #endif
 }
 
+void MxCADViewer::initShortcutsFilePath()
+{
+	QString docPath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+	QString subDir = "MxCADViewer";
+	m_shortcutJsonFilePath = QDir(QDir(docPath).filePath(subDir)).filePath("shortcuts.json");
+}
+
+void MxCADViewer::loadShortcutsFromJson()
+{
+	QFile file(m_shortcutJsonFilePath);
+	if (file.open(QIODevice::ReadOnly)) {
+		QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+		QJsonObject obj = doc.object();
+		for (const QString& key : obj.keys()) {
+			m_shortcutsMap.insert(key, obj.value(key).toString());
+		}
+		file.close();
+	}
+	else {
+		// default shortcuts
+		m_shortcutsMap.insert("Draw Line", "");
+		m_shortcutsMap.insert("Continuous Measurement", "L");
+		m_shortcutsMap.insert("Batch Measurement", "");
+		m_shortcutsMap.insert("Arc Length", "");
+		m_shortcutsMap.insert("Point to Line Distance", "");
+		m_shortcutsMap.insert("Area(with arcs)", "");
+		m_shortcutsMap.insert("Circle", "");
+		m_shortcutsMap.insert("Angle", "");
+		m_shortcutsMap.insert("Hatch Area", "");
+		m_shortcutsMap.insert("Modify Annotation Property", "");
+		m_shortcutsMap.insert("Extract Text", "");
+		m_shortcutsMap.insert("Extract Table", "");
+		m_shortcutsMap.insert("Calculate Side Area", "");
+		m_shortcutsMap.insert("Area Offset", "");
+		m_shortcutsMap.insert("Single Line Text", "");
+		m_shortcutsMap.insert("Multi Line Text", "");
+		m_shortcutsMap.insert("Numbered Text", "");
+		m_shortcutsMap.insert("Ellipse", "");
+		m_shortcutsMap.insert("Rectangle", "");
+		m_shortcutsMap.insert("Cloud", "");
+		m_shortcutsMap.insert("Leader", "");
+		m_shortcutsMap.insert("Delete Annotation", "");
+		m_shortcutsMap.insert("Move Annotation", "");
+		m_shortcutsMap.insert("Copy Annotation", "");
+		m_shortcutsMap.insert("Aligned", "");
+		m_shortcutsMap.insert("Linear", "");
+		m_shortcutsMap.insert("Area", "");
+		m_shortcutsMap.insert("Rectangular Area", "");
+		m_shortcutsMap.insert("Coordinate", "");
+		m_shortcutsMap.insert("Radius", "");
+	}
+}
+
+void MxCADViewer::saveShortcutsToJson()
+{
+	QJsonObject obj;
+	for (auto it = m_shortcutsMap.begin(); it != m_shortcutsMap.end(); ++it) {
+		obj.insert(it.key(), it.value());
+	}
+
+	QJsonDocument doc(obj);
+	QFile file(m_shortcutJsonFilePath);
+	if (file.open(QIODevice::WriteOnly)) {
+		file.write(doc.toJson());
+		file.close();
+	}
+}
+
+void MxCADViewer::applyShortcuts()
+{
+	qDeleteAll(m_activeShortcuts);
+	m_activeShortcuts.clear();
+
+	for (auto it = m_shortcutsMap.begin(); it != m_shortcutsMap.end(); ++it) {
+		if (it.value().isEmpty()) continue;
+
+		QShortcut* shortcut = new QShortcut(QKeySequence(it.value()), this);
+		QString actionName = it.key();
+
+		connect(shortcut, &QShortcut::activated, this, [this, actionName]() {
+			//executeAction(actionName);
+			if (auto act = findChild<QAction*>(actionName))
+			{
+                act->trigger();
+			}else if (auto btn = findChild<QPushButton*>(actionName))
+			{
+                btn->click();
+			}
+				
+			});
+
+		m_activeShortcuts.append(shortcut);
+	}
+}
+
 // Macro to simplify lazy initialization and showing of dialogs
 #define LAZY_INIT_DIALOG(dialog_member, DialogClass, modal_or_nonmodal) \
     if (!dialog_member) { dialog_member = new DialogClass(this); } \
@@ -1088,7 +1293,7 @@ QWidget* MxCADViewer::currentGuiDoc2d()
 }
 
 
-void MxCADViewer::onDimCategoryManager(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_dimCategoryManagerDialog, Mx2dDimCategoryManagerDialog, std::true_type{}); }
+//void MxCADViewer::onDimCategoryManager(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_dimCategoryManagerDialog, Mx2dDimCategoryManagerDialog, std::true_type{}); }
 void MxCADViewer::onDrawingCompare(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_compareSelDrawingDialog, Mx2dCompareSelDrawingDialog, std::true_type{}); }
 void MxCADViewer::onDimSetting(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_annotationSettingDialog, Mx2dAnnotationSettingDialog, std::true_type{}); }
 void MxCADViewer::onMeasurementStat(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_measurementStatDialog, Mx2dMeasurementStatDialog, std::false_type{}); }
@@ -1096,7 +1301,7 @@ void MxCADViewer::onShapeRecognition(MxPageType pageType) { if (pageType != MxPa
 void MxCADViewer::onLookRecognitedShapeList(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_shapeListDialog, Mx2dShapeListDialog, std::false_type{}); }
 void MxCADViewer::onExtractTable(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_extractTableSaveDialog, Mx2dTableSaveDialog, std::true_type{}); }
 void MxCADViewer::onPrint(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_printHintDialog, Mx2dPrintHintDialog, std::true_type{}); }
-void MxCADViewer::onShortcutSettings(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_shortcutSettingsDialog, Mx2dShortcutSettingsDialog, std::true_type{}); }
+
 void MxCADViewer::onExportPDF(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_exportPdfDialog, Mx2dExportPdfDialog, std::true_type{}); }
 void MxCADViewer::onBatchExportPDF(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_batchExportPdfDialog, Mx2dBatchExportPdfDialog, std::true_type{}); }
 void MxCADViewer::onInsertSingleLineText(MxPageType pageType) { if (pageType != MxPageType::PAGE_2D) return; LAZY_INIT_DIALOG(m_insertSingleLineTextDialog, Mx2dInsertSingleLineTextDialog, std::true_type{}); }

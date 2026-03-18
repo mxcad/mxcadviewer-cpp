@@ -171,11 +171,18 @@ public:
 	static void Mx_EraseAnnotation();
 
 	static void Mx_GetDrawingLength();
+	
+	
+	static void Mx_ModifyAnnotationProperty();
+
+	static void Mx_MoveDimPt();
 
 	// Register CAD command functions
 	static void RegisterCommand();
 
 private:
+	static McCmColor getWorldDrawColor();
+	static double getWorldDrawDimRatio();
 	static void textFilter(Mx2d::TextInfoList& result, const McDbObjectIdArray& ids, const QString& containStr = QString(), bool isFull = false);
 	static void worldDrawLine(const McGePoint3d& startPoint, McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw);
 	static void worldDrawRect(const McGePoint3d& corner1, McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw);

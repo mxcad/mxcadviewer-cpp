@@ -25,9 +25,10 @@ Mx2dCustomAngleMeasurement::Mx2dCustomAngleMeasurement(void)
 }
 
 Mx2dCustomAngleMeasurement::Mx2dCustomAngleMeasurement(const McGePoint3d& line1Start, const McGePoint3d& line1End, const McGePoint3d& line2Start, const McGePoint3d& line2End, const McGePoint3d& dimPt, double textHeight, bool isDynamicDrawing)
-	:Mx2dCustomAnnotation(textHeight), m_line1Start(line1Start), m_line1End(line1End), m_line2Start(line2Start), m_line2End(line2End), m_dimPt(dimPt), m_isDynamicDrawing(isDynamicDrawing)
+	:Mx2dCustomAnnotation(textHeight), m_line1Start(line1Start), m_line1End(line1End), m_line2Start(line2Start), m_line2End(line2End), m_isDynamicDrawing(isDynamicDrawing)
 {
 	setType("angleMeasurement");
+	setDimPt(dimPt);
 }
 
 Mx2dCustomAngleMeasurement::~Mx2dCustomAngleMeasurement(void)
@@ -73,6 +74,7 @@ Mdesk::Boolean Mx2dCustomAngleMeasurement::worldDraw(McGiWorldDraw* wd)
 Mcad::ErrorStatus Mx2dCustomAngleMeasurement::getGripPoints(McGePoint3dArray& gripPoints, McGeIntArray& osnapModes, McGeIntArray& geomIds) const
 {
 	assertReadEnabled();
+	return Mcad::eOk;
 	gripPoints.append(m_dimPt);
 	McGeLine2d line1(m_line1Start, m_line1End);
 	McGeLine2d line2(m_line2Start, m_line2End);
@@ -87,6 +89,7 @@ Mcad::ErrorStatus Mx2dCustomAngleMeasurement::getGripPoints(McGePoint3dArray& gr
 Mcad::ErrorStatus Mx2dCustomAngleMeasurement::moveGripPointsAt(const McGeIntArray& indices, const McGeVector3d& offset)
 {
 	assertWriteEnabled();
+	return Mcad::eOk;
 	int iIndex = indices[0];
 	switch (iIndex)
 	{
@@ -134,7 +137,6 @@ Mcad::ErrorStatus Mx2dCustomAngleMeasurement::dwgInFields(McDbDwgFiler* pFiler)
 	pFiler->readPoint3d(&m_line1End);
 	pFiler->readPoint3d(&m_line2Start);
 	pFiler->readPoint3d(&m_line2End);
-	pFiler->readPoint3d(&m_dimPt);
 	pFiler->readBool(&m_isDynamicDrawing);
 	return Mcad::eOk;
 }
@@ -157,7 +159,6 @@ Mcad::ErrorStatus Mx2dCustomAngleMeasurement::dwgOutFields(McDbDwgFiler* pFiler)
 	pFiler->writePoint3d(m_line1End);
 	pFiler->writePoint3d(m_line2Start);
 	pFiler->writePoint3d(m_line2End);
-	pFiler->writePoint3d(m_dimPt);
 	pFiler->writeBool(m_isDynamicDrawing);
 	return Mcad::eOk;
 }
@@ -184,11 +185,15 @@ void Mx2dCustomAngleMeasurement::fromJson(const QJsonObject& jsonObject)
 {
 	assertWriteEnabled();
 	Mx2dCustomAnnotation::fromJson(jsonObject);
+	if(!jsonObject.contains("line1StartPoint")) return;
 	m_line1Start = Mx2d::jsonArray2dToPoint3d(jsonObject["line1StartPoint"].toArray());
+	if(!jsonObject.contains("line1EndPoint")) return;
 	m_line1End = Mx2d::jsonArray2dToPoint3d(jsonObject["line1EndPoint"].toArray());
+    if(!jsonObject.contains("line2StartPoint")) return;
 	m_line2Start = Mx2d::jsonArray2dToPoint3d(jsonObject["line2StartPoint"].toArray());
+    if(!jsonObject.contains("line2EndPoint")) return;
 	m_line2End = Mx2d::jsonArray2dToPoint3d(jsonObject["line2EndPoint"].toArray());
-	m_dimPt = Mx2d::jsonArray2dToPoint3d(jsonObject["dimPoint"].toArray());
+    if(!jsonObject.contains("isDynamicDrawing")) return;
 	m_isDynamicDrawing = jsonObject["isDynamicDrawing"].toBool();
 }
 
@@ -201,7 +206,6 @@ QJsonObject Mx2dCustomAngleMeasurement::toJson() const
 	jsonObject["line1EndPoint"] = Mx2d::point3dToJsonArray2d(m_line1End);
 	jsonObject["line2StartPoint"] = Mx2d::point3dToJsonArray2d(m_line2Start);
 	jsonObject["line2EndPoint"] = Mx2d::point3dToJsonArray2d(m_line2End);
-	jsonObject["dimPoint"] = Mx2d::point3dToJsonArray2d(m_dimPt);
 	jsonObject["isDynamicDrawing"] = m_isDynamicDrawing;
 
 
@@ -231,6 +235,11 @@ Mx2d::TextInfoList Mx2dCustomAngleMeasurement::findText(const QString& text, boo
 	}
 
 	return { {textStr , extents} };
+}
+
+DimPropertyFlags Mx2dCustomAngleMeasurement::dimPropertyFlags() const
+{
+	return Prop_Color | Prop_Category | Prop_TextHeight;
 }
 
 void Mx2dCustomAngleMeasurement::setLine1Start(const McGePoint3d& line1Start)
@@ -293,17 +302,6 @@ bool Mx2dCustomAngleMeasurement::isDynamicDrawing() const
 	return m_isDynamicDrawing;
 }
 
-void Mx2dCustomAngleMeasurement::setDimPt(const McGePoint3d& dimPt)
-{
-	assertWriteEnabled();
-	m_dimPt = dimPt;
-}
-
-McGePoint3d Mx2dCustomAngleMeasurement::dimPt() const
-{
-	assertReadEnabled();
-	return m_dimPt;
-}
 
 
 

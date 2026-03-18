@@ -41,6 +41,7 @@ for the use of this software, its documentation or related materials.
 #include <QCoreApplication>
 #include "Mx2dSignalTransfer.h"
 #include "MxSignalTransfer.h"
+#include "Mx2dGuiDocument.h"
 #include "MxUtils.h"
 #include "MxLogger.h"
 
@@ -108,9 +109,32 @@ void MxCADCommand::RegisterCommand()
 	Mx_AddThreadCommand(Mx_CopyAnnotation);
 	Mx_AddThreadCommand(Mx_EraseAnnotation);
 	Mx_AddThreadCommand(Mx_GetDrawingLength);
+	Mx_AddThreadCommand(Mx_ModifyAnnotationProperty);
+	Mx_AddThreadCommand(Mx_MoveDimPt);
 	Mx_AddCommand(Mx_UpdateDisplay);
 }
 
+
+McCmColor MxCADCommand::getWorldDrawColor()
+{
+	McCmColor color;
+	color.setRGB(230, 81, 0);
+	Mx2dGuiDocument* pCadGuiDoc = qobject_cast<Mx2dGuiDocument*>(MxUtils::gCurrentTab);
+	if (pCadGuiDoc)
+	{
+		DimCategoryData data = pCadGuiDoc->getCurrentDimCategoryData();
+		QColor c = data.color;
+		color.setRGB(c.red(), c.green(), c.blue());
+	}
+	return color;
+}
+
+double MxCADCommand::getWorldDrawDimRatio()
+{
+	if (Mx2dGuiDocument* pCadGuiDoc = qobject_cast<Mx2dGuiDocument*>(MxUtils::gCurrentTab))
+		return pCadGuiDoc->getGlobalRatio();
+	return 1.0;
+}
 
 void MxCADCommand::textFilter(Mx2d::TextInfoList& result, const McDbObjectIdArray& ids, const QString& containStr, bool isFull)
 {
@@ -213,10 +237,10 @@ void MxCADCommand::worldDrawLine(const McGePoint3d& startPoint, McEdGetPointWorl
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
-	McCmColor color;
-	color.setRGB(230, 81, 0);
+	McCmColor color = getWorldDrawColor();
 	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spLine = std::make_unique<Mx2dCustomLine>(startPoint, curPoint, 1.0);
+	spLine->setDimRatio(getWorldDrawDimRatio());
 	spLine->worldDraw(pWorldDraw);
 }
 
@@ -224,10 +248,10 @@ void MxCADCommand::worldDrawRect(const McGePoint3d& corner1, McEdGetPointWorldDr
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
-	McCmColor color;
-	color.setRGB(230, 81, 0);
+	McCmColor color = getWorldDrawColor();
 	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spRect = std::make_unique<Mx2dCustomRect>(corner1, curPoint, 1.0);
+	spRect->setDimRatio(getWorldDrawDimRatio());
 	spRect->worldDraw(pWorldDraw);
 }
 
@@ -238,8 +262,7 @@ void MxCADCommand::worldDrawPolygon(const McGePoint3dArray& pts, McEdGetPointWor
 
 	if (pts.length() > 0)
 	{
-		McCmColor color;
-		color.setRGB(230, 81, 0);
+		McCmColor color = getWorldDrawColor();
 		pWorldDraw->subEntityTraits().setTrueColor(color);
 		auto spPoly = std::make_unique<McDbPolyline>();
 		for (int i = 0; i < pts.length(); i++)
@@ -272,7 +295,7 @@ void MxCADCommand::worldDrawPolygon(const Mx2d::PLVertexList& pts, McEdGetPointW
 		McCmColor oldColor = pWorldDraw->subEntityTraits().trueColor();
 
 		// Set new color for drawing context
-		McCmColor newColor; newColor.setRGB(230, 81, 0);
+		McCmColor newColor = getWorldDrawColor();
 		pWorldDraw->subEntityTraits().setTrueColor(newColor);
 
 		// Use drawing context to draw the shape
@@ -293,10 +316,10 @@ void MxCADCommand::worldDrawEllipse(const McGePoint3d& corner1, McEdGetPointWorl
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d corner2 = pData->curPoint;
-	McCmColor color;
-	color.setRGB(230, 81, 0);
+	McCmColor color = getWorldDrawColor();
 	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spEllipse = std::make_unique<Mx2dCustomEllipse>(corner1, corner2, 1.0);
+    spEllipse->setDimRatio(getWorldDrawDimRatio());
 	spEllipse->worldDraw(pWorldDraw);
 }
 
@@ -304,10 +327,10 @@ void MxCADCommand::worldDrawRectCloud(const McGePoint3d& corner1, double textHei
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d corner2 = pData->curPoint;
-	McCmColor color;
-	color.setRGB(230, 81, 0);
+	McCmColor color = getWorldDrawColor();
 	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spRectCloud = std::make_unique<Mx2dCustomRectCloud>(corner1, corner2, textHeight);
+    spRectCloud->setDimRatio(getWorldDrawDimRatio());
 	spRectCloud->worldDraw(pWorldDraw);
 }
 
@@ -315,10 +338,10 @@ void MxCADCommand::worldDrawText(const QString& str, double textHeight, McDbObje
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
-	McCmColor color;
-	color.setRGB(230, 81, 0);
+	McCmColor color = getWorldDrawColor();
 	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spText = std::make_unique<Mx2dCustomText>(str, curPoint, textHeight);
+	spText->setDimRatio(getWorldDrawDimRatio());
 	spText->worldDraw(pWorldDraw);
 }
 
@@ -326,10 +349,10 @@ void MxCADCommand::worldDrawMText(const QString& str, double textHeight, McDbObj
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
-	McCmColor color;
-	color.setRGB(230, 81, 0);
+	McCmColor color = getWorldDrawColor();
 	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spMText = std::make_unique<Mx2dCustomMText>(str, curPoint, textHeight);
+    spMText->setDimRatio(getWorldDrawDimRatio());
 	spMText->worldDraw(pWorldDraw);
 }
 
@@ -337,10 +360,10 @@ void MxCADCommand::worldDrawLeader(const McGePoint3d& startPt, const QString& te
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
-	McCmColor color;
-	color.setRGB(230, 81, 0);
+	McCmColor color = getWorldDrawColor();
 	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spLeader = std::make_unique<Mx2dCustomLeader>(startPt, curPoint, text, textHeight);
+    spLeader->setDimRatio(getWorldDrawDimRatio());
 	spLeader->worldDraw(pWorldDraw);
 }
 
@@ -350,10 +373,10 @@ void MxCADCommand::worldDrawPolyArea(const McGePoint3dArray& pts, double textHei
 	McGePoint3d curPoint = pData->curPoint;
 	if (pts.length() >= 3)
 	{
-		McCmColor color;
-		color.setRGB(230, 81, 0);
+		McCmColor color = getWorldDrawColor();
 		pWorldDraw->subEntityTraits().setTrueColor(color);
 		auto spPolyArea = std::make_unique<Mx2dCustomPolyArea>(pts, curPoint, textHeight);
+        spPolyArea->setDimRatio(getWorldDrawDimRatio());
 		spPolyArea->worldDraw(pWorldDraw);
 	}
 }
@@ -362,10 +385,10 @@ void MxCADCommand::worldDrawRectArea(const McGePoint3d& corner1, const McGePoint
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
-	McCmColor color;
-	color.setRGB(230, 81, 0);
+	McCmColor color = getWorldDrawColor();
 	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spRectArea = std::make_unique<Mx2dCustomRectArea>(corner1, corner2, curPoint, textHeight);
+    spRectArea->setDimRatio(getWorldDrawDimRatio());
 	spRectArea->worldDraw(pWorldDraw);
 }
 
@@ -373,10 +396,10 @@ void MxCADCommand::worldDrawCartesianCoord(const McGePoint3d& insertPt, double t
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
-	McCmColor color;
-	color.setRGB(230, 81, 0);
+	McCmColor color = getWorldDrawColor();
 	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spCoord = std::make_unique<Mx2dCustomCartesianCoord>(insertPt, curPoint, textHeight);
+    spCoord->setDimRatio(getWorldDrawDimRatio());
 	spCoord->worldDraw(pWorldDraw);
 }
 
@@ -384,10 +407,10 @@ void MxCADCommand::worldDrawAlignedDim(const McGePoint3d& p1, const McGePoint3d&
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
-	McCmColor color;
-	color.setRGB(230, 81, 0);
+	McCmColor color = getWorldDrawColor();
 	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spDim = std::make_unique<Mx2dCustomAlignedDim>(p1, p2, curPoint, textHeight);
+    spDim->setDimRatio(getWorldDrawDimRatio());
 	spDim->worldDraw(pWorldDraw);
 }
 
@@ -395,8 +418,7 @@ void MxCADCommand::worldDrawLinearDim(Mx2dCustomLinearDim* pLinearDim, McEdGetPo
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
-	McCmColor color;
-	color.setRGB(230, 81, 0);
+	McCmColor color = getWorldDrawColor();
 	pWorldDraw->subEntityTraits().setTrueColor(color);
 	pLinearDim->setDimPt(curPoint);
 	pLinearDim->worldDraw(pWorldDraw);
@@ -408,10 +430,10 @@ void MxCADCommand::worldDrawContinuousMeasurement(const Mx2d::PLVertexList& pts,
 	McGePoint3d curPoint = pData->curPoint;
 	if (pts.length() >= 2)
 	{
-		McCmColor color;
-		color.setRGB(230, 81, 0);
+		McCmColor color = getWorldDrawColor();
 		pWorldDraw->subEntityTraits().setTrueColor(color);
 		auto spMeasurement = std::make_unique<Mx2dCustomContinuousMeasurement>(pts, curPoint, textHeight);
+        spMeasurement->setDimRatio(getWorldDrawDimRatio());
 		spMeasurement->worldDraw(pWorldDraw);
 	}
 }
@@ -489,7 +511,7 @@ void MxCADCommand::worldDrawSegmentLengths(Mx2dCustomContinuousMeasurement* pCon
 
 				midPt = McGePoint3d((startPt.x + endPt.x) / 2.0, (startPt.y + endPt.y) / 2.0, 0);
 			}
-			QString str = QString::number(length, 'f', 2);
+			QString str = QString::number(length * pContinuousMeasurement->dimRatio(), 'f', 2);
 			spText->setTextString(str.toLocal8Bit().constData());
 			McDbExtents ext;
 			spText->getGeomExtents(ext, false);
@@ -508,8 +530,7 @@ void MxCADCommand::worldDrawSegmentLengths(Mx2dCustomContinuousMeasurement* pCon
 				spText->transformBy(McGeMatrix3d::rotation(rotAngle, McGeVector3d::kZAxis, mtAnchorPt));
 				spText->transformBy(McGeMatrix3d::translation(midPt - mtAnchorPt));
 			}
-			McCmColor color;
-			color.setRGB(230, 81, 0);
+			McCmColor color = getWorldDrawColor();
 			pWorldDraw->subEntityTraits().setTrueColor(color);
 			spText->worldDraw(pWorldDraw);
 		}
@@ -522,8 +543,7 @@ void MxCADCommand::worldDrawRadiusDim(Mx2dCustomRadiusDim* pRadiusDim, McEdGetPo
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
-	McCmColor color;
-	color.setRGB(230, 81, 0);
+	McCmColor color = getWorldDrawColor();
 	pWorldDraw->subEntityTraits().setTrueColor(color);
 	pRadiusDim->setDimPt(curPoint);
 	double scaled = Mx2d::getViewToDocScaleRatio();
@@ -535,10 +555,10 @@ void MxCADCommand::worldDrawArcLengthDim(const McGePoint3d& startPt, const McGeP
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
-	McCmColor color;
-	color.setRGB(230, 81, 0);
+	McCmColor color = getWorldDrawColor();
 	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spCustomArcLengthDim = std::make_unique<Mx2dCustomArcLengthDim>(startPt, midPt, endPt, curPoint, textHeight);
+    spCustomArcLengthDim->setDimRatio(getWorldDrawDimRatio());
 	spCustomArcLengthDim->worldDraw(pWorldDraw);
 }
 
@@ -546,10 +566,10 @@ void MxCADCommand::worldDrawCircleMeasurement(const McGePoint3d& centerPt, doubl
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
-	McCmColor color;
-	color.setRGB(230, 81, 0);
+	McCmColor color = getWorldDrawColor();
 	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spCustomCircleMeasurement = std::make_unique<Mx2dCustomCircleMeasurement>(centerPt, radius, curPoint, textHeight);
+    spCustomCircleMeasurement->setDimRatio(getWorldDrawDimRatio());
 	spCustomCircleMeasurement->worldDraw(pWorldDraw);
 }
 
@@ -557,10 +577,10 @@ void MxCADCommand::worldDrawAngleMeasurement(const McGePoint3d& l1s, const McGeP
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
-	McCmColor color;
-	color.setRGB(230, 81, 0);
+	McCmColor color = getWorldDrawColor();
 	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spCustomAngleMeasurement = std::make_unique<Mx2dCustomAngleMeasurement>(l1s, l1e, l2s, l2e, curPoint, textHeight, true);
+    spCustomAngleMeasurement->setDimRatio(getWorldDrawDimRatio());
 	spCustomAngleMeasurement->worldDraw(pWorldDraw);
 }
 
@@ -570,10 +590,10 @@ void MxCADCommand::worldDrawArcPolyArea(const Mx2d::PLVertexList& pts, double te
 	McGePoint3d curPoint = pData->curPoint;
 	if (pts.length() >= 2)
 	{
-		McCmColor color;
-		color.setRGB(230, 81, 0);
+		McCmColor color = getWorldDrawColor();
 		pWorldDraw->subEntityTraits().setTrueColor(color);
 		auto spCustomArcPolyArea = std::make_unique<Mx2dCustomArcPolyArea>(pts, curPoint, textHeight);
+        spCustomArcPolyArea->setDimRatio(getWorldDrawDimRatio());
 		spCustomArcPolyArea->worldDraw(pWorldDraw);
 	}
 }
@@ -582,10 +602,10 @@ void MxCADCommand::worldDrawHatchArea2(const Mx2d::HatchPLList& polyArray, doubl
 {
 	if (!pData->isValidCurPoint) return;
 	McGePoint3d curPoint = pData->curPoint;
-	McCmColor color;
-	color.setRGB(230, 81, 0);
+	McCmColor color = getWorldDrawColor();
 	pWorldDraw->subEntityTraits().setTrueColor(color);
 	auto spCustomHatchArea2 = std::make_unique<Mx2dCustomHatchArea2>(polyArray, curPoint, textHeight);
+    spCustomHatchArea2->setDimRatio(getWorldDrawDimRatio());
 	spCustomHatchArea2->worldDraw(pWorldDraw);
 }
 
@@ -595,11 +615,11 @@ void MxCADCommand::worldDrawBatchMeasure(const Mx2d::CurveShapeList& curveShapes
 	McGePoint3d curPoint = pData->curPoint;
 
 	auto spCustomBatchMeasurement = std::make_unique<Mx2dCustomBatchMeasurement>(curveShapes, curPoint, textHeight, isDynamicDrawing);
+    spCustomBatchMeasurement->setDimRatio(getWorldDrawDimRatio());
 
 	McCmColor oldColor = pWorldDraw->subEntityTraits().trueColor();
 
-	McCmColor newColor;
-	newColor.setRGB(230, 81, 0);
+	McCmColor newColor = getWorldDrawColor();
 	pWorldDraw->subEntityTraits().setTrueColor(newColor);
 
 	spCustomBatchMeasurement->worldDraw(pWorldDraw);
@@ -1825,7 +1845,7 @@ void MxCADCommand::Mx_ExtractTextPoly()
 		emit Mx2dSignalTransfer::getInstance().signalExtractTextFinished(MxUtils::gCurrentTab, extractedTexts);
 		});
 }
-#if 1
+
 void MxCADCommand::Mx_ExtractTable() 
 {
 	double m_gap = 0.1;
@@ -1858,734 +1878,6 @@ void MxCADCommand::Mx_ExtractTable()
 		});
 }
 
-#else
-void MxCADCommand::Mx_ExtractTable()
-{
-	double m_gap = 0.1;
-	MrxDbgUiPrPoint getCorner1(QCoreApplication::translate("MxCADCommand", "Select first corner of rectangular area").toStdString().c_str()), getCorner2(QCoreApplication::translate("MxCADCommand", "Select second corner of rectangular area").toStdString().c_str());
-	SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select first corner of rectangular area"));
-	MrxDbgUiPrBase::Status ret = getCorner1.go();
-	if (ret != MrxDbgUiPrBase::kOk)
-	{
-		HIDE_PROMPT_MESSAGE;
-		return;
-	}
-	McGePoint3d corner1 = getCorner1.value();
-	getCorner2.setUserDraw([=](McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw) {
-		worldDrawRect(corner1, pData, pWorldDraw);
-		});
-	SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select second corner of rectangular area"));
-	ret = getCorner2.go();
-	if (ret != MrxDbgUiPrBase::kOk)
-	{
-		HIDE_PROMPT_MESSAGE;
-		return;
-	}
-	HIDE_PROMPT_MESSAGE;
-	McGePoint3d corner2 = getCorner2.value();
-
-	McGePoint3d new_corner1(min(corner1.x, corner2.x) - m_gap, min(corner1.y, corner2.y) - m_gap, 0);
-	McGePoint3d new_corner2(max(corner1.x, corner2.x) + m_gap, max(corner1.y, corner2.y) + m_gap, 0);
-
-	McGePoint3d ptLT(min(new_corner1.x, new_corner2.x), max(new_corner1.y, new_corner2.y), 0);
-	McGePoint3d ptRT(max(new_corner1.x, new_corner2.x), max(new_corner1.y, new_corner2.y), 0);
-	McGePoint3d ptRB(max(new_corner1.x, new_corner2.x), min(new_corner1.y, new_corner2.y), 0);
-	McGePoint3d ptLB(min(new_corner1.x, new_corner2.x), min(new_corner1.y, new_corner2.y), 0);
-
-	double new_sel_rect_left = min(new_corner1.x, new_corner2.x);
-	double new_sel_rect_right = max(new_corner1.x, new_corner2.x);
-	double new_sel_rect_bottom = min(new_corner1.y, new_corner2.y);
-	double new_sel_rect_top = max(new_corner1.y, new_corner2.y);
-
-	MrxDbgSelSet ss;
-
-	if (ss.crossingSelect(new_corner1, new_corner2/*, spFilter.data()*/) != MrxDbgSelSet::kSelected)
-		return;
-	McDbObjectIdArray aryId;
-	ss.asArray(aryId);
-
-	std::vector<McDbEntity*>  ent_ptr_array_all;
-	for (int i = 0; i < aryId.length(); i++)
-	{
-		McDbObjectPointer<McDbEntity> spEntity(aryId[i], McDb::kForWrite);
-		if (spEntity.openStatus() != Mcad::eOk)
-			continue;
-
-		if (spEntity->isA() == McDbBlockReference::desc())
-		{
-			McDbBlockReference* pBlockRef = McDbBlockReference::cast(spEntity.object());
-			McDbVoidPtrArray entitySet;
-			Mx2d::recursiveExplodeBlock(pBlockRef, entitySet);
-			for (int j = 0; j < entitySet.length(); j++)
-			{
-				McDbEntity* pEntity = (McDbEntity*)entitySet[j];
-				ent_ptr_array_all.emplace_back(pEntity);
-			}
-		}
-		else if (spEntity->isA() == McDbProxyEntity::desc())
-		{
-			McDbProxyEntity* pProxyEntity = McDbProxyEntity::cast(spEntity.object());
-			McDbVoidPtrArray entitySet;
-			pProxyEntity->explode(entitySet);
-			for (int j = 0; j < entitySet.length(); j++)
-			{
-				McDbEntity* pEntity = (McDbEntity*)entitySet[j];
-				ent_ptr_array_all.emplace_back(pEntity);
-			}
-		}
-		else
-		{
-			McDbEntity* pEntity = (McDbEntity*)spEntity->clone();
-			ent_ptr_array_all.emplace_back(pEntity);
-		}
-	}
-
-	std::vector<McDbText*> all_texts;
-	double text_height_avg, text_height_sum = 0;
-	double text_width_height_ratio_avg, text_width_height_ratio_sum = 0;
-	for (int i = 0; i < (int)ent_ptr_array_all.size(); i++)
-	{
-		McDbEntity* pEntity = ent_ptr_array_all[i];
-		if (pEntity->isA() == McDbText::desc())
-		{
-			McDbText* pText = (McDbText*)pEntity->clone();
-			McDbExtents ext;
-			pText->getGeomExtents(ext, false);
-			McGePoint3d centerPoint((ext.minPoint().x + ext.maxPoint().x) / 2, (ext.minPoint().y + ext.maxPoint().y) / 2, 0);
-			if (centerPoint.x >= new_sel_rect_left && centerPoint.x <= new_sel_rect_right && centerPoint.y >= new_sel_rect_bottom && centerPoint.y <= new_sel_rect_top)
-			{
-				all_texts.emplace_back(pText);
-				text_height_sum += pText->height();
-				text_width_height_ratio_sum += pText->widthFactor();
-			}
-		}
-		else if (pEntity->isA() == McDbMText::desc())
-		{
-			McDbMText* pMText = McDbMText::cast(pEntity);
-			McDbVoidPtrArray entitySet;
-			pMText->explode(entitySet);
-			for (int j = 0; j < entitySet.length(); j++)
-			{
-				McDbText* pText = (McDbText*)entitySet[j];
-
-				McDbExtents ext;
-				pText->getGeomExtents(ext, false);
-				McGePoint3d centerPoint((ext.minPoint().x + ext.maxPoint().x) / 2, (ext.minPoint().y + ext.maxPoint().y) / 2, 0);
-				if (centerPoint.x >= new_sel_rect_left && centerPoint.x <= new_sel_rect_right && centerPoint.y >= new_sel_rect_bottom && centerPoint.y <= new_sel_rect_top)
-				{
-					all_texts.emplace_back(pText);
-					text_height_sum += pText->height();
-					text_width_height_ratio_sum += pText->widthFactor();
-				}
-			}
-		}
-	}
-	bool set_ratio = false;
-
-	if (all_texts.size() != 0)
-	{
-		set_ratio = true;
-		text_height_avg = text_height_sum / all_texts.size();
-		text_width_height_ratio_avg = text_width_height_ratio_sum / all_texts.size();
-	}
-
-	std::vector<McDbLine*> linesPtr;
-
-	for (int i = 0; i < (int)ent_ptr_array_all.size(); i++)
-	{
-		McDbEntity* pEntity = ent_ptr_array_all[i];
-		if (pEntity->isA() == McDbPolyline::desc())
-		{
-			McDbPolyline* pPLine = McDbPolyline::cast(pEntity);
-			McDbVoidPtrArray entitySet;
-			pPLine->explode(entitySet);
-			for (int j = 0; j < entitySet.length(); j++)
-			{
-				McDbEntity* pEntity = (McDbEntity*)entitySet[j];
-				if (pEntity->isA() == McDbLine::desc())
-				{
-					linesPtr.emplace_back((McDbLine*)pEntity);
-				}
-				else
-				{
-					delete pEntity;
-				}
-			}
-			continue;
-		}
-		else if (pEntity->isA() == McDbLine::desc())
-		{
-			McDbLine* pLine = (McDbLine*)pEntity->clone();
-			linesPtr.emplace_back(pLine);
-		}
-	}
-
-	for (int i = 0; i < (int)ent_ptr_array_all.size(); i++)
-	{
-		delete ent_ptr_array_all[i];
-	}
-
-	std::vector<McDbLine*> horizontalLines, verticalLines;
-	std::vector<double> Xcoords, Ycoords;
-	for (int i = 0; i < (int)linesPtr.size(); i++)
-	{
-		if (Mx2d::IsEqual(linesPtr[i]->startPoint().y, linesPtr[i]->endPoint().y, m_gap))
-		{
-			bool intersectTop = Mx2d::isIntersect(linesPtr[i]->startPoint(), linesPtr[i]->endPoint(), ptLT, ptRT);
-			bool intersectRight = Mx2d::isIntersect(linesPtr[i]->startPoint(), linesPtr[i]->endPoint(), ptRT, ptRB);
-			bool intersectBottom = Mx2d::isIntersect(linesPtr[i]->startPoint(), linesPtr[i]->endPoint(), ptRB, ptLB);
-			bool intersectLeft = Mx2d::isIntersect(linesPtr[i]->startPoint(), linesPtr[i]->endPoint(), ptLB, ptLT);
-
-			bool inRect = Mx2d::isInRect(linesPtr[i]->startPoint(), linesPtr[i]->endPoint(), ptLT.x, ptRB.x, ptRB.y, ptLT.y);
-
-			if (intersectTop || intersectRight || intersectBottom || intersectLeft || inRect)
-			{
-				horizontalLines.emplace_back(linesPtr[i]);
-				bool findSame = false;
-				for (int j = 0; j < (int)Ycoords.size(); j++)
-				{
-					if (Mx2d::IsEqual(linesPtr[i]->startPoint().y, Ycoords[j], m_gap))
-					{
-						findSame = true;
-						break;
-					}
-				}
-				if (!findSame)
-				{
-					Ycoords.emplace_back(linesPtr[i]->startPoint().y);
-				}
-				continue;
-			}
-		}
-		else if (Mx2d::IsEqual(linesPtr[i]->startPoint().x, linesPtr[i]->endPoint().x, m_gap))
-		{
-			bool intersectTop = Mx2d::isIntersect(linesPtr[i]->startPoint(), linesPtr[i]->endPoint(), ptLT, ptRT);
-			bool intersectRight = Mx2d::isIntersect(linesPtr[i]->startPoint(), linesPtr[i]->endPoint(), ptRT, ptRB);
-			bool intersectBottom = Mx2d::isIntersect(linesPtr[i]->startPoint(), linesPtr[i]->endPoint(), ptRB, ptLB);
-			bool intersectLeft = Mx2d::isIntersect(linesPtr[i]->startPoint(), linesPtr[i]->endPoint(), ptLB, ptLT);
-
-			bool inRect = Mx2d::isInRect(linesPtr[i]->startPoint(), linesPtr[i]->endPoint(), ptLT.x, ptRB.x, ptRB.y, ptLT.y);
-
-			if (intersectTop || intersectRight || intersectBottom || intersectLeft || inRect)
-			{
-				verticalLines.emplace_back(linesPtr[i]);
-				bool findSame = false;
-				for (int j = 0; j < (int)Xcoords.size(); j++)
-				{
-					if (Mx2d::IsEqual(linesPtr[i]->startPoint().x, Xcoords[j], m_gap))
-					{
-						findSame = true;
-						break;
-					}
-				}
-				if (!findSame)
-				{
-					Xcoords.emplace_back(linesPtr[i]->startPoint().x);
-				}
-			}
-
-		}
-	}
-
-	if ((int)Xcoords.size() < 2 || (int)Ycoords.size() < 2)
-	{
-		LOG_ERROR(QString("can not be a table"));
-		return;
-	}
-
-	std::vector<double>::iterator itS = Xcoords.begin(), itE = Xcoords.end();
-	std::sort(itS, itE);
-	itS = Ycoords.begin(), itE = Ycoords.end();
-	std::sort(itS, itE);
-
-	std::map<double, std::vector< McDbLine* >> sortedHorizontalLines, sortedVerticalLines;
-
-	std::map<double, std::vector<Mx2d::ContinueRange>> sortedHorizontalRanges, sortedVerticalRanges;
-
-	for (int i = 0; i < (int)Ycoords.size(); i++)
-	{
-		std::vector<McDbLine*> sameYcoordLines;
-		std::vector<Mx2d::ContinueRange> ranges;
-		for (int j = 0; j < (int)horizontalLines.size(); j++)
-		{
-			if (Mx2d::IsEqual(Ycoords[i], horizontalLines[j]->startPoint().y, m_gap))
-			{
-				sameYcoordLines.emplace_back(horizontalLines[j]);
-			}
-		}
-		std::vector<McDbLine*>::iterator itS = sameYcoordLines.begin(), itE = sameYcoordLines.end();
-		std::sort(itS, itE, Mx2d::cmpHLine);
-		sortedHorizontalLines.insert(make_pair(Ycoords[i], sameYcoordLines));
-		McDbLine* pFirst = *itS;
-		Mx2d::ContinueRange curRange(min(pFirst->startPoint().x, pFirst->endPoint().x), max(pFirst->startPoint().x, pFirst->endPoint().x));
-		for (; itS != itE - 1; itS++)
-		{
-			McDbLine* pNext = *(itS + 1);
-			double nextStart = min(pNext->startPoint().x, pNext->endPoint().x);
-			double nextEnd = max(pNext->startPoint().x, pNext->endPoint().x);
-			if ((curRange.end >= nextStart || curRange.end + m_gap > nextStart) && curRange.end <= nextEnd)
-			{
-				curRange = Mx2d::ContinueRange(curRange.start, nextEnd);
-			}
-			else
-			{
-				ranges.emplace_back(curRange);
-				curRange = Mx2d::ContinueRange(nextStart, nextEnd);
-			}
-		}
-		ranges.emplace_back(curRange);
-		sortedHorizontalRanges.insert(make_pair(Ycoords[i], ranges));
-
-	}
-	for (int i = 0; i < (int)Xcoords.size(); i++)
-	{
-		std::vector<McDbLine*> sameXcoordLines;
-		std::vector<Mx2d::ContinueRange> ranges;
-		for (int j = 0; j < (int)verticalLines.size(); j++)
-		{
-			if (Mx2d::IsEqual(Xcoords[i], verticalLines[j]->startPoint().x, m_gap))
-			{
-				sameXcoordLines.emplace_back(verticalLines[j]);
-			}
-		}
-		std::vector<McDbLine*>::iterator itS = sameXcoordLines.begin(), itE = sameXcoordLines.end();
-		sort(itS, itE, Mx2d::cmpVLine);
-		sortedVerticalLines.insert(make_pair(Xcoords[i], sameXcoordLines));
-		McDbLine* pFirst = *itS;
-		Mx2d::ContinueRange curRange(min(pFirst->startPoint().y, pFirst->endPoint().y), max(pFirst->startPoint().y, pFirst->endPoint().y));
-		for (; itS != itE - 1; itS++)
-		{
-			McDbLine* pNext = *(itS + 1);
-			double nextStart = min(pNext->startPoint().y, pNext->endPoint().y);
-			double nextEnd = max(pNext->startPoint().y, pNext->endPoint().y);
-			if ((curRange.end >= nextStart || curRange.end + m_gap > nextStart) && curRange.end <= nextEnd)
-			{
-				curRange = Mx2d::ContinueRange(curRange.start, nextEnd);
-			}
-			else
-			{
-				ranges.emplace_back(curRange);
-				curRange = Mx2d::ContinueRange(nextStart, nextEnd);
-			}
-		}
-		ranges.emplace_back(curRange);
-		sortedVerticalRanges.insert(make_pair(Xcoords[i], ranges));
-
-	}
-
-	for (int i = 0; i < (int)linesPtr.size(); i++)
-	{
-		delete linesPtr[i];
-	}
-
-	std::vector<Mx2d::CellRect> uniqueRects;
-
-	for (int i = 0; i < (int)Xcoords.size() - 1; i++)
-	{
-		for (int j = i + 1; j < (int)Xcoords.size(); j++)
-		{
-			for (int k = 0; k < (int)Ycoords.size() - 1; k++)
-			{
-				for (int m = k + 1; m < (int)Ycoords.size(); m++)
-				{
-					uniqueRects.emplace_back(Mx2d::CellRect(Xcoords[i], Xcoords[j], Ycoords[k], Ycoords[m]));
-				}
-			}
-		}
-	}
-
-	std::vector<Mx2d::CellRect> noCrossRangeRects;
-	std::vector<Mx2d::CellRect> cellRects;
-
-	for (int i = 0; i < (int)uniqueRects.size(); i++)
-	{
-		Mx2d::CellRect rect = uniqueRects[i];
-		std::map<double, std::vector<Mx2d::ContinueRange>>::iterator itLeft, itRight, itBottom, itTop, itEndH, itEndV;
-		itLeft = sortedVerticalRanges.find(rect.left);
-		itRight = sortedVerticalRanges.find(rect.right);
-		itBottom = sortedHorizontalRanges.find(rect.bottom);
-		itTop = sortedHorizontalRanges.find(rect.top);
-		itEndH = sortedHorizontalRanges.end();
-		itEndV = sortedVerticalRanges.end();
-		if (itLeft != itEndV && itRight != itEndV && itBottom != itEndH && itTop != itEndH)
-		{
-			std::vector<Mx2d::ContinueRange> rangesLeft = itLeft->second;
-			std::vector<Mx2d::ContinueRange> rangesRight = itRight->second;
-			Mx2d::ContinueRange rect_left_right_edge(rect.bottom, rect.top);
-			std::vector<Mx2d::ContinueRange> rangesBottom = itBottom->second;
-			std::vector<Mx2d::ContinueRange> rangesTop = itTop->second;
-			Mx2d::ContinueRange rect_bottom_top_edge(rect.left, rect.right);
-
-			if (find(rangesLeft.begin(), rangesLeft.end(), rect_left_right_edge) == rangesLeft.end())
-				continue;
-			if (find(rangesRight.begin(), rangesRight.end(), rect_left_right_edge) == rangesRight.end())
-				continue;
-			if (find(rangesBottom.begin(), rangesBottom.end(), rect_bottom_top_edge) == rangesBottom.end())
-				continue;
-			if (find(rangesTop.begin(), rangesTop.end(), rect_bottom_top_edge) == rangesTop.end())
-				continue;
-
-			std::map<double, std::vector<Mx2d::ContinueRange>>::iterator it = sortedHorizontalRanges.begin();
-			bool beCrossedByH = false;
-			for (; it != sortedHorizontalRanges.end(); it++)
-			{
-				double y = it->first;
-				std::vector<Mx2d::ContinueRange> ranges = it->second;
-				if (y > rect.bottom && y < rect.top)
-				{
-					for (int j = 0; j < (int)ranges.size(); j++)
-					{
-						if (rect.left >= ranges[j].start - m_gap && rect.right <= ranges[j].end + m_gap)
-						{
-							beCrossedByH = true;
-							break;
-						}
-					}
-					if (!beCrossedByH)
-					{
-						continue;
-					}
-					else
-					{
-						break;
-					}
-				}
-			}
-			if (beCrossedByH)
-			{
-				continue;
-			}
-			it = sortedVerticalRanges.begin();
-			bool beCrossedByV = false;
-			for (; it != sortedVerticalRanges.end(); it++)// vertical line
-			{
-				double x = it->first;
-				std::vector<Mx2d::ContinueRange> ranges = it->second;
-				if (x > rect.left && x < rect.right)
-				{
-					for (int j = 0; j < (int)ranges.size(); j++)
-					{
-						if (rect.bottom >= ranges[j].start - m_gap && rect.top <= ranges[j].end + m_gap)
-						{
-							beCrossedByV = true;
-							break;
-						}
-					}
-					if (!beCrossedByV)
-					{
-						continue;
-					}
-					else
-					{
-						break;
-					}
-				}
-			}
-			if (beCrossedByV)
-			{
-				continue;
-			}
-
-			noCrossRangeRects.emplace_back(rect);
-		}
-		else
-		{
-			continue;
-		}
-	}
-
-	for (int i = 0; i < (int)noCrossRangeRects.size(); i++)
-	{
-		bool isInnerRect = false;
-		for (int j = 0; j < (int)noCrossRangeRects.size(); j++)
-		{
-			if (i == j)
-			{
-				continue;
-			}
-			if (noCrossRangeRects[i].beLongTo(noCrossRangeRects[j]))
-			{
-				isInnerRect = true;
-				break;
-			}
-		}
-		if (!isInnerRect)
-		{
-			cellRects.emplace_back(noCrossRangeRects[i]);
-		}
-	}
-
-	if ((int)cellRects.size() == 0)
-	{
-		return;
-	}
-
-	std::vector<double> newXcoords, newYcoords;
-
-	for (int i = 0; i < (int)cellRects.size(); i++)
-	{
-		Mx2d::CellRect rect = cellRects[i];
-		bool findLeft = false;
-		bool findRight = false;
-		bool findBottom = false;
-		bool findTop = false;
-		for (int j = 0; j < (int)newXcoords.size(); j++)
-		{
-			if (Mx2d::IsEqual(rect.left, newXcoords[j], m_gap))
-			{
-				findLeft = true;
-				break;
-			}
-		}
-		if (!findLeft)
-		{
-			newXcoords.emplace_back(rect.left);
-		}
-		for (int j = 0; j < (int)newXcoords.size(); j++)
-		{
-			if (Mx2d::IsEqual(rect.right, newXcoords[j], m_gap))
-			{
-				findRight = true;
-				break;
-			}
-		}
-		if (!findRight)
-		{
-			newXcoords.emplace_back(rect.right);
-		}
-		for (int j = 0; j < (int)newYcoords.size(); j++)
-		{
-			if (Mx2d::IsEqual(rect.bottom, newYcoords[j], m_gap))
-			{
-				findBottom = true;
-				break;
-			}
-		}
-		if (!findBottom)
-		{
-			newYcoords.emplace_back(rect.bottom);
-		}
-		for (int j = 0; j < (int)newYcoords.size(); j++)
-		{
-			if (Mx2d::IsEqual(rect.top, newYcoords[j], m_gap))
-			{
-				findTop = true;
-				break;
-			}
-		}
-		if (!findTop)
-		{
-			newYcoords.emplace_back(rect.top);
-		}
-	}
-
-	std::vector<double>::iterator it_newS = newXcoords.begin(), it_newE = newXcoords.end();
-	std::sort(it_newS, it_newE);
-	it_newS = newYcoords.begin(), it_newE = newYcoords.end();
-	std::sort(it_newS, it_newE);
-
-	int cnt = 0;
-	std::map<int, double> row, colomn;
-	for (int i = 0; i < (int)newYcoords.size() - 1; i++)
-	{
-		double YcoordS = newYcoords[i];
-		double YcoordE = newYcoords[i + 1];
-		double Ycoord = (YcoordS + YcoordE) / 2;
-		row.insert(std::make_pair(cnt, Ycoord));
-		cnt++;
-	}
-	cnt = 0;
-	for (int i = 0; i < (int)newXcoords.size() - 1; i++)
-	{
-		double XcoordS = newXcoords[i];
-		double XcoordE = newXcoords[i + 1];
-		double Xcoord = (XcoordS + XcoordE) / 2;
-		colomn.insert(std::make_pair(cnt, Xcoord));
-		cnt++;
-	}
-	for (int i = 0; i < (int)cellRects.size(); i++)
-	{
-		Mx2d::CellRect& cell_rect = cellRects[i];
-		std::map<int, double>::iterator it_r = row.begin(), it_c = colomn.begin();
-		std::vector<int> rows_buf, colomns_buf;
-		for (; it_r != row.end(); it_r++)
-		{
-			double Ycoord = it_r->second;
-			int rowNum = it_r->first;
-			if (Ycoord > cell_rect.bottom && Ycoord < cell_rect.top)
-			{
-				rows_buf.emplace_back(rowNum);
-			}
-		}
-		cell_rect.rowStart = rows_buf.front();
-		cell_rect.rowEnd = rows_buf.back();
-		for (; it_c != colomn.end(); it_c++)
-		{
-			double Xcoord = it_c->second;
-			int colomnNum = it_c->first;
-			if (Xcoord > cell_rect.left && Xcoord < cell_rect.right)
-			{
-				colomns_buf.emplace_back(colomnNum);
-			}
-		}
-		cell_rect.columnStart = colomns_buf.front();
-		cell_rect.columnEnd = colomns_buf.back();
-	}
-
-
-	for (int i = 0; i < (int)cellRects.size(); i++)
-	{
-		Mx2d::CellRect& cell = cellRects[i];
-
-		std::vector<McDbText*> texts;
-		std::map<double, std::vector<McDbText*>> rows;
-		QString text;
-		for (int j = 0; j < (int)all_texts.size(); j++)
-		{
-			McDbExtents ext;
-			all_texts[j]->getGeomExtents(ext, false);
-			McGePoint3d pt((ext.minPoint().x + ext.maxPoint().x) / 2, (ext.minPoint().y + ext.maxPoint().y) / 2, 0);
-			if (pt.x<cell.left || pt.x > cell.right || pt.y > cell.top || pt.y < cell.bottom)
-				continue;
-			texts.emplace_back(all_texts[j]);
-
-		}
-
-		if ((int)texts.size() != 0)
-		{
-			for (int m = 0; m < (int)texts.size() - 1; m++)
-			{
-				for (int n = 0; n < (int)texts.size() - 1 - m; n++)
-				{
-					if (texts[n]->position().x > texts[n + 1]->position().x)
-					{
-						McDbText* tmp_text_ptr;
-						tmp_text_ptr = texts[n];
-						texts[n] = texts[n + 1];
-						texts[n + 1] = tmp_text_ptr;
-					}
-				}
-			}
-		}
-
-		while ((int)texts.size() >= 1)
-		{
-			std::vector<McDbText*> tmp_texts;
-
-			McDbExtents ext_firstText;
-			texts[0]->getGeomExtents(ext_firstText, false);
-			double row = (ext_firstText.minPoint().y + ext_firstText.maxPoint().y) / 2;
-			std::vector<McDbText*> this_row_texts;
-			this_row_texts.emplace_back(texts[0]);
-			for (int k = 1; k < (int)texts.size(); k++)
-			{
-				McDbExtents ext;
-				texts[k]->getGeomExtents(ext, false);
-
-				if (ext.minPoint().y <= ext_firstText.maxPoint().y && ext.maxPoint().y >= ext_firstText.minPoint().y)
-				{
-					this_row_texts.emplace_back(texts[k]);
-				}
-				else
-				{
-					tmp_texts.emplace_back(texts[k]);
-				}
-			}
-			rows.insert(make_pair(row, this_row_texts));
-			texts = tmp_texts;
-		}
-
-		for (auto it = rows.rbegin(); it != rows.rend(); it++)
-		{
-			QString this_row_strs;
-			for (int k = 0; k < (int)it->second.size(); k++)
-			{
-				this_row_strs += QString::fromLocal8Bit(it->second[k]->textString());
-			}
-			if (it != --rows.rend())
-			{
-				text = text + this_row_strs + "\n";
-			}
-			else
-			{
-				text += this_row_strs;
-			}
-		}
-		cell.texts = text;
-	}
-
-	for (int i = 0; i < (int)all_texts.size(); i++)
-	{
-		delete all_texts[i];
-	}
-
-	MXAPP.CallMain([=]() {
-
-		QString defaultDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-		QString fileName = QCoreApplication::translate("MxCADCommand", "table.xlsx");
-		QString filter = QCoreApplication::translate("MxCADCommand", "Spreadsheet files (*.xlsx *.xls);;All files (*)");
-
-		QFileDialog saveFileDlg(nullptr, QCoreApplication::translate("MxCADCommand", "Save Spreadsheet File"), defaultDir, filter);
-		saveFileDlg.setDefaultSuffix("xlsx");
-		saveFileDlg.setFileMode(QFileDialog::AnyFile);
-		saveFileDlg.setAcceptMode(QFileDialog::AcceptSave);
-		saveFileDlg.setOption(QFileDialog::DontConfirmOverwrite, false);
-
-		if (saveFileDlg.exec() != QDialog::Accepted)
-		{
-			return;
-		}
-
-		QString filePath = saveFileDlg.selectedFiles().first();
-
-		lxw_workbook* workbook = workbook_new(filePath.toUtf8().constData());
-
-		lxw_worksheet* worksheet = workbook_add_worksheet(workbook, NULL);
-
-		if (set_ratio)
-		{
-			for (int i = 0; i < (int)newXcoords.size() - 1; i++)
-			{
-				worksheet_set_column(worksheet, i, i, (newXcoords[i + 1] - newXcoords[i]) * 1.5 / (text_height_avg * text_width_height_ratio_avg), NULL);
-			}
-			for (int i = (int)newYcoords.size() - 1; i > 0; i--)
-			{
-				worksheet_set_row(worksheet, (int)newYcoords.size() - i - 1, (newYcoords[i] - newYcoords[i - 1]) * 8 / text_height_avg, NULL);
-			}
-		}
-
-		lxw_format* cell_format = workbook_add_format(workbook);
-		format_set_align(cell_format, LXW_ALIGN_CENTER);
-		format_set_align(cell_format, LXW_ALIGN_VERTICAL_CENTER);
-		format_set_border(cell_format, LXW_BORDER_THIN);
-		format_set_text_wrap(cell_format);
-		format_set_font_name(cell_format, "Arial");
-		format_set_font_size(cell_format, 10);
-
-		for (int i = 0; i < (int)cellRects.size(); i++)
-		{
-			Mx2d::CellRect cell = cellRects[i];
-
-			if (cell.rowStart == cell.rowEnd && cell.columnStart == cell.columnEnd)
-			{
-				worksheet_write_string(worksheet, (int)row.size() - cell.rowStart - 1, cell.columnStart, cell.texts.toUtf8().constData(), cell_format);
-			}
-			else
-			{
-				worksheet_merge_range(worksheet, (int)row.size() - cell.rowStart - 1, cell.columnStart, (int)row.size() - cell.rowEnd - 1, cell.columnEnd, cell.texts.toUtf8().constData(), cell_format);
-			}
-		}
-
-		lxw_error err = workbook_close(workbook);
-		if (LXW_NO_ERROR != err) {
-			LOG_ERROR(QString("Failed to export table, please check if file is already open, close it and try again!"));
-			// TODO: show error message
-			return;
-		}
-		});
-}
-
-#endif
 
 void MxCADCommand::Mx_DrawNumberedText()
 {
@@ -2881,6 +2173,7 @@ void MxCADCommand::Mx_DrawPolyAreaMark()
 	SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select start point"));
 	MrxDbgUiPrPoint getStartPoint(QCoreApplication::translate("MxCADCommand", "Select start point").toStdString().c_str());
 	MrxDbgUiPrBase::Status ret = getStartPoint.go();
+	HIDE_PROMPT_MESSAGE;
 	if (ret != MrxDbgUiPrBase::kOk) return;
 	McGePoint3d startPoint = getStartPoint.value();
 
@@ -3236,6 +2529,7 @@ void MxCADCommand::Mx_DrawLinearDimMark()
 
 		// Create temporary linear dimension object for dynamic preview
 		Mx2dCustomLinearDim* pLinearDim = new Mx2dCustomLinearDim(startPoint, endPoint, endPoint, textHeight);
+		pLinearDim->setDimRatio(getWorldDrawDimRatio());
 
 		SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select linear dimension text insertion point"));
 		MrxDbgUiPrPoint getTextInsertPoint(QCoreApplication::translate("MxCADCommand", "Select linear dimension text insertion point").toStdString().c_str());
@@ -3508,7 +2802,7 @@ void MxCADCommand::Mx_DrawRadiusDimMark()
 
 		// Create temporary radius dimension for dynamic preview
 		Mx2dCustomRadiusDim* pRadiusDim = new Mx2dCustomRadiusDim(arcStartPt, arcMidPt, arcEndPt, McGePoint3d(), 1.0);
-
+		pRadiusDim->setDimRatio(getWorldDrawDimRatio());
 		// Prompt to select dimension placement point
 		SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select dimension placement point"));
 		MrxDbgUiPrPoint getPlacementPoint(QCoreApplication::translate("MxCADCommand", "Select dimension placement point").toStdString().c_str());
@@ -3538,7 +2832,7 @@ void MxCADCommand::Mx_DrawRadiusDimMark()
 
 		// Create temporary radius dimension for dynamic preview
 		Mx2dCustomRadiusDim* pRadiusDim = new Mx2dCustomRadiusDim(circleCenter, circleRadius, McGePoint3d(), 1.0);
-
+		pRadiusDim->setDimRatio(getWorldDrawDimRatio());
 		// Prompt to select dimension placement point
 		SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select dimension placement point"));
 		MrxDbgUiPrPoint getPlacementPoint(QCoreApplication::translate("MxCADCommand", "Select dimension placement point").toStdString().c_str());
@@ -5034,6 +4328,8 @@ void MxCADCommand::Mx_GetDrawingLength()
     McGePoint3d startPoint = getStartPoint.value();
     SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select end point"));
     MrxDbgUiPrPoint getEndPoint(QCoreApplication::translate("MxCADCommand", "Select end point").toStdString().c_str());
+	getEndPoint.setBasePt(startPoint);
+	getEndPoint.setUseBasePt(true);
     retStatus = getEndPoint.go();
     HIDE_PROMPT_MESSAGE;
     if (retStatus != MrxDbgUiPrBase::kOk)
@@ -5044,6 +4340,73 @@ void MxCADCommand::Mx_GetDrawingLength()
 	double length = startPoint.distanceTo(endPoint);
     MXAPP.CallMain([=]() {
 		 emit Mx2dSignalTransfer::getInstance().signalDrawingLength(MxUtils::gCurrentTab, length);
+		});
+
+}
+
+void MxCADCommand::Mx_ModifyAnnotationProperty()
+{
+	MrxDbgRbList entityFilter = Mx::mcutBuildList(RTDXF0, "AnnotationMark,RectCloudMark,RectMark,LineMark,EllipseMark,LeaderMark,TextMark,MTextMark,PolyAreaMark,RectAreaMark,CartesianCoordMark,AlignedDimMark,LinearDimMark,ContinuousMeasurementMark,RadiusDimMark,ArcLengthDimMark,CircleMeasurementMark,AngleMeasurementMark,ArcPolyAreaMark,HatchAreaMark,HatchArea2Mark,BatchMeasurementMark", 0);
+	McDbObjectId targetEntId;
+	McGePoint3d pickPoint;
+
+	// Prompt to select a annotation
+	SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select a annotation"));
+	if (MrxDbgUtils::selectEnt(QCoreApplication::translate("MxCADCommand", "Select a annotation").toStdString().c_str(), targetEntId, pickPoint, entityFilter.data()) != RTNORM)
+	{
+		HIDE_PROMPT_MESSAGE;
+		return;
+	}
+	HIDE_PROMPT_MESSAGE;
+	MXAPP.CallMain([&]() {
+		emit Mx2dSignalTransfer::getInstance().signalGotAnnotationProperty(MxUtils::gCurrentTab, targetEntId);
+		});
+}
+
+void MxCADCommand::Mx_MoveDimPt()
+{
+	struct resbuf* pRb = Mx::mcedGetArgs();
+	if (!pRb || pRb->restype != RTId)
+	{
+		return;
+	}
+	McDbObjectId id;
+	id.setFromOldId(pRb->resval.objId);
+
+	McDbObjectPointer<Mx2dCustomAnnotation> spAnno(id, McDb::kForWrite);
+	if (spAnno.openStatus() != Mcad::eOk)
+		return;
+	McGePoint3d oldPt = spAnno->dimPt();
+	SHOW_PROMPT_MESSAGE(QCoreApplication::translate("MxCADCommand", "Select placement point"));
+	MrxDbgUiPrPoint getPoint(QCoreApplication::translate("MxCADCommand", "Select placement point").toStdString().c_str());
+
+	getPoint.setUserDraw([&](McEdGetPointWorldDrawData* pData, McGiWorldDraw* pWorldDraw) {
+		if (!pData->isValidCurPoint) return;
+		McGePoint3d curPoint = pData->curPoint;
+		spAnno->setDimPt(curPoint);
+		spAnno->worldDraw(pWorldDraw);
+		/*for (int i = 0; i < ids.length(); i++) {
+			McDbEntityPointer spEntity(ids[i], McDb::kForRead);
+			if (spEntity.openStatus() != Mcad::eOk)
+			{
+				continue;
+			}
+			McDbEntity* pEntityCopy = static_cast<McDbEntity*>(spEntity->clone());
+			std::unique_ptr<McDbEntity> uspEntity(pEntityCopy);
+			uspEntity->transformBy(McGeMatrix3d::translation(curPoint - basePt));
+			uspEntity->worldDraw(pWorldDraw);
+		}*/
+		});
+	MrxDbgUiPrBase::Status ret = getPoint.go();
+	HIDE_PROMPT_MESSAGE;
+	if (ret != MrxDbgUiPrBase::kOk)
+	{
+		spAnno->setDimPt(oldPt);
+		return;
+	}
+    McGePoint3d pt = getPoint.value();
+	MXAPP.CallMain([&]() {
+		emit Mx2dSignalTransfer::getInstance().signalMoveDimPt(MxUtils::gCurrentTab, id, oldPt, pt);
 		});
 
 }

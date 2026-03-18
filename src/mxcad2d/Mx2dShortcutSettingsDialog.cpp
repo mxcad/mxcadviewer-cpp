@@ -7,13 +7,19 @@ for the use of this software, its documentation or related materials.
 *******************************************************************************************/
 
 #include "Mx2dShortcutSettingsDialog.h"
-
-#include <QtWidgets>
-#include <QKeyEvent>
+#include "KeyCaptureDelegate.h"
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QLabel>
 #include <QHeaderView>
+#include <QMouseEvent>
+#include <QMessageBox>
+#include <QFont>
+#include <QDebug>
 
-Mx2dShortcutSettingsDialog::Mx2dShortcutSettingsDialog(QWidget* parent)
-	: QDialog(parent)
+Mx2dShortcutSettingsDialog::Mx2dShortcutSettingsDialog(const QList<ShortcutData>& shortcutList, QWidget* parent)
+	: QDialog(parent), m_shortcutDataList(shortcutList)
 {
 	Qt::WindowFlags flags = Qt::Dialog;
 	flags |= Qt::CustomizeWindowHint;
@@ -21,129 +27,181 @@ Mx2dShortcutSettingsDialog::Mx2dShortcutSettingsDialog(QWidget* parent)
 	flags |= Qt::WindowCloseButtonHint;
 	setWindowFlags(flags);
 
+	setupUI();
 	setWindowTitle(tr("Shortcut Settings"));
-	setupUi();
-	populateTables();
-	setupConnections();
-
-	setFixedSize(600, 850);
+	resize(600, 940);
 }
 
-Mx2dShortcutSettingsDialog::~Mx2dShortcutSettingsDialog()
+void Mx2dShortcutSettingsDialog::setupUI()
 {
-}
+	QVBoxLayout* mainLayout = new QVBoxLayout(this);
+	mainLayout->setSpacing(10);
 
-void Mx2dShortcutSettingsDialog::setupUi()
-{
-	QVBoxLayout* pMainLayout = new QVBoxLayout(this);
-	pMainLayout->setSpacing(10);
-	pMainLayout->setContentsMargins(15, 15, 15, 15);
+	QLabel* lblTip1 = new QLabel(tr("You can click a row in the table to set a shortcut for the function"), this);
+	mainLayout->addWidget(lblTip1);
 
-	m_pInfoLabel1 = new QLabel(tr("You can click a row in the table to set a shortcut for the function"));
-	m_pInfoLabel2 = new QLabel(tr("(Shortcut setting method: Press keys directly on the keyboard)"));
-	QFont boldFont = m_pInfoLabel2->font();
+	QLabel* lblTip2 = new QLabel(tr("(Shortcut setting method: Press keys directly on the keyboard)"), this);
+	QFont boldFont;
 	boldFont.setBold(true);
-	boldFont.setPointSize(boldFont.pointSize() + 1);
-	m_pInfoLabel2->setFont(boldFont);
+	boldFont.setPointSize(11);
+	lblTip2->setFont(boldFont);
+	lblTip2->setAlignment(Qt::AlignCenter);
+	mainLayout->addWidget(lblTip2);
 
-	pMainLayout->addWidget(m_pInfoLabel1);
-	pMainLayout->addWidget(m_pInfoLabel2, 0, Qt::AlignHCenter);
-	pMainLayout->addSpacing(5);
 
-	m_pEditableTable = new QTableWidget();
-	m_pEditableTable->setColumnCount(2);
-	m_pEditableTable->setHorizontalHeaderLabels({ tr("Function Name"), tr("Shortcut") });
-	m_pEditableTable->verticalHeader()->hide();
-	m_pEditableTable->horizontalHeader()->setStretchLastSection(true);
-	m_pEditableTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-	m_pEditableTable->setSelectionMode(QAbstractItemView::SingleSelection);
+	m_customTable = new QTableView(this);
+	m_customModel = new QStandardItemModel(m_shortcutDataList.size(), 2, this);
+	m_customModel->setHorizontalHeaderLabels({ tr("Function Name"), tr("Shortcut") });
 
-	m_pEditableTable->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked | QAbstractItemView::AnyKeyPressed);
+	int row = 0;
+	for (const ShortcutData& data : m_shortcutDataList) {
+		QStandardItem* nameItem = new QStandardItem(data.displayName);
+		nameItem->setFlags(nameItem->flags() & ~Qt::ItemIsEditable);
+		nameItem->setTextAlignment(Qt::AlignCenter);
 
-	m_pEditableTable->setItemDelegateForColumn(1, new ShortcutDelegate(m_pEditableTable));
+		nameItem->setData(data.id, Qt::UserRole);
 
-	pMainLayout->addWidget(m_pEditableTable);
+		QStandardItem* keyItem = new QStandardItem(data.shortcut);
+		keyItem->setTextAlignment(Qt::AlignCenter);
 
-	m_pFixedLabel = new QLabel(tr("The following are some built-in software shortcuts (cannot be modified):"));
-	pMainLayout->addWidget(m_pFixedLabel);
+		m_customModel->setItem(row, 0, nameItem);
+		m_customModel->setItem(row, 1, keyItem);
+		row++;
+	}
 
-	m_pFixedTable = new QTableWidget();
-	m_pFixedTable->setColumnCount(2);
-	m_pFixedTable->setHorizontalHeaderLabels({ tr("Function Name"), tr("Shortcut") });
-	m_pFixedTable->verticalHeader()->hide();
-	m_pFixedTable->horizontalHeader()->setStretchLastSection(true);
-	m_pFixedTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	m_pFixedTable->setFocusPolicy(Qt::NoFocus);
-	m_pFixedTable->setSelectionMode(QAbstractItemView::NoSelection);
+	m_customTable->setModel(m_customModel);
+	m_customTable->horizontalHeader()->setStretchLastSection(false);
+	m_customTable->setColumnWidth(0, 300);
+	m_customTable->setColumnWidth(1, 200);
+	m_customTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-	pMainLayout->addWidget(m_pFixedTable);
+	m_customTable->verticalHeader()->setVisible(false);
+	//m_customTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-	m_pSaveButton = new QPushButton(tr("Save"));
-	m_pSaveButton->setFixedSize(80, 28);
+	m_customTable->setItemDelegateForColumn(1, new KeyCaptureDelegate(this));
+	m_customTable->viewport()->installEventFilter(this);
 
-	QHBoxLayout* pButtonLayout = new QHBoxLayout();
-	pButtonLayout->addStretch();
-	pButtonLayout->addWidget(m_pSaveButton);
+	connect(m_customTable, &QTableView::clicked, this, [this](const QModelIndex& index) {
+		if (index.isValid()) {
+			QModelIndex targetIndex = m_customModel->index(index.row(), 1);
+			m_oldShortcut = m_customModel->data(targetIndex).toString();
 
-	pMainLayout->addLayout(pButtonLayout);
+			m_customTable->edit(targetIndex);
+		}
+		});
+	connect(m_customModel, &QStandardItemModel::dataChanged, this, &Mx2dShortcutSettingsDialog::onCustomDataChanged);
+
+	mainLayout->addWidget(m_customTable, 1);
+
+	QLabel* lblTip3 = new QLabel(tr("The following are some built-in software shortcuts (cannot be modified):"), this);
+	lblTip3->setContentsMargins(0, 10, 0, 0);
+	mainLayout->addWidget(lblTip3);
+
+	struct FixedShortcut { QString name; QString key; };
+	QList<FixedShortcut> fixedList = {
+		{tr("Open"), "Ctrl+O"}, {tr("Undo"), "Ctrl+Z"}, {tr("Redo"), "Ctrl+Y"},
+		{tr("Text Search"), "Ctrl+F"}
+	};
+	m_fixedTable = new QTableView(this);
+	m_fixedModel = new QStandardItemModel(fixedList.size(), 2, this);
+	m_fixedModel->setHorizontalHeaderLabels({ tr("Function Name"), tr("Shortcut") });
+
+	
+	
+
+	for (int i = 0; i < fixedList.size(); ++i) {
+		QStandardItem* nameItem = new QStandardItem(fixedList[i].name);
+		nameItem->setTextAlignment(Qt::AlignCenter);
+		QStandardItem* keyItem = new QStandardItem(fixedList[i].key);
+		keyItem->setTextAlignment(Qt::AlignCenter);
+
+		m_fixedModel->setItem(i, 0, nameItem);
+		m_fixedModel->setItem(i, 1, keyItem);
+	}
+
+	m_fixedTable->setModel(m_fixedModel);
+	m_fixedTable->horizontalHeader()->setStretchLastSection(false);
+	m_fixedTable->setColumnWidth(0, 200);
+	m_fixedTable->setColumnWidth(1, 200);
+	m_fixedTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	m_fixedTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+	m_fixedTable->verticalHeader()->setVisible(false);
+	//m_fixedTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+	m_fixedTable->setFixedHeight(220);
+
+	mainLayout->addWidget(m_fixedTable, 0);
+
+	QHBoxLayout* btnLayout = new QHBoxLayout();
+	btnLayout->addStretch();
+	QPushButton* btnSave = new QPushButton(tr("Save"), this);
+	btnSave->setMinimumWidth(80);
+	btnSave->setMinimumHeight(30);
+	btnLayout->addWidget(btnSave);
+	mainLayout->addLayout(btnLayout);
+
+	connect(btnSave, &QPushButton::clicked, this, &QDialog::accept);
 }
 
-void Mx2dShortcutSettingsDialog::populateTables()
+bool Mx2dShortcutSettingsDialog::checkConflict(const QString& shortcut, int currentRowToExclude)
 {
-	QList<QPair<QString, QString>> editableShortcuts = {
-		{tr("Draw Line"), ""},
-		{tr("Continuous Measurement"), "L"},
-		{tr("Batch Measurement"), ""},
-		{tr("Arc Length"), ""},
-		{tr("Distance from Point to Line"), ""},
-		{tr("Area (with arcs)"), ""},
-		{tr("Measure Circle"), ""},
-		{tr("Measure Angle"), ""},
-		{tr("Measurement Statistics"), ""},
-		{tr("Measure Hatch Area"), ""},
-		{tr("Modify Single Annotation Properties"), ""},
-		{tr("Extract Text"), ""}
-	};
+	if (shortcut.isEmpty()) return false;
 
-	m_pEditableTable->setRowCount(editableShortcuts.size());
-	for (int i = 0; i < editableShortcuts.size(); ++i) {
-		// Function name column (non-editable)
-		QTableWidgetItem* pFuncNameItem = new QTableWidgetItem(editableShortcuts[i].first);
-		pFuncNameItem->setFlags(pFuncNameItem->flags() & ~Qt::ItemIsEditable); // Remove editable flag
-		m_pEditableTable->setItem(i, 0, pFuncNameItem);
-
-		// Shortcut column (keep default editable flag)
-		QTableWidgetItem* pShortcutItem = new QTableWidgetItem(editableShortcuts[i].second);
-		pShortcutItem->setTextAlignment(Qt::AlignCenter);
-		m_pEditableTable->setItem(i, 1, pShortcutItem);
+	for (int i = 0; i < m_fixedModel->rowCount(); ++i) {
+		qDebug() << "i = " << i;
+		if (m_fixedModel->item(i, 1)->text() == shortcut) return true;
 	}
-	m_pEditableTable->resizeColumnToContents(0);
 
-	QList<QPair<QString, QString>> fixedShortcuts = {
-		{tr("Open"), "Ctrl+O"},
-		{tr("Undo"), "Ctrl+Z"},
-		{tr("Redo"), "Ctrl+Y"},
-		{tr("Find Text"), "Ctrl+F"},
-		{tr("Print"), "Ctrl+P"},
-		{tr("Exit Full Screen"), "Esc"}
-	};
-
-	m_pFixedTable->setRowCount(fixedShortcuts.size());
-	for (int i = 0; i < fixedShortcuts.size(); ++i) {
-		QTableWidgetItem* pFuncNameItem = new QTableWidgetItem(fixedShortcuts[i].first);
-		QTableWidgetItem* pShortcutItem = new QTableWidgetItem(fixedShortcuts[i].second);
-		pShortcutItem->setTextAlignment(Qt::AlignCenter);
-
-		pFuncNameItem->setFlags(pFuncNameItem->flags() & ~Qt::ItemIsEditable);
-		pShortcutItem->setFlags(pShortcutItem->flags() & ~Qt::ItemIsEditable);
-
-		m_pFixedTable->setItem(i, 0, pFuncNameItem);
-		m_pFixedTable->setItem(i, 1, pShortcutItem);
+	for (int i = 0; i < m_customModel->rowCount(); ++i) {
+		if (i == currentRowToExclude) continue;
+		if (m_customModel->item(i, 1)->text() == shortcut) return true;
 	}
-	m_pFixedTable->resizeColumnToContents(0);
+	return false;
 }
 
-void Mx2dShortcutSettingsDialog::setupConnections()
+void Mx2dShortcutSettingsDialog::onCustomDataChanged(const QModelIndex& topLeft, const QModelIndex&/*bottomRight*/)
 {
-	connect(m_pSaveButton, &QPushButton::clicked, this, &QDialog::accept);
+	if (topLeft.column() != 1) return;
+
+	QString newShortcut = m_customModel->data(topLeft).toString();
+
+	if (newShortcut.isEmpty() || newShortcut == m_oldShortcut) {
+		return;
+	}
+
+	if (checkConflict(newShortcut, topLeft.row())) {
+		QMessageBox::warning(this, tr("Prompt"), tr("This shortcut key already exists. Please reset it!"));
+
+
+		m_customModel->blockSignals(true);
+		m_customModel->setData(topLeft, m_oldShortcut);
+		m_customModel->blockSignals(false);
+	}
+}
+
+bool Mx2dShortcutSettingsDialog::eventFilter(QObject* watched, QEvent* event)
+{
+	if (watched == m_customTable->viewport() && (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonDblClick)) {
+		QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+		QModelIndex index = m_customTable->indexAt(mouseEvent->pos());
+
+		if (!index.isValid()) {
+			m_customTable->clearSelection();
+			m_customTable->clearFocus();
+		}
+	}
+	return QDialog::eventFilter(watched, event);
+}
+
+QMap<QString, QString> Mx2dShortcutSettingsDialog::getSavedShortcuts() const
+{
+	QMap<QString, QString> result;
+	for (int i = 0; i < m_customModel->rowCount(); ++i) {
+		QString id = m_customModel->item(i, 0)->data(Qt::UserRole).toString();
+		QString shortcut = m_customModel->item(i, 1)->text();
+
+		result.insert(id, shortcut);
+	}
+	return result;
 }

@@ -9,9 +9,12 @@ for the use of this software, its documentation or related materials.
 #include "Mx2dUtils.h"
 #include <algorithm>
 #include <QDebug>
+#include <QMessageBox>
+#include <QCoreApplication>
 #include "Mx2dGuiDocument.h"
 #include "MxLogger.h"
 #include "Mx2dCustomAnnotation.h"
+#include "MxUtils.h"
 namespace {
 
 	bool isSameLineText(McDbText* text, McDbText* other) {
@@ -790,7 +793,26 @@ namespace Mx2d {
 	{
 		if (pEnt)
 		{
-			McCmColor newColor; newColor.setRGB(230, 81, 0);
+			QColor catColor(230, 81, 0);
+			QString catName;
+			double dimRatio = 1.0;
+			if (Mx2dGuiDocument* pCadGuiDoc = qobject_cast<Mx2dGuiDocument*>(MxUtils::gCurrentTab))
+			{
+                dimRatio = pCadGuiDoc->getGlobalRatio();
+				DimCategoryData data = pCadGuiDoc->getCurrentDimCategoryData();
+				if (!data.name.isEmpty())
+				{
+					catColor = data.color;
+					catName = data.name;
+				}
+				else
+				{
+					delete pEnt;
+					QMessageBox::warning(nullptr, QCoreApplication::translate("Mx2dUtils", "Warning"), QCoreApplication::translate("Mx2dUtils", "Please select an annotation category first."));
+					return McDbObjectId::kNull;
+				}
+			}
+			McCmColor newColor; newColor.setRGB(catColor.red(), catColor.green(), catColor.blue());
 			pEnt->setColor(newColor);
 			McDbObjectId id, curSpaceId;
 			curSpaceId = Mx::mcdbCurDwg()->currentSpaceId();
@@ -802,6 +824,8 @@ namespace Mx2d {
 				{
                     Mx2dCustomAnnotation* pAnnotation = Mx2dCustomAnnotation::cast(pEnt);
 					pAnnotation->setLayout(layoutName);
+                    pAnnotation->setCategory(catName);
+					pAnnotation->setDimRatio(dimRatio);
 				}
 				pEnt->close();
 				McDbEntityPointer spEntity(id, McDb::kForWrite);
@@ -966,6 +990,18 @@ namespace Mx2d {
 
 		// Determine final position: non-zero winding number means inside, zero means outside
 		return (windingNumber != 0) ? 1 : 0;
+	}
+
+	QColor cadColorToQColor(const McCmColor& color)
+	{
+		return { color.red(), color.green(), color.blue() };
+	}
+
+	McCmColor qColorToCadColor(const QColor& color)
+	{
+		McCmColor cadColor;
+        cadColor.setRGB(color.red(), color.green(), color.blue());
+        return cadColor;
 	}
 
 	

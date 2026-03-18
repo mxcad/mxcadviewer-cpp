@@ -45,6 +45,7 @@ Mdesk::Boolean Mx2dCustomRectCloud::worldDraw(McGiWorldDraw* wd)
 Mcad::ErrorStatus Mx2dCustomRectCloud::getGripPoints(McGePoint3dArray& gripPoints, McGeIntArray& osnapModes, McGeIntArray& geomIds) const
 {
 	assertReadEnabled();
+	return Mcad::eOk;
 	gripPoints.append(m_corner1);
 	gripPoints.append(m_corner2);
 	return Mcad::eOk;
@@ -53,6 +54,7 @@ Mcad::ErrorStatus Mx2dCustomRectCloud::getGripPoints(McGePoint3dArray& gripPoint
 Mcad::ErrorStatus Mx2dCustomRectCloud::moveGripPointsAt(const McGeIntArray& indices, const McGeVector3d& offset)
 {
 	assertWriteEnabled();
+	return Mcad::eOk;
 	int iIndex = indices[0];
 	switch (iIndex)
 	{
@@ -141,7 +143,9 @@ void Mx2dCustomRectCloud::fromJson(const QJsonObject& jsonObject)
 {
 	assertWriteEnabled();
 	Mx2dCustomAnnotation::fromJson(jsonObject);
+	if(!jsonObject.contains("corner1")) return;
 	m_corner1 = Mx2d::jsonArray2dToPoint3d(jsonObject["corner1"].toArray());
+    if(!jsonObject.contains("corner2")) return;
 	m_corner2 = Mx2d::jsonArray2dToPoint3d(jsonObject["corner2"].toArray());
 }
 
@@ -153,6 +157,11 @@ QJsonObject Mx2dCustomRectCloud::toJson() const
 	jsonObject["corner2"] = Mx2d::point3dToJsonArray2d(m_corner2);
 
 	return jsonObject;
+}
+
+DimPropertyFlags Mx2dCustomRectCloud::dimPropertyFlags() const
+{
+	return Prop_Color | Prop_Category;
 }
 
 void Mx2dCustomRectCloud::setCorner1(const McGePoint3d& pt)

@@ -22,10 +22,11 @@ Mx2dCustomArcPolyArea::Mx2dCustomArcPolyArea(void)
 	setType("arcPolyArea");
 }
 
-Mx2dCustomArcPolyArea::Mx2dCustomArcPolyArea(const Mx2d::PLVertexList& pts, const McGePoint3d& textPos, double textHeight)
-	:Mx2dCustomAnnotation(textHeight), m_pts(pts), m_textPos(textPos)
+Mx2dCustomArcPolyArea::Mx2dCustomArcPolyArea(const Mx2d::PLVertexList& pts, const McGePoint3d& dimPt, double textHeight)
+	:Mx2dCustomAnnotation(textHeight), m_pts(pts)
 {
 	setType("arcPolyArea");
+	setDimPt(dimPt);
 }
 
 Mx2dCustomArcPolyArea::~Mx2dCustomArcPolyArea(void)
@@ -51,11 +52,11 @@ Mdesk::Boolean Mx2dCustomArcPolyArea::worldDraw(McGiWorldDraw* wd)
 Mcad::ErrorStatus Mx2dCustomArcPolyArea::getGripPoints(McGePoint3dArray& gripPoints, McGeIntArray& osnapModes, McGeIntArray& geomIds) const
 {
 	assertReadEnabled();
-
+	return Mcad::eOk;
 	for (int i = 0; i < m_pts.length(); ++i) {
 		gripPoints.append(m_pts[i].pt);
 	}
-	gripPoints.append(m_textPos);
+	gripPoints.append(m_dimPt);
 
 	return Mcad::eOk;
 }
@@ -63,10 +64,11 @@ Mcad::ErrorStatus Mx2dCustomArcPolyArea::getGripPoints(McGePoint3dArray& gripPoi
 Mcad::ErrorStatus Mx2dCustomArcPolyArea::moveGripPointsAt(const McGeIntArray& indices, const McGeVector3d& offset)
 {
 	assertWriteEnabled();
+	return Mcad::eOk;
 	int iIndex = indices[0];
 
 	if (iIndex == m_pts.length()) {
-		m_textPos = m_textPos + offset;
+		m_dimPt = m_dimPt + offset;
 	}
 	else {
 		m_pts[iIndex].pt = m_pts[iIndex].pt + offset;
@@ -126,8 +128,6 @@ Mcad::ErrorStatus Mx2dCustomArcPolyArea::dwgInFields(McDbDwgFiler* pFiler)
 		pFiler->readDouble(&bulge);
 		m_pts.append({ pt,bulge });
 	}
-	// read text position
-	pFiler->readPoint3d(&m_textPos);
 
 
 	return Mcad::eOk;
@@ -156,8 +156,6 @@ Mcad::ErrorStatus Mx2dCustomArcPolyArea::dwgOutFields(McDbDwgFiler* pFiler) cons
 		pFiler->writePoint3d(m_pts[i].pt);
 		pFiler->writeDouble(m_pts[i].bulge);
 	}
-	// write text position
-	pFiler->writePoint3d(m_textPos);
 
 
 	return Mcad::eOk;
@@ -186,7 +184,7 @@ Mcad::ErrorStatus Mx2dCustomArcPolyArea::transformBy(const McGeMatrix3d& xform)
 		McGePoint3d& pt = m_pts[i].pt;
 		pt.transformBy(xform);
 	}
-	m_textPos.transformBy(xform);
+	m_dimPt.transformBy(xform);
 
 	return Mcad::eOk;
 }
@@ -195,8 +193,8 @@ void Mx2dCustomArcPolyArea::fromJson(const QJsonObject& jsonObject)
 {
 	assertWriteEnabled();
 	Mx2dCustomAnnotation::fromJson(jsonObject);
+	if(!jsonObject.contains("points")) return;
 	m_pts = Mx2d::jsonArrayToPLVertexList(jsonObject["points"].toArray());
-	m_textPos = Mx2d::jsonArray2dToPoint3d(jsonObject["textPosition"].toArray());
 }
 
 QJsonObject Mx2dCustomArcPolyArea::toJson() const
@@ -204,7 +202,6 @@ QJsonObject Mx2dCustomArcPolyArea::toJson() const
 	assertReadEnabled();
 	QJsonObject jsonObject = Mx2dCustomAnnotation::toJson();
 	jsonObject["points"] = Mx2d::plVertexListToJsonArray(m_pts);
-	jsonObject["textPosition"] = Mx2d::point3dToJsonArray2d(m_textPos);
 	return jsonObject;
 }
 
@@ -234,23 +231,17 @@ Mx2d::TextInfoList Mx2dCustomArcPolyArea::findText(const QString& text, bool isE
 	return { {textStr , extents} };
 }
 
+DimPropertyFlags Mx2dCustomArcPolyArea::dimPropertyFlags() const
+{
+	return Prop_Color | Prop_Category | Prop_TextHeight | Prop_Ratio | Prop_TextPosition;
+}
+
 Mx2d::PLVertexList Mx2dCustomArcPolyArea::points() const
 {
 	assertReadEnabled();
 	return m_pts;
 }
 
-void Mx2dCustomArcPolyArea::setTextPos(const McGePoint3d& pos)
-{
-	assertWriteEnabled();
-	m_textPos = pos;
-}
-
-McGePoint3d Mx2dCustomArcPolyArea::textPos() const
-{
-	assertReadEnabled();
-	return m_textPos;
-}
 
 void Mx2dCustomArcPolyArea::setPoints(const Mx2d::PLVertexList& pts)
 {
@@ -274,7 +265,7 @@ McDbText* Mx2dCustomArcPolyArea::createText(double area, double perimeter) const
 	McDbObjectId textStyle = Mx::mcdbCurDwg()->textstyle();
 
 	McDbText* pText = new McDbText();
-	pText->setAlignmentPoint(m_textPos);
+	pText->setAlignmentPoint(m_dimPt);
 	pText->setHeight(textHeight());
 	QString areaStr = QCoreApplication::translate("Mx2dCustomArcPolyArea", "Area:%1, Perimeter:%2").arg(QString::number(area * dimRatio() * dimRatio())).arg(QString::number(perimeter * dimRatio()));
 

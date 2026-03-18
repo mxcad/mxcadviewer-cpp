@@ -49,6 +49,8 @@ class Mx2dCalculateSideAreaDialog;
 class Mx2dModifySingleLineTextDialog;
 class Mx2dModifyMultiLineTextDialog;
 class Mx2dAreaOffsetDialog;
+class Mx2dRatioDialog;
+class QShortcut;
 #ifdef MX_BUILD_LOGIN
 class MxLoginScene;
 #endif
@@ -113,6 +115,15 @@ private:
     void setToolButtonPopupMode(QAction* action);
     static void openFolderAndSelectFile(const QString& filePath);
 
+private:
+    void initShortcutsFilePath();
+	void loadShortcutsFromJson();
+	void saveShortcutsToJson();
+	void applyShortcuts();
+
+	QMap<QString, QString> m_shortcutsMap;
+	QList<QShortcut*> m_activeShortcuts;
+	QString m_shortcutJsonFilePath;
 private slots:
     // --- Toolbar Action Handlers ---
     void onOpen();
@@ -121,6 +132,8 @@ private slots:
     void onEnglish();
     void onChinese();
     void restartApp();
+	void openShortcutDialog();
+	void executeAction(const QString& actionName);
 
     // --- Tab and Window Management ---
     void onTabCloseRequested(int index);
@@ -140,7 +153,7 @@ private slots:
 
     // --- 2D View Specific Slots ---
     void onDoNothing(MxPageType pageType);
-    void onDimCategoryManager(MxPageType pageType);
+    //void onDimCategoryManager(MxPageType pageType);
     void onDrawingCompare(MxPageType pageType);
     void onDimSetting(MxPageType pageType);
     void onMeasurementStat(MxPageType pageType);
@@ -148,7 +161,6 @@ private slots:
     void onLookRecognitedShapeList(MxPageType pageType);
     void onExtractTable(MxPageType pageType);
     void onPrint(MxPageType pageType);
-    void onShortcutSettings(MxPageType pageType);
     void onExportPDF(MxPageType pageType);
     void onBatchExportPDF(MxPageType pageType);
     void onInsertSingleLineText(MxPageType pageType);
@@ -226,6 +238,7 @@ private:
     Mx2dModifySingleLineTextDialog* m_modifySingleLineTextDialog = nullptr;
     Mx2dModifyMultiLineTextDialog*  m_modifyMultiLineTextDialog = nullptr;
     Mx2dAreaOffsetDialog*           m_areaOffsetDialog = nullptr;
+    Mx2dRatioDialog*                m_ratioDialog = nullptr;
 private:
     QWidget* currentGuiDoc2d();
 

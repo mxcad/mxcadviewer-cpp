@@ -65,8 +65,6 @@ void Mx2dAnnotationEditor::loadFromFile(const QString& fileName)
 		if (pAnnotation)
 		{
 			pAnnotation->fromJson(annotationObj);
-			McCmColor newColor; newColor.setRGB(230, 81, 0);
-			pAnnotation->setColor(newColor);
 			McDbObjectId id;
 			
 			QString spaceName = annotationObj["layout"].toString();
@@ -174,6 +172,72 @@ void Mx2dAnnotationEditor::modifyRectArea(McDbObjectId id, const McGePoint3d& ol
 void Mx2dAnnotationEditor::modifyAnnotation(McDbObjectId id, const QJsonObject& oldJson, const QJsonObject& newJson)
 {
 	executeCommand(std::make_unique<Mx2dModifyAnnotationCommand>(id, oldJson, newJson));
+}
+
+void Mx2dAnnotationEditor::modifyAnnotationColor(McDbObjectId id, const QColor& oldColor, const QColor& newColor)
+{
+    executeCommand(std::make_unique<Mx2dModifyAnnotationColorCommand>(id, oldColor, newColor));
+}
+
+void Mx2dAnnotationEditor::modifyAnnotationCategory(McDbObjectId id, const QString& oldCategory, const QString& newCategory)
+{
+    executeCommand(std::make_unique<Mx2dModifyAnnotationCategoryCommand>(id, oldCategory, newCategory));
+}
+
+void Mx2dAnnotationEditor::modifyAnnotationTextHeight(McDbObjectId id, double oldHeight, double newHeight)
+{
+    executeCommand(std::make_unique<Mx2dModifyAnnotationTextHeightCommand>(id, oldHeight, newHeight));
+}
+
+void Mx2dAnnotationEditor::modifyAnnotationRatio(McDbObjectId id, double oldRatio, double newRatio)
+{
+    executeCommand(std::make_unique<Mx2dModifyAnnotationRatioCommand>(id, oldRatio, newRatio));
+}
+
+void Mx2dAnnotationEditor::modifyAnnotationsCategory(const QString& oldCategory, const QString& newCategory)
+{
+	for (const auto& id : m_annotations) {
+		McDbObjectPointer<Mx2dCustomAnnotation> spAnno(id, McDb::kForWrite);
+		if (spAnno.openStatus() != Mcad::eOk)
+			continue;
+		if (spAnno->category() == oldCategory)
+			spAnno->setCategory(newCategory);
+	}
+	saveToFile(m_fileName);
+}
+
+void Mx2dAnnotationEditor::modifyAnnotationDimPt(McDbObjectId id, const McGePoint3d& oldPt, const McGePoint3d& newPt)
+{
+    executeCommand(std::make_unique<Mx2dModifyAnnotationDimPtCommand>(id, oldPt, newPt));
+}
+
+void Mx2dAnnotationEditor::setAnnotationsVisable(const QString& cat, bool visible)
+{
+    for (const auto& id : m_annotations) {
+        McDbObjectPointer<Mx2dCustomAnnotation> spAnno(id, McDb::kForWrite);
+        if (spAnno.openStatus() != Mcad::eOk)
+            continue;
+        if (spAnno->category() == cat)
+			spAnno->setVisibility(visible ? McDb::kVisible : McDb::kInvisible);
+    }
+    MxDrawApp::UpdateDisplay();
+}
+
+bool Mx2dAnnotationEditor::hasAnnotationInCategory(const QString& cat) const
+{
+    for (const auto& id : m_annotations) {
+        McDbObjectPointer<Mx2dCustomAnnotation> spAnno(id, McDb::kForRead);
+        if (spAnno.openStatus() != Mcad::eOk)
+            continue;
+        if (spAnno->category() == cat)
+            return true;
+    }
+	return false;
+}
+
+std::set<McDbObjectId> Mx2dAnnotationEditor::getAllAnnotations() const
+{
+	return m_annotations;
 }
 
 

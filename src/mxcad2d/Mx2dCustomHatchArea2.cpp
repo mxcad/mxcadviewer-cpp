@@ -23,10 +23,11 @@ Mx2dCustomHatchArea2::Mx2dCustomHatchArea2(void)
 	setType("hatchArea2");
 }
 
-Mx2dCustomHatchArea2::Mx2dCustomHatchArea2(const Mx2d::HatchPLList& polys, const McGePoint3d& textPos, double textHeight, bool isDynamicDrawing)
-	:Mx2dCustomAnnotation(textHeight), m_polys(polys), m_textPos(textPos), m_isDynamicDrawing(isDynamicDrawing)
+Mx2dCustomHatchArea2::Mx2dCustomHatchArea2(const Mx2d::HatchPLList& polys, const McGePoint3d& dimPt, double textHeight, bool isDynamicDrawing)
+	:Mx2dCustomAnnotation(textHeight), m_polys(polys), m_isDynamicDrawing(isDynamicDrawing)
 {
 	setType("hatchArea2");
+	setDimPt(dimPt);
 }
 
 Mx2dCustomHatchArea2::~Mx2dCustomHatchArea2(void)
@@ -59,9 +60,9 @@ Mdesk::Boolean Mx2dCustomHatchArea2::worldDraw(McGiWorldDraw* wd)
 Mcad::ErrorStatus Mx2dCustomHatchArea2::getGripPoints(McGePoint3dArray& gripPoints, McGeIntArray& osnapModes, McGeIntArray& geomIds) const
 {
 	assertReadEnabled();
+	return Mcad::eOk;
 
-
-	gripPoints.append(m_textPos);
+	gripPoints.append(m_dimPt);
 
 	return Mcad::eOk;
 }
@@ -69,12 +70,13 @@ Mcad::ErrorStatus Mx2dCustomHatchArea2::getGripPoints(McGePoint3dArray& gripPoin
 Mcad::ErrorStatus Mx2dCustomHatchArea2::moveGripPointsAt(const McGeIntArray& indices, const McGeVector3d& offset)
 {
 	assertWriteEnabled();
+	return Mcad::eOk;
 	int iIndex = indices[0];
 
 	switch (iIndex)
 	{
 	case 0:
-		m_textPos = m_textPos + offset;
+		m_dimPt = m_dimPt + offset;
 		break;
 	}
 	return Mcad::eOk;
@@ -155,8 +157,6 @@ Mcad::ErrorStatus Mx2dCustomHatchArea2::dwgInFields(McDbDwgFiler* pFiler)
 		m_polys.append({ vertices, length, area, isExternal });
 
 	}
-	// read text position
-	pFiler->readPoint3d(&m_textPos);
 	pFiler->readBool(&m_isDynamicDrawing);
 
 
@@ -196,8 +196,6 @@ Mcad::ErrorStatus Mx2dCustomHatchArea2::dwgOutFields(McDbDwgFiler* pFiler) const
 		pFiler->writeDouble(poly.area);
 		pFiler->writeBool(poly.isExternal);
 	}
-	// write text position
-	pFiler->writePoint3d(m_textPos);
 	pFiler->writeBool(m_isDynamicDrawing);
 
 
@@ -231,7 +229,7 @@ Mcad::ErrorStatus Mx2dCustomHatchArea2::transformBy(const McGeMatrix3d& xform)
 			pt.transformBy(xform);
 		}
 	}
-	m_textPos.transformBy(xform);
+	m_dimPt.transformBy(xform);
 
 	return Mcad::eOk;
 }
@@ -240,6 +238,7 @@ void Mx2dCustomHatchArea2::fromJson(const QJsonObject& jsonObject)
 {
 	assertWriteEnabled();
 	Mx2dCustomAnnotation::fromJson(jsonObject);
+	if(!jsonObject.contains("polys")) return;
 	Mx2d::HatchPLList polys;
 	QJsonArray polysArray = jsonObject["polys"].toArray();
 	for (auto poly_ : polysArray)
@@ -259,7 +258,7 @@ void Mx2dCustomHatchArea2::fromJson(const QJsonObject& jsonObject)
 		polys.append(poly);
 	}
 	m_polys = polys;
-	m_textPos = Mx2d::jsonArray2dToPoint3d(jsonObject["textPos"].toArray());
+	if(!jsonObject.contains("isDynamicDrawing")) return;
 	m_isDynamicDrawing = jsonObject["isDynamicDrawing"].toBool();
 }
 
@@ -287,7 +286,6 @@ QJsonObject Mx2dCustomHatchArea2::toJson() const
 		polysArray.append(polyObj);
 	}
 	jsonObject["polys"] = polysArray;
-	jsonObject["textPos"] = Mx2d::point3dToJsonArray2d(m_textPos);
 	jsonObject["isDynamicDrawing"] = m_isDynamicDrawing;
 
 	return jsonObject;
@@ -315,6 +313,11 @@ Mx2d::TextInfoList Mx2dCustomHatchArea2::findText(const QString& text, bool isEx
 	return { {textStr , extents} };
 }
 
+DimPropertyFlags Mx2dCustomHatchArea2::dimPropertyFlags() const
+{
+	return Prop_Color | Prop_Category | Prop_TextHeight | Prop_Ratio | Prop_TextPosition;
+}
+
 void Mx2dCustomHatchArea2::setPolys(const Mx2d::HatchPLList& polys)
 {
 	assertWriteEnabled();
@@ -327,17 +330,6 @@ Mx2d::HatchPLList Mx2dCustomHatchArea2::polys() const
 	return m_polys;
 }
 
-void Mx2dCustomHatchArea2::setTextPos(const McGePoint3d& textPos)
-{
-	assertWriteEnabled();
-	m_textPos = textPos;
-}
-
-McGePoint3d Mx2dCustomHatchArea2::textPos() const
-{
-	assertReadEnabled();
-	return m_textPos;
-}
 
 void Mx2dCustomHatchArea2::setIsDynamicDrawing(bool isDynamicDrawing)
 {
@@ -378,7 +370,7 @@ McDbText* Mx2dCustomHatchArea2::createText(double area, double perimeter) const
 	McDbObjectId textStyle = Mx::mcdbCurDwg()->textstyle();
 
 	McDbText* pText = new McDbText();
-	pText->setAlignmentPoint(m_textPos);
+	pText->setAlignmentPoint(m_dimPt);
 	pText->setHeight(textHeight());
 
 	QString areaStr = QCoreApplication::translate("Mx2dCustomHatchArea2", "Area:%1, Perimeter:%2").arg(QString::number(area * dimRatio() * dimRatio())).arg(QString::number(perimeter * dimRatio()));

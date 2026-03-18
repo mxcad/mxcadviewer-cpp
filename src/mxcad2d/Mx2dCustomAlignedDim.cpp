@@ -26,9 +26,10 @@ Mx2dCustomAlignedDim::Mx2dCustomAlignedDim(void)
 }
 
 Mx2dCustomAlignedDim::Mx2dCustomAlignedDim(const McGePoint3d& startPt, const McGePoint3d& endPt, const McGePoint3d& dimPt, double textHeight)
-	: Mx2dCustomAnnotation(textHeight), m_startPt(startPt), m_endPt(endPt), m_dimPt(dimPt)
+	: Mx2dCustomAnnotation(textHeight), m_startPt(startPt), m_endPt(endPt)
 {
 	setType("alignedDim");
+	setDimPt(dimPt);
 }
 
 #define ALIGNEDDIM_VERSION 1
@@ -50,7 +51,6 @@ Mcad::ErrorStatus Mx2dCustomAlignedDim::dwgInFields(McDbDwgFiler* pFiler)
 	pFiler->readInt(&lVar);
 	pFiler->readPoint3d(&m_startPt);
 	pFiler->readPoint3d(&m_endPt);
-	pFiler->readPoint3d(&m_dimPt);
 
 	return Mcad::eOk;
 }
@@ -72,7 +72,6 @@ Mcad::ErrorStatus Mx2dCustomAlignedDim::dwgOutFields(McDbDwgFiler* pFiler) const
 	pFiler->writeInt(ALIGNEDDIM_VERSION);
 	pFiler->writePoint3d(m_startPt);
 	pFiler->writePoint3d(m_endPt);
-	pFiler->writePoint3d(m_dimPt);
 
 	return Mcad::eOk;
 }
@@ -110,9 +109,10 @@ void Mx2dCustomAlignedDim::fromJson(const QJsonObject& jsonObject)
 {
 	assertWriteEnabled();
 	Mx2dCustomAnnotation::fromJson(jsonObject);
+	if(!jsonObject.contains("startPoint")) return;
 	m_startPt = Mx2d::jsonArray2dToPoint3d(jsonObject["startPoint"].toArray());
+    if(!jsonObject.contains("endPoint")) return;
 	m_endPt = Mx2d::jsonArray2dToPoint3d(jsonObject["endPoint"].toArray());
-	m_dimPt = Mx2d::jsonArray2dToPoint3d(jsonObject["dimPoint"].toArray());
 }
 
 QJsonObject Mx2dCustomAlignedDim::toJson() const
@@ -121,7 +121,6 @@ QJsonObject Mx2dCustomAlignedDim::toJson() const
 	QJsonObject jsonObject = Mx2dCustomAnnotation::toJson();
 	jsonObject["startPoint"] = Mx2d::point3dToJsonArray2d(m_startPt);
 	jsonObject["endPoint"] = Mx2d::point3dToJsonArray2d(m_endPt);
-	jsonObject["dimPoint"] = Mx2d::point3dToJsonArray2d(m_dimPt);
 
 	return jsonObject;
 }
@@ -144,6 +143,11 @@ Mx2d::TextInfoList Mx2dCustomAlignedDim::findText(const QString& text, bool isEx
 	}
 	
 	return { {textStr , extents} };
+}
+
+DimPropertyFlags Mx2dCustomAlignedDim::dimPropertyFlags() const
+{
+	return Prop_Color | Prop_Category | Prop_TextHeight | Prop_Ratio;
 }
 
 
@@ -171,17 +175,6 @@ McGePoint3d Mx2dCustomAlignedDim::endPt() const
 	return m_endPt;
 }
 
-void Mx2dCustomAlignedDim::setDimPt(const McGePoint3d& pt)
-{
-	assertWriteEnabled();
-	m_dimPt = pt;
-}
-
-McGePoint3d Mx2dCustomAlignedDim::dimPt() const
-{
-	assertReadEnabled();
-	return m_dimPt;
-}
 
 McDbLine* Mx2dCustomAlignedDim::createDimLine() const
 {
@@ -373,6 +366,7 @@ Mdesk::Boolean Mx2dCustomAlignedDim::worldDraw(McGiWorldDraw* wd)
 Mcad::ErrorStatus Mx2dCustomAlignedDim::getGripPoints(McGePoint3dArray& gripPoints, McGeIntArray& osnapModes, McGeIntArray& geomIds) const
 {
 	assertReadEnabled();
+	return Mcad::eOk;
 	gripPoints.append(m_startPt);
 	gripPoints.append(m_endPt);
 	gripPoints.append(m_dimPt);
@@ -382,6 +376,7 @@ Mcad::ErrorStatus Mx2dCustomAlignedDim::getGripPoints(McGePoint3dArray& gripPoin
 Mcad::ErrorStatus Mx2dCustomAlignedDim::moveGripPointsAt(const McGeIntArray& indices, const McGeVector3d& offset)
 {
 	assertWriteEnabled();
+	return Mcad::eOk;
 	int iIndex = indices[0];
 	switch (iIndex)
 	{

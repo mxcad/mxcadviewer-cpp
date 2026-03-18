@@ -23,9 +23,10 @@ Mx2dCustomMText::Mx2dCustomMText(void)
 }
 
 Mx2dCustomMText::Mx2dCustomMText(const QString& textStr, const McGePoint3d& dimPt, double textHeight)
-	: Mx2dCustomAnnotation(textHeight), m_text(textStr), m_dimPt(dimPt)
+	: Mx2dCustomAnnotation(textHeight), m_text(textStr)
 {
 	setType("mtext");
+	setDimPt(dimPt);
 }
 
 Mx2dCustomMText::~Mx2dCustomMText(void)
@@ -47,6 +48,7 @@ Mdesk::Boolean Mx2dCustomMText::worldDraw(McGiWorldDraw* wd)
 Mcad::ErrorStatus Mx2dCustomMText::getGripPoints(McGePoint3dArray& gripPoints, McGeIntArray& osnapModes, McGeIntArray& geomIds) const
 {
 	assertReadEnabled();
+	return Mcad::eOk;
 	gripPoints.append(m_dimPt);
 	return Mcad::eOk;
 }
@@ -54,6 +56,7 @@ Mcad::ErrorStatus Mx2dCustomMText::getGripPoints(McGePoint3dArray& gripPoints, M
 Mcad::ErrorStatus Mx2dCustomMText::moveGripPointsAt(const McGeIntArray& indices, const McGeVector3d& offset)
 {
 	assertWriteEnabled();
+	return Mcad::eOk;
 	int iIndex = indices[0];
 	switch (iIndex)
 	{
@@ -101,7 +104,6 @@ Mcad::ErrorStatus Mx2dCustomMText::dwgInFields(McDbDwgFiler* pFiler)
 	MxString mxStr;
 	pFiler->readString(mxStr);
 	m_text = QString::fromLocal8Bit(mxStr.c_str());
-	pFiler->readPoint3d(&m_dimPt);
 
 	return Mcad::eOk;
 }
@@ -120,7 +122,6 @@ Mcad::ErrorStatus Mx2dCustomMText::dwgOutFields(McDbDwgFiler* pFiler) const
 	Mx2dCustomAnnotation::dwgOutFields(pFiler);
 	pFiler->writeInt(MTEXT_VERSION);
 	pFiler->writeString(m_text.toLocal8Bit().constData());
-	pFiler->writePoint3d(m_dimPt);
 
 	return Mcad::eOk;
 }
@@ -143,8 +144,8 @@ void Mx2dCustomMText::fromJson(const QJsonObject& jsonObject)
 {
 	assertWriteEnabled();
 	Mx2dCustomAnnotation::fromJson(jsonObject);
+	if(!jsonObject.contains("text")) return;
 	m_text = jsonObject["text"].toString();
-	m_dimPt = Mx2d::jsonArray2dToPoint3d(jsonObject["dimPoint"].toArray());
 }
 
 QJsonObject Mx2dCustomMText::toJson() const
@@ -153,7 +154,6 @@ QJsonObject Mx2dCustomMText::toJson() const
 	QJsonObject jsonObject = Mx2dCustomAnnotation::toJson();
 
 	jsonObject["text"] = m_text;
-	jsonObject["dimPoint"] = Mx2d::point3dToJsonArray2d(m_dimPt);
 
 	return jsonObject;
 }
@@ -185,6 +185,11 @@ Mx2d::TextInfoList Mx2dCustomMText::findText(const QString& text, bool isExactMa
 	return res;
 }
 
+DimPropertyFlags Mx2dCustomMText::dimPropertyFlags() const
+{
+	return Prop_Color | Prop_Category | Prop_TextHeight | Prop_Content;
+}
+
 void Mx2dCustomMText::setContents(const QString& textStr)
 {
 	assertWriteEnabled();
@@ -195,18 +200,6 @@ QString Mx2dCustomMText::contents() const
 {
 	assertReadEnabled();
 	return m_text;
-}
-
-void Mx2dCustomMText::setDimPt(const McGePoint3d& dimPt)
-{
-	assertWriteEnabled();
-	m_dimPt = dimPt;
-}
-
-McGePoint3d Mx2dCustomMText::dimPt() const
-{
-	assertReadEnabled();
-	return m_dimPt;
 }
 
 

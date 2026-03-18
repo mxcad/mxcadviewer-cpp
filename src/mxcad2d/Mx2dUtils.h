@@ -286,4 +286,8 @@ namespace Mx2d {
 
 	int isPointInPolygon(const Point2D& pt, const Point2DList& pts);
 
+	QColor cadColorToQColor(const McCmColor& color);
+
+	McCmColor qColorToCadColor(const QColor& color);
+
 } // namespace Mx2d

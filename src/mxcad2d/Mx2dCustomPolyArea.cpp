@@ -23,10 +23,11 @@ Mx2dCustomPolyArea::Mx2dCustomPolyArea(void)
 	setType("polyArea");
 }
 
-Mx2dCustomPolyArea::Mx2dCustomPolyArea(const McGePoint3dArray& polyPoints, const McGePoint3d& textPos, double textHeight)
-	:Mx2dCustomAnnotation(textHeight), m_polyPoints(polyPoints), m_textPos(textPos)
+Mx2dCustomPolyArea::Mx2dCustomPolyArea(const McGePoint3dArray& polyPoints, const McGePoint3d& dimPt, double textHeight)
+	:Mx2dCustomAnnotation(textHeight), m_polyPoints(polyPoints)
 {
 	setType("polyArea");
+	setDimPt(dimPt);
 }
 
 Mx2dCustomPolyArea::~Mx2dCustomPolyArea(void)
@@ -52,11 +53,11 @@ Mdesk::Boolean Mx2dCustomPolyArea::worldDraw(McGiWorldDraw* wd)
 Mcad::ErrorStatus Mx2dCustomPolyArea::getGripPoints(McGePoint3dArray& gripPoints, McGeIntArray& osnapModes, McGeIntArray& geomIds) const
 {
 	assertReadEnabled();
-
+	return Mcad::eOk;
 	for (int i = 0; i < m_polyPoints.length(); ++i) {
 		gripPoints.append(m_polyPoints[i]);
 	}
-	gripPoints.append(m_textPos);
+	gripPoints.append(m_dimPt);
 
 	return Mcad::eOk;
 }
@@ -64,10 +65,11 @@ Mcad::ErrorStatus Mx2dCustomPolyArea::getGripPoints(McGePoint3dArray& gripPoints
 Mcad::ErrorStatus Mx2dCustomPolyArea::moveGripPointsAt(const McGeIntArray& indices, const McGeVector3d& offset)
 {
 	assertWriteEnabled();
+	return Mcad::eOk;
 	int iIndex = indices[0];
 
 	if (iIndex == m_polyPoints.length()) {
-		m_textPos = m_textPos + offset;
+		m_dimPt = m_dimPt + offset;
 	}
 	else {
 		m_polyPoints[iIndex] = m_polyPoints[iIndex] + offset;
@@ -124,8 +126,6 @@ Mcad::ErrorStatus Mx2dCustomPolyArea::dwgInFields(McDbDwgFiler* pFiler)
 		pFiler->readPoint3d(&pt);
 		m_polyPoints.append(pt);
 	}
-	// read text position
-	pFiler->readPoint3d(&m_textPos);
 
 
 	return Mcad::eOk;
@@ -152,8 +152,6 @@ Mcad::ErrorStatus Mx2dCustomPolyArea::dwgOutFields(McDbDwgFiler* pFiler) const
 	for (int i = 0; i < m_polyPoints.length(); ++i) {
 		pFiler->writePoint3d(m_polyPoints[i]);
 	}
-	// write text position
-	pFiler->writePoint3d(m_textPos);
 
 	return Mcad::eOk;
 }
@@ -181,7 +179,7 @@ Mcad::ErrorStatus Mx2dCustomPolyArea::transformBy(const McGeMatrix3d& xform)
 		McGePoint3d& pt = m_polyPoints[i];
 		pt.transformBy(xform);
 	}
-	m_textPos.transformBy(xform);
+	m_dimPt.transformBy(xform);
 
 	return Mcad::eOk;
 }
@@ -190,6 +188,7 @@ void Mx2dCustomPolyArea::fromJson(const QJsonObject& jsonObject)
 {
 	assertWriteEnabled();
 	Mx2dCustomAnnotation::fromJson(jsonObject);
+	if(!jsonObject.contains("points")) return;
 	McGePoint3dArray points;
 	QJsonArray pointsArray = jsonObject["points"].toArray();
 	for (auto point : pointsArray)
@@ -198,7 +197,6 @@ void Mx2dCustomPolyArea::fromJson(const QJsonObject& jsonObject)
 		points.append(Mx2d::jsonArray2dToPoint3d(pointArray));
 	}
 	m_polyPoints = points;
-	m_textPos = Mx2d::jsonArray2dToPoint3d(jsonObject["textPos"].toArray());
 }
 
 QJsonObject Mx2dCustomPolyArea::toJson() const
@@ -214,7 +212,6 @@ QJsonObject Mx2dCustomPolyArea::toJson() const
 		pointsArray.append(pointArray);
 	}
 	jsonObject["points"] = pointsArray;
-	jsonObject["textPos"] = Mx2d::point3dToJsonArray2d(m_textPos);
 
 	return jsonObject;
 }
@@ -244,6 +241,11 @@ Mx2d::TextInfoList Mx2dCustomPolyArea::findText(const QString& text, bool isExac
 	return { {textStr , extents} };
 }
 
+DimPropertyFlags Mx2dCustomPolyArea::dimPropertyFlags() const
+{
+	return Prop_Color | Prop_Category | Prop_TextHeight | Prop_Ratio | Prop_TextPosition;
+}
+
 void Mx2dCustomPolyArea::setPoints(const McGePoint3dArray& points)
 {
 	assertWriteEnabled();
@@ -253,18 +255,6 @@ McGePoint3dArray Mx2dCustomPolyArea::points() const
 {
 	assertReadEnabled();
 	return m_polyPoints;
-}
-
-void Mx2dCustomPolyArea::setTextPos(const McGePoint3d& pos)
-{
-	assertWriteEnabled();
-	m_textPos = pos;
-}
-
-McGePoint3d Mx2dCustomPolyArea::textPos() const
-{
-	assertReadEnabled();
-	return m_textPos;
 }
 
 
@@ -284,7 +274,7 @@ McDbText* Mx2dCustomPolyArea::createText(double area, double perimeter) const
 	McDbObjectId textStyle = Mx::mcdbCurDwg()->textstyle();
 
 	McDbText* pText = new McDbText();
-	pText->setAlignmentPoint(m_textPos);
+	pText->setAlignmentPoint(m_dimPt);
 	pText->setHeight(textHeight());
 
 	QString areaStr = QCoreApplication::translate("Mx2dCustomPolyArea", "Area:%1, Perimeter:%2").arg(QString::number(area * dimRatio() * dimRatio())).arg(QString::number(perimeter * dimRatio()));

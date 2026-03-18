@@ -22,9 +22,10 @@ Mx2dCustomBatchMeasurement::Mx2dCustomBatchMeasurement(void)
 }
 
 Mx2dCustomBatchMeasurement::Mx2dCustomBatchMeasurement(const Mx2d::CurveShapeList& curveShapes, const McGePoint3d& dimPt, double textHeight, bool isDynamicDrawing)
-	:Mx2dCustomAnnotation(textHeight), m_curveShapes(curveShapes), m_dimPt(dimPt), m_isDynamicDrawing(isDynamicDrawing)
+	:Mx2dCustomAnnotation(textHeight), m_curveShapes(curveShapes), m_isDynamicDrawing(isDynamicDrawing)
 {
 	setType("batchMeasurement");
+	setDimPt(dimPt);
 }
 
 Mx2dCustomBatchMeasurement::~Mx2dCustomBatchMeasurement(void)
@@ -51,6 +52,7 @@ Mdesk::Boolean Mx2dCustomBatchMeasurement::worldDraw(McGiWorldDraw* wd)
 Mcad::ErrorStatus Mx2dCustomBatchMeasurement::getGripPoints(McGePoint3dArray& gripPoints, McGeIntArray& osnapModes, McGeIntArray& geomIds) const
 {
 	assertReadEnabled();
+	return Mcad::eOk;
 	gripPoints.append(m_dimPt);
 	return Mcad::eOk;
 }
@@ -58,6 +60,7 @@ Mcad::ErrorStatus Mx2dCustomBatchMeasurement::getGripPoints(McGePoint3dArray& gr
 Mcad::ErrorStatus Mx2dCustomBatchMeasurement::moveGripPointsAt(const McGeIntArray& indices, const McGeVector3d& offset)
 {
 	assertWriteEnabled();
+	return Mcad::eOk;
 	int iIndex = indices[0];
 	switch (iIndex)
 	{
@@ -106,7 +109,6 @@ Mcad::ErrorStatus Mx2dCustomBatchMeasurement::dwgInFields(McDbDwgFiler* pFiler)
 	Mx2dCustomAnnotation::dwgInFields(pFiler);
 	int lVar = 1;
 	pFiler->readInt(&lVar);
-	pFiler->readPoint3d(&m_dimPt);
 	pFiler->readBool(&m_isDynamicDrawing);
 	int numShapes = 0;
 	pFiler->readInt(&numShapes);
@@ -155,7 +157,6 @@ Mcad::ErrorStatus Mx2dCustomBatchMeasurement::dwgOutFields(McDbDwgFiler* pFiler)
 	}
 	Mx2dCustomAnnotation::dwgOutFields(pFiler);
 	pFiler->writeInt(BATCHMEASUREMENT_VERSION);
-	pFiler->writePoint3d(m_dimPt);
 	pFiler->writeBool(m_isDynamicDrawing);
 	// write number of shapes
 	int numShapes = m_curveShapes.length();
@@ -197,6 +198,7 @@ void Mx2dCustomBatchMeasurement::fromJson(const QJsonObject& jsonObject)
 {
 	assertWriteEnabled();
 	Mx2dCustomAnnotation::fromJson(jsonObject);
+	if(!jsonObject.contains("shapes")) return;
 	Mx2d::CurveShapeList curveShapes;
 	QJsonArray shapesArray = jsonObject["shapes"].toArray();
 	for (int i = 0; i < shapesArray.size(); i++)
@@ -226,7 +228,7 @@ void Mx2dCustomBatchMeasurement::fromJson(const QJsonObject& jsonObject)
 		}
 	}
 	m_curveShapes = curveShapes;
-	m_dimPt = Mx2d::jsonArray2dToPoint3d(jsonObject["dimPoint"].toArray());
+	if(!jsonObject.contains("isDynamicDrawing")) return;
 	m_isDynamicDrawing = jsonObject["isDynamicDrawing"].toBool();
 }
 
@@ -240,7 +242,6 @@ QJsonObject Mx2dCustomBatchMeasurement::toJson() const
 		shapesArray.append(shape->toJson());
 	}
 	jsonObject["shapes"] = shapesArray;
-	jsonObject["dimPoint"] = Mx2d::point3dToJsonArray2d(m_dimPt);
 	jsonObject["isDynamicDrawing"] = m_isDynamicDrawing;
 	return jsonObject;
 }
@@ -265,6 +266,11 @@ Mx2d::TextInfoList Mx2dCustomBatchMeasurement::findText(const QString& text, boo
 	return { {textStr , extents} };
 }
 
+DimPropertyFlags Mx2dCustomBatchMeasurement::dimPropertyFlags() const
+{
+	return Prop_Color | Prop_Category | Prop_TextHeight | Prop_Ratio | Prop_TextPosition;
+}
+
 void Mx2dCustomBatchMeasurement::setCurveShapes(const Mx2d::CurveShapeList& curveShapes)
 {
 	assertWriteEnabled();
@@ -277,17 +283,6 @@ Mx2d::CurveShapeList Mx2dCustomBatchMeasurement::curveShapes() const
 	return m_curveShapes;
 }
 
-void Mx2dCustomBatchMeasurement::setDimPt(const McGePoint3d& dimPt)
-{
-	assertWriteEnabled();
-	m_dimPt = dimPt;
-}
-
-McGePoint3d Mx2dCustomBatchMeasurement::dimPt() const
-{
-	assertReadEnabled();
-	return m_dimPt;
-}
 
 void Mx2dCustomBatchMeasurement::setIsDynamicDrawing(bool isDynamicDrawing)
 {

@@ -16,7 +16,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows" AND MSVC)
     add_definitions(-D_USE_MATH_DEFINES) # Windows for math.h
 endif()
 
-option(MX_BUILD_3D "Build 3D" ON)
+option(MX_BUILD_3D "Build 3D" OFF)
 option(MX_BUILD_LOGIN "Build login system" OFF)
 
 set(3RDPARTY_DIR "${CMAKE_SOURCE_DIR}/3rdparty" CACHE PATH "3rdparty directory")
@@ -292,13 +292,15 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows" AND MSVC)
 		set (QT_PLUGINS_DIR "${QT_BINARY_DIR}/../plugins")
 	endif()
 	
-	set(OpenCASCADE_BINARY_DIR_DEBUG "${OpenCASCADE_BINARY_DIR}d")
+	if(MX_BUILD_3D)
+        set(OpenCASCADE_BINARY_DIR_DEBUG "${OpenCASCADE_BINARY_DIR}d")
 	
-	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
-		"$<IF:$<CONFIG:Debug>,${OpenCASCADE_BINARY_DIR_DEBUG},${OpenCASCADE_BINARY_DIR}>"
-		"$<TARGET_FILE_DIR:${PROJECT_NAME}>"
-	)
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
+            "$<IF:$<CONFIG:Debug>,${OpenCASCADE_BINARY_DIR_DEBUG},${OpenCASCADE_BINARY_DIR}>"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+        )
+    endif()
 	
 	set_target_properties (${PROJECT_NAME} PROPERTIES
     VS_DEBUGGER_ENVIRONMENT "\

@@ -2,6 +2,40 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN">
 <context>
+    <name>ColorComboBox</name>
+    <message>
+        <location filename="mxcad2d/ColorComboBox.cpp" line="71"/>
+        <source>More Colors...</source>
+        <translation>更多颜色...</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/ColorComboBox.cpp" line="28"/>
+        <source>MORE</source>
+        <translation>更多</translation>
+    </message>
+</context>
+<context>
+    <name>ColorListDelegate</name>
+    <message>
+        <location filename="mxcad2d/ColorListDelegate.cpp" line="27"/>
+        <source>MORE</source>
+        <translation>更多</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/ColorListDelegate.cpp" line="29"/>
+        <source>More Colors...</source>
+        <translation>更多颜色...</translation>
+    </message>
+</context>
+<context>
+    <name>DimPropertyDelegate</name>
+    <message>
+        <location filename="mxcad2d/DimPropertyDelegate.cpp" line="139"/>
+        <source>Current Ratio</source>
+        <translation>当前比例</translation>
+    </message>
+</context>
+<context>
     <name>DrawingPreviewWidget</name>
     <message>
         <location filename="mxcad2d/Mx2dExportPdfDialog.cpp" line="76"/>
@@ -14,10 +48,8 @@
 <context>
     <name>ImageLabel</name>
     <message>
-        <location filename="mxlogin/imagelabel.cpp" line="15"/>
-        <location filename="mxlogin/imagelabel.cpp" line="25"/>
         <source>failed to load image</source>
-        <translation>图片加载失败</translation>
+        <translation type="vanished">图片加载失败</translation>
     </message>
 </context>
 <context>
@@ -501,7 +533,7 @@
 <context>
     <name>Mx2dCustomArcPolyArea</name>
     <message>
-        <location filename="mxcad2d/Mx2dCustomArcPolyArea.cpp" line="279"/>
+        <location filename="mxcad2d/Mx2dCustomArcPolyArea.cpp" line="270"/>
         <source>Area:%1, Perimeter:%2</source>
         <translation>面积：%1，周长：%2</translation>
     </message>
@@ -509,17 +541,17 @@
 <context>
     <name>Mx2dCustomCircleMeasurement</name>
     <message>
-        <location filename="mxcad2d/Mx2dCustomCircleMeasurement.cpp" line="257"/>
+        <location filename="mxcad2d/Mx2dCustomCircleMeasurement.cpp" line="251"/>
         <source>Radius:%1</source>
         <translation>半径：%1</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dCustomCircleMeasurement.cpp" line="268"/>
+        <location filename="mxcad2d/Mx2dCustomCircleMeasurement.cpp" line="262"/>
         <source>Circumference:%1</source>
         <translation>周长：%1</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dCustomCircleMeasurement.cpp" line="283"/>
+        <location filename="mxcad2d/Mx2dCustomCircleMeasurement.cpp" line="277"/>
         <source>Area:%1</source>
         <translation>面积：%1</translation>
     </message>
@@ -535,7 +567,7 @@
 <context>
     <name>Mx2dCustomHatchArea2</name>
     <message>
-        <location filename="mxcad2d/Mx2dCustomHatchArea2.cpp" line="384"/>
+        <location filename="mxcad2d/Mx2dCustomHatchArea2.cpp" line="376"/>
         <source>Area:%1, Perimeter:%2</source>
         <translation>面积：%1，周长：%2</translation>
     </message>
@@ -543,7 +575,7 @@
 <context>
     <name>Mx2dCustomPolyArea</name>
     <message>
-        <location filename="mxcad2d/Mx2dCustomPolyArea.cpp" line="290"/>
+        <location filename="mxcad2d/Mx2dCustomPolyArea.cpp" line="280"/>
         <source>Area:%1, Perimeter:%2</source>
         <translation>面积：%1，周长：%2</translation>
     </message>
@@ -551,7 +583,7 @@
 <context>
     <name>Mx2dCustomRectArea</name>
     <message>
-        <location filename="mxcad2d/Mx2dCustomRectArea.cpp" line="207"/>
+        <location filename="mxcad2d/Mx2dCustomRectArea.cpp" line="198"/>
         <source>Area:%1, Perimeter:%2</source>
         <translation>面积：%1，周长：%2</translation>
     </message>
@@ -559,69 +591,215 @@
 <context>
     <name>Mx2dDimCategoryManagerDialog</name>
     <message>
-        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="28"/>
-        <source>Dimension Category Management</source>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="43"/>
+        <source>Annotation Category Management</source>
+        <oldsource>Dimension Category Management</oldsource>
         <translation>标注分类管理</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="37"/>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="58"/>
         <source>New Category</source>
         <translation>新建分类</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="38"/>
         <source>Current Category:</source>
-        <translation>当前分类：</translation>
+        <translation type="vanished">当前分类：</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="38"/>
         <source>Default</source>
-        <translation>默认</translation>
+        <translation type="vanished">默认</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="39"/>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="59"/>
+        <source>Current Category: None</source>
+        <translation>当前分类：无</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="60"/>
         <source>Show All</source>
         <translation>全部显示</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="40"/>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="61"/>
         <source>Hide All</source>
         <translation>全部隐藏</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="43"/>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="64"/>
         <source>Please enter the category name to search</source>
         <translation>请输入要查找的分类名称</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="44"/>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="65"/>
         <source>Search</source>
         <translation>查找</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="47"/>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="66"/>
+        <source>Move Up</source>
+        <translation>上移</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="67"/>
+        <source>Move Down</source>
+        <translation>下移</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="70"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="47"/>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="70"/>
         <source>Color</source>
         <translation>颜色</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="47"/>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="70"/>
         <source>Show</source>
         <translation>显示</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="47"/>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="70"/>
         <source>Current</source>
         <translation>当前</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="53"/>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="90"/>
         <source>Double-click table items to modify category name and color, or set current category</source>
         <translation>双击表格项可以修改分类的名称和颜色，也可以设置当前分类</translation>
+    </message>
+    <message>
+        <source>default</source>
+        <translation type="vanished">默认</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="257"/>
+        <source>Current Category: </source>
+        <translation>当前分类：</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="264"/>
+        <source>Category %1</source>
+        <translation>分类 %1</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="329"/>
+        <source>Information</source>
+        <translation>提示</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="330"/>
+        <source>&apos;%1&apos; is the current category and cannot be hidden. Other categories have been hidden.</source>
+        <translation>&apos;%1&apos;是当前分类，无法隐藏，其它分类已经被隐藏</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="445"/>
+        <source>Select Color</source>
+        <translation>选择颜色</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="453"/>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="469"/>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="476"/>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="510"/>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="518"/>
+        <source>Warning</source>
+        <translation>提示</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="453"/>
+        <source>The current category cannot be hidden.</source>
+        <translation>当前分类无法被隐藏</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="469"/>
+        <source>The current category cannot be deleted.</source>
+        <translation>当前分类无法被删除</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="476"/>
+        <source>Please delete all annotations in category &apos;%1&apos; first.</source>
+        <translation>请先删除分类&apos;%1&apos;中的所有标注</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="480"/>
+        <source>Confirm Delete</source>
+        <translation>确认删除</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="481"/>
+        <source>Are you sure you want to delete category &apos;%1&apos;?</source>
+        <translation>确定要删除分类&apos;%1&apos;吗？</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="510"/>
+        <source>Category name cannot be empty.</source>
+        <translation>分类名不能为空</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimCategoryManagerDialog.cpp" line="518"/>
+        <source>Category name already exists.</source>
+        <translation>分类名已经存在</translation>
+    </message>
+</context>
+<context>
+    <name>Mx2dDimPropertyDialog</name>
+    <message>
+        <location filename="mxcad2d/Mx2dDimPropertyDialog.cpp" line="71"/>
+        <source>Annotation Properties</source>
+        <translation>标注属性</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimPropertyDialog.cpp" line="84"/>
+        <source>Property Name</source>
+        <translation>属性名</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimPropertyDialog.cpp" line="84"/>
+        <source>Property Value</source>
+        <translation>属性值</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimPropertyDialog.cpp" line="112"/>
+        <source>Color</source>
+        <translation>颜色</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimPropertyDialog.cpp" line="115"/>
+        <source>Category</source>
+        <translation>分类</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimPropertyDialog.cpp" line="118"/>
+        <source>Text Height</source>
+        <translation>文字高度</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimPropertyDialog.cpp" line="121"/>
+        <source>Ratio</source>
+        <translation>比例</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimPropertyDialog.cpp" line="124"/>
+        <source>Text Position</source>
+        <translation>文字位置</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimPropertyDialog.cpp" line="127"/>
+        <source>Content</source>
+        <translation>文字内容</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimPropertyDialog.cpp" line="150"/>
+        <location filename="mxcad2d/Mx2dDimPropertyDialog.cpp" line="161"/>
+        <source>Modify</source>
+        <translation>点击修改</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dDimPropertyDialog.cpp" line="254"/>
+        <source>Select Color</source>
+        <translation>选择颜色</translation>
     </message>
 </context>
 <context>
@@ -835,12 +1013,12 @@
         <translation type="vanished">模型</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="57"/>
+        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="62"/>
         <source>Annotation Category Management</source>
         <translation>标注分类管理</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="60"/>
+        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="68"/>
         <source>Annotation Category</source>
         <translation>标注分类</translation>
     </message>
@@ -849,53 +1027,75 @@
         <translation type="vanished">默认</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="84"/>
         <source>default</source>
-        <translation>默认</translation>
+        <translation type="vanished">默认</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="87"/>
+        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="76"/>
         <source>Select one or more annotations to modify properties in batch</source>
         <translation>选择一个或多个标注批量修改属性</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="91"/>
+        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="80"/>
         <source>Move Annotation</source>
         <translation>移动标注</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="97"/>
+        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="87"/>
         <source>Copy Annotation</source>
         <translation>复制标注</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="103"/>
+        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="94"/>
         <source>Paste Annotation</source>
         <translation>粘贴标注</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="885"/>
-        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="1077"/>
-        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="1305"/>
-        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="1567"/>
+        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="1066"/>
+        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="1258"/>
+        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="1486"/>
+        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="1748"/>
         <source>Prompt</source>
         <translation>提示</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="885"/>
+        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="1066"/>
         <source>No entity selected!</source>
         <translation>提取失败！</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="1077"/>
-        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="1305"/>
+        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="1258"/>
+        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="1486"/>
         <source>can not be a table</source>
         <translation>无法构成表格</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="1567"/>
+        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="1748"/>
         <source>Failed to export table, please check if file is already open, close it and try again!</source>
         <translation>导出表格失败，请检查表格文件是否已经打开，如果打开，请先关闭表格文件后重试！</translation>
+    </message>
+</context>
+<context>
+    <name>Mx2dIndexColorDialog</name>
+    <message>
+        <location filename="mxcad2d/Mx2dIndexColorDialog.cpp" line="151"/>
+        <source>Select Color</source>
+        <translation>选择颜色</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dIndexColorDialog.cpp" line="171"/>
+        <source>Please click one of the color blocks below to select a color</source>
+        <translation>请点击下方颜色块中的一个来选择颜色</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dIndexColorDialog.cpp" line="206"/>
+        <source>OK</source>
+        <translation>确定</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dIndexColorDialog.cpp" line="207"/>
+        <source>Cancel</source>
+        <translation>取消</translation>
     </message>
 </context>
 <context>
@@ -1568,6 +1768,31 @@
     </message>
 </context>
 <context>
+    <name>Mx2dRatioDialog</name>
+    <message>
+        <location filename="mxcad2d/Mx2dRatioDialog.cpp" line="34"/>
+        <source>Enter Actual Length</source>
+        <oldsource>Enter Actual Size</oldsource>
+        <translation>输入实际尺寸</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dRatioDialog.cpp" line="39"/>
+        <source>Enter the actual size between two points to set the annotation ratio:</source>
+        <oldsource>Enter the actual size between two points to set the annotation scale:</oldsource>
+        <translation>输入两点之间的实际尺寸来设置标注比例：</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dRatioDialog.cpp" line="48"/>
+        <source>OK</source>
+        <translation>确定</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dRatioDialog.cpp" line="49"/>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+</context>
+<context>
     <name>Mx2dShapeListDialog</name>
     <message>
         <location filename="mxcad2d/Mx2dShapeListDialog.cpp" line="24"/>
@@ -1639,7 +1864,7 @@
     <message>
         <location filename="mxcad2d/Mx2dShapeListDialog.cpp" line="220"/>
         <source>Confirm Delete</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">确认删除</translation>
     </message>
     <message>
         <location filename="mxcad2d/Mx2dShapeListDialog.cpp" line="220"/>
@@ -1767,131 +1992,115 @@
 <context>
     <name>Mx2dShortcutSettingsDialog</name>
     <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="24"/>
+        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="31"/>
         <source>Shortcut Settings</source>
-        <translation type="unfinished">快捷键设置</translation>
+        <translation>快捷键设置</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="42"/>
+        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="40"/>
         <source>You can click a row in the table to set a shortcut for the function</source>
-        <translation type="unfinished"></translation>
+        <translation>您可以单击表格中的一行来设置功能的快捷键</translation>
     </message>
     <message>
         <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="43"/>
         <source>(Shortcut setting method: Press keys directly on the keyboard)</source>
-        <translation type="unfinished"></translation>
+        <translation>（快捷键设置方式：直接按键盘进行输入）</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="55"/>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="72"/>
+        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="54"/>
+        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="107"/>
         <source>Function Name</source>
-        <translation type="unfinished"></translation>
+        <translation>功能名称</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="55"/>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="72"/>
+        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="54"/>
+        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="107"/>
         <source>Shortcut</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="67"/>
-        <source>The following are some built-in software shortcuts (cannot be modified):</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="81"/>
-        <source>Save</source>
-        <translation type="unfinished">保存</translation>
-    </message>
-    <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="94"/>
-        <source>Draw Line</source>
-        <translation type="unfinished">画直线</translation>
-    </message>
-    <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="95"/>
-        <source>Continuous Measurement</source>
-        <translation type="unfinished">连续测量</translation>
+        <translation>快捷键</translation>
     </message>
     <message>
         <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="96"/>
-        <source>Batch Measurement</source>
-        <translation type="unfinished">批量测量</translation>
-    </message>
-    <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="97"/>
-        <source>Arc Length</source>
-        <translation type="unfinished">弧长</translation>
-    </message>
-    <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="98"/>
-        <source>Distance from Point to Line</source>
-        <translation type="unfinished">点到直线的距离</translation>
-    </message>
-    <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="99"/>
-        <source>Area (with arcs)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="100"/>
-        <source>Measure Circle</source>
-        <translation type="unfinished">测量圆</translation>
-    </message>
-    <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="101"/>
-        <source>Measure Angle</source>
-        <translation type="unfinished">测量角度</translation>
-    </message>
-    <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="102"/>
-        <source>Measurement Statistics</source>
-        <translation type="unfinished">测量统计</translation>
+        <source>The following are some built-in software shortcuts (cannot be modified):</source>
+        <translation>以下是一些软件内置的快捷键（不可修改）：</translation>
     </message>
     <message>
         <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="103"/>
+        <source>Text Search</source>
+        <translation>文字查找</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="138"/>
+        <source>Save</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="174"/>
+        <source>Prompt</source>
+        <translation>提示</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="174"/>
+        <source>This shortcut key already exists. Please reset it!</source>
+        <translation>当前快捷键已经存在，请重新设置！</translation>
+    </message>
+    <message>
+        <source>Draw Line</source>
+        <translation type="obsolete">画直线</translation>
+    </message>
+    <message>
+        <source>Continuous Measurement</source>
+        <translation type="obsolete">连续测量</translation>
+    </message>
+    <message>
+        <source>Batch Measurement</source>
+        <translation type="obsolete">批量测量</translation>
+    </message>
+    <message>
+        <source>Arc Length</source>
+        <translation type="obsolete">弧长</translation>
+    </message>
+    <message>
+        <source>Distance from Point to Line</source>
+        <translation type="obsolete">点到直线的距离</translation>
+    </message>
+    <message>
+        <source>Measure Circle</source>
+        <translation type="obsolete">测量圆</translation>
+    </message>
+    <message>
+        <source>Measure Angle</source>
+        <translation type="obsolete">测量角度</translation>
+    </message>
+    <message>
+        <source>Measurement Statistics</source>
+        <translation type="obsolete">测量统计</translation>
+    </message>
+    <message>
         <source>Measure Hatch Area</source>
-        <translation type="unfinished">测量填充面积</translation>
+        <translation type="obsolete">测量填充面积</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="104"/>
-        <source>Modify Single Annotation Properties</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="105"/>
         <source>Extract Text</source>
-        <translation type="unfinished">提取文字</translation>
+        <translation type="obsolete">提取文字</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="123"/>
+        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="102"/>
         <source>Open</source>
-        <translation type="unfinished">打开</translation>
+        <translation>打开</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="124"/>
+        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="102"/>
         <source>Undo</source>
-        <translation type="unfinished">撤销</translation>
+        <translation>撤销</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="125"/>
+        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="102"/>
         <source>Redo</source>
-        <translation type="unfinished">恢复</translation>
+        <translation>恢复</translation>
     </message>
     <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="126"/>
-        <source>Find Text</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="127"/>
         <source>Print</source>
-        <translation type="unfinished">打印</translation>
-    </message>
-    <message>
-        <location filename="mxcad2d/Mx2dShortcutSettingsDialog.cpp" line="128"/>
-        <source>Exit Full Screen</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">打印</translation>
     </message>
 </context>
 <context>
@@ -2191,357 +2400,298 @@
     </message>
 </context>
 <context>
+    <name>Mx2dUtils</name>
+    <message>
+        <location filename="mxcad2d/Mx2dUtils.cpp" line="811"/>
+        <source>Warning</source>
+        <translation>提示</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/Mx2dUtils.cpp" line="811"/>
+        <source>Please select an annotation category first.</source>
+        <translation>请先选择一个标注分类</translation>
+    </message>
+</context>
+<context>
     <name>Mx3dExplodeSlider</name>
     <message>
-        <location filename="mxcad3d/Mx3dExplodeSlider.cpp" line="50"/>
         <source>Exploded View</source>
-        <translation>爆炸视图</translation>
+        <translation type="vanished">爆炸视图</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dExplodeSlider.cpp" line="149"/>
         <source>Restore</source>
-        <translation>恢复</translation>
+        <translation type="vanished">恢复</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dExplodeSlider.cpp" line="177"/>
         <source>Explode</source>
-        <translation>炸开</translation>
+        <translation type="vanished">炸开</translation>
     </message>
 </context>
 <context>
     <name>Mx3dGuiDocument</name>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="83"/>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="159"/>
         <source>Model Tree</source>
-        <translation>模型树</translation>
+        <translation type="vanished">模型树</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="97"/>
         <source>Property</source>
-        <translation>属性</translation>
+        <translation type="vanished">属性</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="134"/>
         <source>Projection Mode</source>
-        <translation>投影模式</translation>
+        <translation type="vanished">投影模式</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="140"/>
         <source>Enable Shadow</source>
-        <translation>开启阴影</translation>
+        <translation type="vanished">开启阴影</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="145"/>
         <source>Show Edges</source>
-        <translation>显示边线</translation>
+        <translation type="vanished">显示边线</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="150"/>
         <source>Wireframe Mode</source>
-        <translation>线框模式</translation>
+        <translation type="vanished">线框模式</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="155"/>
         <source>Fit to Screen</source>
-        <translation>全图适应缩放</translation>
+        <translation type="vanished">全图适应缩放</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="171"/>
         <source>Exploded View</source>
-        <translation>爆炸视图</translation>
+        <translation type="vanished">爆炸视图</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="187"/>
         <source>Section</source>
-        <translation>剖切</translation>
+        <translation type="vanished">剖切</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="202"/>
         <source>Point Measurement</source>
-        <translation>点测量</translation>
+        <translation type="vanished">点测量</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="209"/>
         <source>Circle Center Measurement</source>
-        <translation>圆心测量</translation>
+        <translation type="vanished">圆心测量</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="216"/>
         <source>Diameter Measurement</source>
-        <translation>直径测量</translation>
+        <translation type="vanished">直径测量</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="223"/>
         <source>Minimum Distance Measurement</source>
-        <translation>最小距离测量</translation>
+        <translation type="vanished">最小距离测量</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="230"/>
         <source>Two Center Points Distance Measurement</source>
-        <translation>中心距离测量</translation>
+        <translation type="vanished">中心距离测量</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="237"/>
         <source>Angle Measurement</source>
-        <translation>角度测量</translation>
+        <translation type="vanished">角度测量</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="244"/>
         <source>Length Measurement</source>
-        <translation>长度测量</translation>
+        <translation type="vanished">长度测量</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="251"/>
         <source>Surface Area Measurement</source>
-        <translation>表面积测量</translation>
+        <translation type="vanished">表面积测量</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="258"/>
         <source>Bounding Box Measurement</source>
-        <translation>包围盒测量</translation>
+        <translation type="vanished">包围盒测量</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="277"/>
         <source>Measure</source>
-        <translation>测量</translation>
+        <translation type="vanished">测量</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="1385"/>
         <source>Color</source>
-        <translation>颜色</translation>
+        <translation type="vanished">颜色</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="1385"/>
         <source>Product Color</source>
-        <translation>产品颜色</translation>
+        <translation type="vanished">产品颜色</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="1494"/>
         <source>Open File</source>
-        <translation>打开文件</translation>
+        <translation type="vanished">打开文件</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dGuiDocument.cpp" line="1494"/>
         <source>Unsupported file format</source>
-        <translation>不支持的文件格式</translation>
+        <translation type="vanished">不支持的文件格式</translation>
     </message>
 </context>
 <context>
     <name>Mx3dSectionTools</name>
     <message>
-        <location filename="mxcad3d/Mx3dSectionTools.cpp" line="178"/>
         <source>X Plane</source>
-        <translation>X平面</translation>
+        <translation type="vanished">X平面</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSectionTools.cpp" line="201"/>
-        <location filename="mxcad3d/Mx3dSectionTools.cpp" line="235"/>
-        <location filename="mxcad3d/Mx3dSectionTools.cpp" line="268"/>
-        <location filename="mxcad3d/Mx3dSectionTools.cpp" line="301"/>
         <source>Invert</source>
-        <translation>翻转</translation>
+        <translation type="vanished">翻转</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSectionTools.cpp" line="212"/>
         <source>Y Plane</source>
-        <translation>Y平面</translation>
+        <translation type="vanished">Y平面</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSectionTools.cpp" line="245"/>
         <source>Z Plane</source>
-        <translation>Z平面</translation>
+        <translation type="vanished">Z平面</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSectionTools.cpp" line="277"/>
         <source>Custom</source>
-        <translation>自定义</translation>
+        <translation type="vanished">自定义</translation>
     </message>
 </context>
 <context>
     <name>Mx3dSetBgColorDialog</name>
     <message>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="39"/>
         <source>Set Background Color</source>
-        <translation>设置背景颜色</translation>
+        <translation type="vanished">设置背景颜色</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="53"/>
         <source>Solid Color</source>
-        <translation>单色</translation>
+        <translation type="vanished">单色</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="54"/>
         <source>Gradient</source>
-        <translation>渐变色</translation>
+        <translation type="vanished">渐变色</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="66"/>
         <source>Select Color...</source>
-        <translation>选择颜色...</translation>
+        <translation type="vanished">选择颜色...</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="74"/>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="132"/>
         <source>Restore Default</source>
-        <translation>恢复默认</translation>
+        <translation type="vanished">恢复默认</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="105"/>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="117"/>
         <source>Select...</source>
-        <translation>选择...</translation>
+        <translation type="vanished">选择...</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="110"/>
         <source>Start Color:</source>
-        <translation>起始颜色：</translation>
+        <translation type="vanished">起始颜色：</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="122"/>
         <source>End Color:</source>
-        <translation>结束颜色：</translation>
+        <translation type="vanished">结束颜色：</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="127"/>
         <source>Horizontal</source>
-        <translation>水平</translation>
+        <translation type="vanished">水平</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="127"/>
         <source>Vertical</source>
-        <translation>垂直</translation>
+        <translation type="vanished">垂直</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="127"/>
         <source>Diagonal 1</source>
-        <translation>对角线1</translation>
+        <translation type="vanished">对角线1</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="127"/>
         <source>Diagonal 2</source>
-        <translation>对角线2</translation>
+        <translation type="vanished">对角线2</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="128"/>
         <source>Corner 1</source>
-        <translation>角1</translation>
+        <translation type="vanished">角1</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="128"/>
         <source>Corner 2</source>
-        <translation>角2</translation>
+        <translation type="vanished">角2</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="128"/>
         <source>Corner 3</source>
-        <translation>角3</translation>
+        <translation type="vanished">角3</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="128"/>
         <source>Corner 4</source>
-        <translation>角4</translation>
+        <translation type="vanished">角4</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="130"/>
         <source>Gradient Mode:</source>
-        <translation>渐变模式：</translation>
+        <translation type="vanished">渐变模式：</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="182"/>
         <source>Select Background Color</source>
-        <translation>选择背景颜色</translation>
+        <translation type="vanished">选择背景颜色</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="192"/>
         <source>Select Gradient Start Color</source>
-        <translation>选择渐变起始颜色</translation>
+        <translation type="vanished">选择渐变起始颜色</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dSetBgColorDialog.cpp" line="202"/>
         <source>Select Gradient End Color</source>
-        <translation>选择渐变结束颜色</translation>
+        <translation type="vanished">选择渐变结束颜色</translation>
     </message>
 </context>
 <context>
     <name>Mx3dUtils</name>
     <message>
-        <location filename="mxcad3d/Mx3dUtils.cpp" line="656"/>
         <source>Name</source>
-        <translation>名称</translation>
+        <translation type="vanished">名称</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dUtils.cpp" line="661"/>
         <source>Shape Type</source>
-        <translation>形状类型</translation>
+        <translation type="vanished">形状类型</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dUtils.cpp" line="664"/>
         <source>XDE Shape Type</source>
-        <translation>XDE形状类型</translation>
+        <translation type="vanished">XDE形状类型</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dUtils.cpp" line="667"/>
         <source>Layer</source>
-        <translation>图层</translation>
+        <translation type="vanished">图层</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dUtils.cpp" line="672"/>
         <source>Location</source>
-        <translation>位置</translation>
+        <translation type="vanished">位置</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dUtils.cpp" line="678"/>
         <source>Color</source>
-        <translation>颜色</translation>
+        <translation type="vanished">颜色</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dUtils.cpp" line="688"/>
         <source>Product Color</source>
-        <translation>产品颜色</translation>
+        <translation type="vanished">产品颜色</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dUtils.cpp" line="692"/>
         <source>Material Name</source>
-        <translation>材质名称</translation>
+        <translation type="vanished">材质名称</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dUtils.cpp" line="697"/>
         <source>Product Name</source>
-        <translation>产品名称</translation>
+        <translation type="vanished">产品名称</translation>
     </message>
 </context>
 <context>
     <name>Mx3dViewer</name>
     <message>
-        <location filename="mxcad3d/Mx3dViewer.cpp" line="114"/>
         <source>Front</source>
-        <translation>前</translation>
+        <translation type="vanished">前</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dViewer.cpp" line="115"/>
         <source>Back</source>
-        <translation>后</translation>
+        <translation type="vanished">后</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dViewer.cpp" line="116"/>
         <source>Left</source>
-        <translation>左</translation>
+        <translation type="vanished">左</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dViewer.cpp" line="117"/>
         <source>Right</source>
-        <translation>右</translation>
+        <translation type="vanished">右</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dViewer.cpp" line="118"/>
         <source>Top</source>
-        <translation>上</translation>
+        <translation type="vanished">上</translation>
     </message>
     <message>
-        <location filename="mxcad3d/Mx3dViewer.cpp" line="119"/>
         <source>Bottom</source>
-        <translation>下</translation>
+        <translation type="vanished">下</translation>
     </message>
 </context>
 <context>
@@ -2619,686 +2769,677 @@ Please ensure you have a default text file viewer installed.</source>
 <context>
     <name>MxBindPhoneWidget</name>
     <message>
-        <location filename="mxlogin/mxbindphonewidget.ui" line="20"/>
         <source>Form</source>
-        <translation>窗体</translation>
+        <translation type="vanished">窗体</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxbindphonewidget.ui" line="84"/>
         <source>Close</source>
-        <translation>关闭</translation>
+        <translation type="vanished">关闭</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxbindphonewidget.ui" line="148"/>
         <source>Bind Phone</source>
-        <translation>绑定手机</translation>
+        <translation type="vanished">绑定手机</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxbindphonewidget.ui" line="161"/>
         <source>Bind your phone for a more convenient and secure account</source>
-        <translation>绑定手机让账号更加方便和安全</translation>
+        <translation type="vanished">绑定手机让账号更加方便和安全</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxbindphonewidget.ui" line="193"/>
         <source>Image</source>
-        <translation>图片</translation>
+        <translation type="vanished">图片</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxbindphonewidget.ui" line="247"/>
         <source>Bind Phone Number</source>
-        <translation>绑定手机号</translation>
+        <translation type="vanished">绑定手机号</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxbindphonewidget.ui" line="298"/>
         <source>Please enter your phone number</source>
-        <translation>请输入手机号</translation>
+        <translation type="vanished">请输入手机号</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxbindphonewidget.ui" line="317"/>
         <source>Please enter the graphic code</source>
-        <translation>请输入图形验证码</translation>
+        <translation type="vanished">请输入图形验证码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxbindphonewidget.ui" line="357"/>
         <source>Please enter SMS code</source>
-        <translation>请输入短信验证码</translation>
+        <translation type="vanished">请输入短信验证码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxbindphonewidget.ui" line="381"/>
-        <location filename="mxlogin/mxbindphonewidget.cpp" line="49"/>
         <source>Get Code</source>
-        <translation>获取验证码</translation>
+        <translation type="vanished">获取验证码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxbindphonewidget.ui" line="429"/>
         <source>Bind</source>
-        <translation>绑定</translation>
+        <translation type="vanished">绑定</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxbindphonewidget.cpp" line="105"/>
-        <location filename="mxlogin/mxbindphonewidget.cpp" line="124"/>
         <source>Resend (%1s)</source>
-        <translation>重新发送（%1s）</translation>
+        <translation type="vanished">重新发送（%1s）</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxbindphonewidget.cpp" line="165"/>
-        <location filename="mxlogin/mxbindphonewidget.cpp" line="221"/>
         <source>Invalid phone number format.</source>
-        <translation>手机号格式错误</translation>
+        <translation type="vanished">手机号格式错误</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxbindphonewidget.cpp" line="170"/>
         <source>Please enter the graphic code.</source>
-        <translation>请输入图形验证码</translation>
+        <translation type="vanished">请输入图形验证码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxbindphonewidget.cpp" line="202"/>
         <source>Verification code sent.</source>
-        <translation>短信验证码已发送</translation>
+        <translation type="vanished">短信验证码已发送</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxbindphonewidget.cpp" line="206"/>
         <source>Failed to send code: </source>
-        <translation>短信验证码发送失败：</translation>
+        <translation type="vanished">短信验证码发送失败：</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxbindphonewidget.cpp" line="225"/>
         <source>Please enter the SMS code.</source>
-        <translation>请输入短信验证码</translation>
+        <translation type="vanished">请输入短信验证码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxbindphonewidget.cpp" line="260"/>
         <source>Phone number bound successfully.</source>
-        <translation>手机号绑定成功</translation>
+        <translation type="vanished">手机号绑定成功</translation>
     </message>
 </context>
 <context>
     <name>MxCADCommand</name>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="56"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="57"/>
         <source>,Right-click to break current step, Esc to stop current command.</source>
         <translation>，单击鼠标右键结束当前步骤，按Esc键退出当前命令。</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1084"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1085"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1223"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1224"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1662"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1663"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1831"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1832"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1864"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1865"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2722"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2723"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2799"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2800"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1105"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1106"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1244"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1245"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1683"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1684"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1852"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1853"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2015"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2016"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2092"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2093"/>
         <source>Select first corner of rectangular area</source>
         <translation>选择矩形区域第一个角点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1091"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1092"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1233"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1234"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1669"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1670"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1831"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1843"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1112"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1113"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1254"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1255"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1690"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1691"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1852"/>
         <location filename="mxcad2d/MxCADCommand.cpp" line="1864"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1876"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2731"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2732"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2811"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2812"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2024"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2025"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2104"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2105"/>
         <source>Select second corner of rectangular area</source>
         <translation>选择矩形区域第二个角点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1135"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1136"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1256"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1257"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1325"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1326"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1730"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1731"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2880"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2881"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="5028"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="5029"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1156"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1157"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1277"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1278"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1346"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1347"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1751"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1752"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2173"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2174"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4320"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4321"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4420"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4421"/>
         <source>Select start point</source>
         <translation>选择起点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1148"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1151"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1272"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1275"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1739"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1742"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2889"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2892"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1169"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1172"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1293"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1296"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1760"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1763"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2183"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2186"/>
         <source>Select next point</source>
         <translation>选择下一个点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1186"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1769"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1207"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1790"/>
         <source>Self-intersecting polygons are not allowed. Please select again.</source>
         <translation>无法处理自相交的多边形，请重新选择</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1338"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1339"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="5041"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="5042"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1359"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1360"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4329"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4330"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4433"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4434"/>
         <source>Select end point</source>
         <translation>选择终点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1404"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1405"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1425"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1426"/>
         <source>Select first corner of zoom window</source>
         <translation>选择窗口缩放的第一个角点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1411"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1412"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1432"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1433"/>
         <source>Select second corner of zoom window</source>
         <translation>选择窗口缩放的第二个角点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1524"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1531"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1568"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="1575"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1545"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1552"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1589"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1596"/>
         <source>Click an entity to select its layer</source>
         <translation>单击一个实体以选中其所在图层</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2524"/>
-        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="1509"/>
+        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="1690"/>
         <source>table.xlsx</source>
         <translation>表格.xlsx</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2525"/>
-        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="1510"/>
+        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="1691"/>
         <source>Spreadsheet files (*.xlsx *.xls);;All files (*)</source>
         <translation>Excel文件 (*.xlsx *.xls);;所有文件 (*)</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2527"/>
-        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="1512"/>
+        <location filename="mxcad2d/Mx2dGuiDocument.cpp" line="1693"/>
         <source>Save Spreadsheet File</source>
         <translation>保存Excel文件</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2608"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2621"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2656"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2660"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2692"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2696"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2924"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2925"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3020"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3021"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3067"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3068"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3118"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3119"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3346"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3347"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4202"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4203"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1901"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1914"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1949"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1953"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1985"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="1989"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2218"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2219"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2314"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2315"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2361"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2362"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2412"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2413"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2641"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2642"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3497"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3498"/>
         <source>Select text insertion point</source>
         <translation>选择文字插入点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2760"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2761"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2053"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2054"/>
         <source>Select diagonal point 1</source>
         <translation>选择对角点1</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2770"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2771"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2063"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2064"/>
         <source>Select diagonal point 2</source>
         <translation>选择对角点2</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2847"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2848"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2140"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2141"/>
         <source>Select leader start point</source>
         <translation>选择引线起点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2856"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2857"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2149"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2150"/>
         <source>Select leader end point</source>
         <translation>选择引线终点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2915"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2209"/>
         <source>Self crossed poly!</source>
         <translation>无法处理自相交的多边形，请重新选择</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2950"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="2951"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3271"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3272"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2244"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2245"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2566"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2567"/>
         <source>Select point or arc segment</source>
         <translation>选择点或圆弧</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3046"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3047"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2340"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2341"/>
         <source>Select first corner of rectangle</source>
         <translation>选择矩形的第一个角点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3055"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3056"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2349"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2350"/>
         <source>Select second corner of rectangle</source>
         <translation>选择矩形的第二个角点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3098"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3099"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2392"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2393"/>
         <source>Select point to annotate</source>
         <translation>选择标注点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3151"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3152"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2445"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2446"/>
         <source>Select aligned dimension start point</source>
         <translation>选择对齐标注起点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3162"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3163"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2456"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2457"/>
         <source>Select aligned dimension end point</source>
         <translation>选择对齐标注终点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3177"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3178"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3836"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3837"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3898"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3899"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2471"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2472"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3131"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3132"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3193"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3194"/>
         <source>Select aligned dimension text insertion point</source>
         <translation>选择对齐标注文字插入点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3210"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3211"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2504"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2505"/>
         <source>Select linear dimension start point</source>
         <translation>选择线性标注起点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3221"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3222"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2515"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2516"/>
         <source>Select linear dimension end point</source>
         <translation>选择线性标注终点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3239"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3240"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2534"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2535"/>
         <source>Select linear dimension text insertion point</source>
         <translation>选择线性标注文字插入点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3376"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3377"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2671"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2672"/>
         <source>Select continuous measurement object</source>
         <translation>选择连续测量对象</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3430"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3431"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2725"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2726"/>
         <source>Select a circle or arc</source>
         <translation>选择圆或圆弧</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3512"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3513"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3542"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3543"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3609"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3610"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3681"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3682"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2807"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2808"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2837"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2838"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2904"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2905"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2976"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2977"/>
         <source>Select dimension placement point</source>
         <translation>选择测量文字放置点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3577"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3578"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2872"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="2873"/>
         <source>Select an arc</source>
         <translation>选择圆弧</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3724"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3725"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3019"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3020"/>
         <source>Select a circle</source>
         <translation>选择圆</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3747"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3748"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3042"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3043"/>
         <source>Select measurement placement point</source>
         <translation>选择测量文字放置点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3790"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3791"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3085"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3086"/>
         <source>Select a point</source>
         <translation>选择一个点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3803"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3804"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3098"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3099"/>
         <source>Select a line</source>
         <translation>选择一条直线段</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3938"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3939"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3233"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3234"/>
         <source>Select first line</source>
         <translation>选择第一条直线段</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3963"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="3964"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3258"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3259"/>
         <source>Select second line</source>
         <translation>选择第二条直线段</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4049"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4050"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3344"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3345"/>
         <source>Select angle measurement placement point</source>
         <translation>选择角度测量文字放置点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4078"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4082"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3373"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3377"/>
         <source>Select area annotation entity</source>
         <translation>选择面积标注对象</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4139"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4144"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3434"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3439"/>
         <source>Select a hatch entity</source>
         <translation>选择填充实体</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4232"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4238"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3527"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3533"/>
         <source>Select text to modify</source>
         <translation>选择要修改的文字</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4309"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4315"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3604"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3610"/>
         <source>Select text to move</source>
         <translation>选择要移动的文字</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4333"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4334"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3628"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3629"/>
         <source>Select new placement point</source>
         <translation>选择新的放置点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4375"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4381"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3670"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3676"/>
         <source>Select text to copy</source>
         <translation>选择要复制的文字</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4399"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4400"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3694"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3695"/>
         <source>Select copy placement point</source>
         <translation>选择复制文字放置点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4446"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4452"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3741"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3747"/>
         <source>Select area annotation object</source>
         <translation>选择面积标注对象</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4673"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4674"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3968"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="3969"/>
         <source>Select a curve</source>
         <translation>选择一条曲线</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4784"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4785"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4079"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4080"/>
         <source>Select text placement point</source>
         <translation>选择测量文字放置点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4824"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4827"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4910"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4913"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4996"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4999"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4119"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4122"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4205"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4208"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4291"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4294"/>
         <source>Select annotation objects</source>
         <translation>选择标注对象</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4851"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4852"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4937"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4938"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4146"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4147"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4232"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4233"/>
         <source>Select base point</source>
         <translation>选择基点</translation>
     </message>
     <message>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4863"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4864"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4948"/>
-        <location filename="mxcad2d/MxCADCommand.cpp" line="4949"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4158"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4159"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4243"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4244"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4380"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4381"/>
         <source>Select placement point</source>
         <translation>选择放置点</translation>
+    </message>
+    <message>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4354"/>
+        <location filename="mxcad2d/MxCADCommand.cpp" line="4355"/>
+        <source>Select a annotation</source>
+        <translation>选择一个标注对象</translation>
     </message>
 </context>
 <context>
     <name>MxCADViewer</name>
     <message>
-        <location filename="MxCADViewer.cpp" line="98"/>
-        <location filename="MxCADViewer.cpp" line="123"/>
+        <location filename="MxCADViewer.cpp" line="106"/>
+        <location filename="MxCADViewer.cpp" line="131"/>
         <source>&lt;Guest&gt;</source>
         <translation>&lt;游客&gt;</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="115"/>
-        <location filename="MxCADViewer.cpp" line="122"/>
-        <location filename="MxCADViewer.cpp" line="175"/>
+        <location filename="MxCADViewer.cpp" line="123"/>
+        <location filename="MxCADViewer.cpp" line="130"/>
         <location filename="MxCADViewer.cpp" line="183"/>
         <location filename="MxCADViewer.cpp" line="191"/>
-        <location filename="MxCADViewer.cpp" line="218"/>
+        <location filename="MxCADViewer.cpp" line="199"/>
+        <location filename="MxCADViewer.cpp" line="226"/>
         <source>Login</source>
         <translation>登录</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="130"/>
-        <location filename="MxCADViewer.cpp" line="195"/>
+        <location filename="MxCADViewer.cpp" line="138"/>
+        <location filename="MxCADViewer.cpp" line="203"/>
         <source>Please login to continue</source>
         <translation>请登录后继续</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="135"/>
+        <location filename="MxCADViewer.cpp" line="143"/>
         <source>Please upgrade to VIP to continue</source>
         <translation>请先升级为VIP会员后继续</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="157"/>
-        <location filename="MxCADViewer.cpp" line="171"/>
-        <location filename="MxCADViewer.cpp" line="728"/>
+        <location filename="MxCADViewer.cpp" line="165"/>
+        <location filename="MxCADViewer.cpp" line="179"/>
+        <location filename="MxCADViewer.cpp" line="773"/>
         <source>Recent Files</source>
         <translation>最近打开文件</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="166"/>
+        <location filename="MxCADViewer.cpp" line="174"/>
         <source>Open</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="167"/>
+        <location filename="MxCADViewer.cpp" line="175"/>
         <source>Open File</source>
         <oldsource>Open Model</oldsource>
         <translation>打开文件</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="170"/>
+        <location filename="MxCADViewer.cpp" line="178"/>
         <source>Recent</source>
         <translation>最近打开</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="236"/>
+        <location filename="MxCADViewer.cpp" line="244"/>
         <source>Account</source>
         <translation>账号</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="178"/>
+        <location filename="MxCADViewer.cpp" line="186"/>
         <source>Logout</source>
         <translation>退出登录</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="242"/>
-        <location filename="MxCADViewer.cpp" line="243"/>
+        <location filename="MxCADViewer.cpp" line="250"/>
+        <location filename="MxCADViewer.cpp" line="251"/>
         <source>Setting</source>
         <translation>设置</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="245"/>
+        <location filename="MxCADViewer.cpp" line="253"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="246"/>
+        <location filename="MxCADViewer.cpp" line="254"/>
         <source>About MxCADViewer</source>
         <oldsource>About CAD Dream Viewer</oldsource>
         <translation>关于CAD梦想看图</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="248"/>
+        <location filename="MxCADViewer.cpp" line="256"/>
         <source>Language</source>
         <translation>语言</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="249"/>
+        <location filename="MxCADViewer.cpp" line="257"/>
         <source>Language Settings</source>
         <oldsource>Setting Language</oldsource>
         <translation>语言设置</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="251"/>
-        <location filename="MxCADViewer.cpp" line="252"/>
+        <location filename="MxCADViewer.cpp" line="259"/>
+        <location filename="MxCADViewer.cpp" line="260"/>
         <source>English</source>
         <translation>英语</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="253"/>
-        <location filename="MxCADViewer.cpp" line="254"/>
+        <location filename="MxCADViewer.cpp" line="261"/>
+        <location filename="MxCADViewer.cpp" line="262"/>
         <source>Simplified Chinese</source>
         <oldsource>Chinese</oldsource>
         <translation>简体中文</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="261"/>
+        <location filename="MxCADViewer.cpp" line="269"/>
         <source>Exit</source>
         <translation>退出</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="262"/>
+        <location filename="MxCADViewer.cpp" line="270"/>
         <source>Exit App</source>
         <oldsource>Exit Application</oldsource>
         <translation>退出应用程序</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="335"/>
+        <location filename="MxCADViewer.cpp" line="343"/>
         <source>Change Background Color</source>
         <translation>修改背景颜色</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="370"/>
+        <location filename="MxCADViewer.cpp" line="378"/>
         <source>Zoom All</source>
         <translation>全图适应缩放</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="371"/>
+        <location filename="MxCADViewer.cpp" line="379"/>
         <source>Zoom Window</source>
         <translation>窗口适应缩放</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="379"/>
+        <location filename="MxCADViewer.cpp" line="387"/>
         <source>Layer Manager</source>
         <oldsource>Layers</oldsource>
         <translation>图层管理</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="380"/>
+        <location filename="MxCADViewer.cpp" line="388"/>
         <source>Open layer manager</source>
         <translation>打开图层管理</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="389"/>
+        <location filename="MxCADViewer.cpp" line="397"/>
         <source>Undo</source>
         <translation>撤销</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="395"/>
+        <location filename="MxCADViewer.cpp" line="403"/>
         <source>Redo</source>
         <translation>恢复</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="406"/>
+        <location filename="MxCADViewer.cpp" line="414"/>
+        <location filename="MxCADViewer.cpp" line="848"/>
         <source>Extract Text</source>
         <translation>提取文字</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="418"/>
+        <location filename="MxCADViewer.cpp" line="427"/>
+        <location filename="MxCADViewer.cpp" line="849"/>
         <source>Extract Table</source>
         <translation>提取表格</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="421"/>
+        <location filename="MxCADViewer.cpp" line="431"/>
+        <location filename="MxCADViewer.cpp" line="841"/>
         <source>Arc Length</source>
         <translation>弧长</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="424"/>
+        <location filename="MxCADViewer.cpp" line="435"/>
+        <location filename="MxCADViewer.cpp" line="842"/>
         <source>Point to Line Distance</source>
         <translation>点到直线的距离</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="427"/>
+        <location filename="MxCADViewer.cpp" line="439"/>
+        <location filename="MxCADViewer.cpp" line="839"/>
         <source>Continuous Measurement</source>
         <translation>连续测量</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="430"/>
+        <location filename="MxCADViewer.cpp" line="443"/>
+        <location filename="MxCADViewer.cpp" line="840"/>
         <source>Batch Measurement</source>
         <translation>批量测量</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="433"/>
+        <location filename="MxCADViewer.cpp" line="447"/>
         <source>Show Segment Length</source>
         <oldsource>View Segment Length</oldsource>
         <translation>查看分段长度</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="436"/>
+        <location filename="MxCADViewer.cpp" line="454"/>
+        <location filename="MxCADViewer.cpp" line="843"/>
         <source>Area(with arcs)</source>
         <oldsource>Area with Arc</oldsource>
         <translation>面积（含弧线）</translation>
@@ -3308,433 +3449,495 @@ Please ensure you have a default text file viewer installed.</source>
         <translation type="vanished">测量填充面积</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="442"/>
+        <location filename="MxCADViewer.cpp" line="462"/>
+        <location filename="MxCADViewer.cpp" line="850"/>
         <source>Calculate Side Area</source>
         <translation>计算侧面积</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="445"/>
+        <location filename="MxCADViewer.cpp" line="466"/>
+        <location filename="MxCADViewer.cpp" line="851"/>
         <source>Area Offset</source>
         <translation>面积偏移</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="448"/>
+        <location filename="MxCADViewer.cpp" line="470"/>
+        <location filename="MxCADViewer.cpp" line="844"/>
         <source>Circle</source>
         <oldsource>Measure Circle</oldsource>
         <translation>测量圆</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="451"/>
+        <location filename="MxCADViewer.cpp" line="474"/>
+        <location filename="MxCADViewer.cpp" line="845"/>
         <source>Angle</source>
         <oldsource>Measure Angle</oldsource>
         <translation>测量角度</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="468"/>
+        <location filename="MxCADViewer.cpp" line="497"/>
         <source>Split and Export CAD</source>
         <translation>CAD图纸分割导出</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="470"/>
+        <location filename="MxCADViewer.cpp" line="499"/>
         <source>PDF to CAD</source>
         <translation>PDF转CAD</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="472"/>
+        <location filename="MxCADViewer.cpp" line="501"/>
         <source>Export PDF</source>
         <translation>导出PDF</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="474"/>
+        <location filename="MxCADViewer.cpp" line="503"/>
         <source>Batch Export PDF</source>
         <translation>批量导出PDF</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="476"/>
+        <location filename="MxCADViewer.cpp" line="478"/>
         <source>Shortcut Settings</source>
         <translation>快捷键设置</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="478"/>
         <source>Modify Single Dimension</source>
-        <translation>修改单个标注属性</translation>
+        <translation type="vanished">修改单个标注属性</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="479"/>
+        <location filename="MxCADViewer.cpp" line="505"/>
         <source>External Reference Manager</source>
         <translation>外部参照管理</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="480"/>
+        <location filename="MxCADViewer.cpp" line="506"/>
         <source>CAD Gray Display</source>
         <translation>CAD图显示灰色</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="481"/>
+        <location filename="MxCADViewer.cpp" line="507"/>
         <source>T-Arch Convert (to T3)</source>
         <translation>天正图纸转换（转t3）</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="482"/>
+        <location filename="MxCADViewer.cpp" line="508"/>
         <source>CAD Version Conversion</source>
         <translation>CAD图纸版本转换</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="484"/>
+        <location filename="MxCADViewer.cpp" line="510"/>
         <source>Layout to Model</source>
         <translation>布局转模型</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="510"/>
+        <location filename="MxCADViewer.cpp" line="535"/>
         <source>Detect CAD drawing entities</source>
         <translation>识别查找CAD图纸中的实体</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="591"/>
+        <location filename="MxCADViewer.cpp" line="630"/>
         <source>Import/Export Annotations or PDF</source>
         <translation>导入/导出标注对象或PDF</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="594"/>
+        <location filename="MxCADViewer.cpp" line="633"/>
         <source>Annotation Settings</source>
         <translation>标注设置</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="594"/>
+        <location filename="MxCADViewer.cpp" line="633"/>
         <source>Annotation settings</source>
         <translation>标注设置</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="595"/>
+        <location filename="MxCADViewer.cpp" line="636"/>
         <source>Ratio</source>
         <translation>比例</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="595"/>
+        <location filename="MxCADViewer.cpp" line="637"/>
         <source>Annotation ratio setting</source>
         <translation>标注比例设置</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="598"/>
+        <location filename="MxCADViewer.cpp" line="643"/>
         <source>Text Search</source>
         <translation>文字查找</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="599"/>
+        <location filename="MxCADViewer.cpp" line="644"/>
         <source>Locate text in drawings or annotations</source>
         <translation>定位图纸或标注对象中的文字</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="610"/>
+        <location filename="MxCADViewer.cpp" line="656"/>
         <source>Rotate Clockwise 90 Degree</source>
         <translation>顺时针旋转90°</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="611"/>
+        <location filename="MxCADViewer.cpp" line="657"/>
         <source>Rotate Counter-Clockwise 90 Degree</source>
         <translation>逆时针旋转90°</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="118"/>
-        <location filename="MxCADViewer.cpp" line="148"/>
-        <location filename="MxCADViewer.cpp" line="491"/>
+        <location filename="MxCADViewer.cpp" line="126"/>
+        <location filename="MxCADViewer.cpp" line="156"/>
+        <location filename="MxCADViewer.cpp" line="516"/>
         <source>VIP</source>
         <translation>会员</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="117"/>
-        <location filename="MxCADViewer.cpp" line="147"/>
-        <location filename="MxCADViewer.cpp" line="177"/>
-        <location filename="MxCADViewer.cpp" line="191"/>
-        <location filename="MxCADViewer.cpp" line="208"/>
+        <location filename="MxCADViewer.cpp" line="125"/>
+        <location filename="MxCADViewer.cpp" line="155"/>
+        <location filename="MxCADViewer.cpp" line="185"/>
+        <location filename="MxCADViewer.cpp" line="199"/>
+        <location filename="MxCADViewer.cpp" line="216"/>
         <source>Profile</source>
         <translation>个人中心</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="118"/>
-        <location filename="MxCADViewer.cpp" line="148"/>
+        <location filename="MxCADViewer.cpp" line="126"/>
+        <location filename="MxCADViewer.cpp" line="156"/>
         <source>Not VIP</source>
         <translation>非会员</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="130"/>
-        <location filename="MxCADViewer.cpp" line="135"/>
-        <location filename="MxCADViewer.cpp" line="195"/>
-        <location filename="MxCADViewer.cpp" line="743"/>
-        <location filename="MxCADViewer.cpp" line="747"/>
-        <location filename="MxCADViewer.cpp" line="758"/>
-        <location filename="MxCADViewer.cpp" line="762"/>
+        <location filename="MxCADViewer.cpp" line="138"/>
+        <location filename="MxCADViewer.cpp" line="143"/>
+        <location filename="MxCADViewer.cpp" line="203"/>
+        <location filename="MxCADViewer.cpp" line="788"/>
+        <location filename="MxCADViewer.cpp" line="792"/>
+        <location filename="MxCADViewer.cpp" line="803"/>
+        <location filename="MxCADViewer.cpp" line="807"/>
         <source>Tip</source>
         <translation>提示</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="176"/>
+        <location filename="MxCADViewer.cpp" line="184"/>
         <source>Purchase VIP</source>
         <translation>购买会员</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="376"/>
+        <location filename="MxCADViewer.cpp" line="384"/>
         <source>Zoom</source>
         <translation>缩放</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="376"/>
+        <location filename="MxCADViewer.cpp" line="384"/>
         <source>Zoom viewport</source>
         <translation>视口缩放</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="439"/>
+        <location filename="MxCADViewer.cpp" line="450"/>
+        <location filename="MxCADViewer.cpp" line="847"/>
+        <source>Modify Annotation Property</source>
+        <translation>修改标注属性</translation>
+    </message>
+    <message>
+        <location filename="MxCADViewer.cpp" line="458"/>
+        <location filename="MxCADViewer.cpp" line="846"/>
         <source>Hatch Area</source>
         <translation>测量填充面积</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="491"/>
+        <location filename="MxCADViewer.cpp" line="516"/>
         <source>VIP functions</source>
         <translation>会员功能</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="494"/>
+        <location filename="MxCADViewer.cpp" line="519"/>
         <source>Measure</source>
         <translation>测量</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="495"/>
+        <location filename="MxCADViewer.cpp" line="520"/>
         <source>Measure tools</source>
         <translation>测量工具</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="500"/>
+        <location filename="MxCADViewer.cpp" line="525"/>
         <source>Measure Stats</source>
         <oldsource>Statistics</oldsource>
         <translation>测量统计</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="500"/>
+        <location filename="MxCADViewer.cpp" line="525"/>
         <source>Statistics of measurement data</source>
         <translation>测量数据统计</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="501"/>
+        <location filename="MxCADViewer.cpp" line="526"/>
         <source>Drawing Compare</source>
         <oldsource>Compare</oldsource>
         <translation>图纸对比</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="501"/>
+        <location filename="MxCADViewer.cpp" line="526"/>
         <source>Compare drawing differences</source>
         <translation>对比图纸差异</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="504"/>
-        <location filename="MxCADViewer.cpp" line="510"/>
+        <location filename="MxCADViewer.cpp" line="529"/>
+        <location filename="MxCADViewer.cpp" line="535"/>
         <source>Entity Recognition</source>
         <oldsource>Recognize Shapes</oldsource>
         <translation>图形识别</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="506"/>
+        <location filename="MxCADViewer.cpp" line="531"/>
         <source>View Detected Entities</source>
         <oldsource>View Recognized Shapes</oldsource>
         <translation>查看已识别的图形</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="516"/>
+        <location filename="MxCADViewer.cpp" line="541"/>
+        <location filename="MxCADViewer.cpp" line="852"/>
         <source>Single Line Text</source>
         <translation>单行文字</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="518"/>
+        <location filename="MxCADViewer.cpp" line="544"/>
+        <location filename="MxCADViewer.cpp" line="853"/>
         <source>Multi Line Text</source>
         <translation>多行文字</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="520"/>
+        <location filename="MxCADViewer.cpp" line="547"/>
+        <location filename="MxCADViewer.cpp" line="854"/>
         <source>Numbered Text</source>
         <translation>编号文字</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="522"/>
+        <location filename="MxCADViewer.cpp" line="550"/>
         <source>Modify Text</source>
         <translation>修改文字</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="524"/>
+        <location filename="MxCADViewer.cpp" line="552"/>
         <source>Move Text</source>
         <translation>移动文字</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="526"/>
+        <location filename="MxCADViewer.cpp" line="554"/>
         <source>Copy Text</source>
         <translation>复制文字</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="534"/>
+        <location filename="MxCADViewer.cpp" line="562"/>
         <source>Text</source>
         <translation>文字</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="534"/>
+        <location filename="MxCADViewer.cpp" line="562"/>
         <source>Create or modify text</source>
         <translation>创建或修改文字</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="537"/>
+        <location filename="MxCADViewer.cpp" line="565"/>
+        <location filename="MxCADViewer.cpp" line="566"/>
+        <location filename="MxCADViewer.cpp" line="838"/>
         <source>Draw Line</source>
         <translation>画直线</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="541"/>
+        <location filename="MxCADViewer.cpp" line="575"/>
+        <location filename="MxCADViewer.cpp" line="856"/>
         <source>Rectangle</source>
         <translation>矩形</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="543"/>
+        <location filename="MxCADViewer.cpp" line="578"/>
+        <location filename="MxCADViewer.cpp" line="855"/>
         <source>Ellipse</source>
         <translation>椭圆</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="545"/>
+        <location filename="MxCADViewer.cpp" line="581"/>
+        <location filename="MxCADViewer.cpp" line="857"/>
         <source>Cloud</source>
         <translation>云线</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="547"/>
+        <location filename="MxCADViewer.cpp" line="584"/>
+        <location filename="MxCADViewer.cpp" line="858"/>
         <source>Leader</source>
         <translation>引线</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="556"/>
+        <location filename="MxCADViewer.cpp" line="594"/>
         <source>Picture</source>
         <translation>图片</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="557"/>
+        <location filename="MxCADViewer.cpp" line="595"/>
         <source>Freehand</source>
         <translation>任意线</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="559"/>
+        <location filename="MxCADViewer.cpp" line="597"/>
         <source>Shapes</source>
         <translation>形状</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="563"/>
+        <location filename="MxCADViewer.cpp" line="601"/>
+        <location filename="MxCADViewer.cpp" line="859"/>
         <source>Delete Annotation</source>
         <translation>删除标注</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="565"/>
+        <location filename="MxCADViewer.cpp" line="604"/>
         <source>Delete All Annotations</source>
         <translation>删除所有标注</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="567"/>
+        <location filename="MxCADViewer.cpp" line="606"/>
         <source>Confirm</source>
         <translation>确认</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="567"/>
+        <location filename="MxCADViewer.cpp" line="606"/>
         <source>Are you sure you want to delete all annotations?</source>
         <translation>你确认要删除所有标注吗？</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="572"/>
+        <location filename="MxCADViewer.cpp" line="611"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="572"/>
+        <location filename="MxCADViewer.cpp" line="611"/>
         <source>Delete one or more annotations</source>
         <translation>删除一个或多个标注</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="575"/>
+        <location filename="MxCADViewer.cpp" line="614"/>
         <source>Hide Annotations</source>
         <translation>隐藏/显示标注</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="575"/>
+        <location filename="MxCADViewer.cpp" line="614"/>
         <source>Hide or show all annotations</source>
         <translation>隐藏或显示所有标注</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="586"/>
+        <location filename="MxCADViewer.cpp" line="625"/>
         <source>Import Drawing and Annotations</source>
         <translation>导入图纸和标注</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="587"/>
+        <location filename="MxCADViewer.cpp" line="626"/>
         <source>Export Drawing and Annotations</source>
         <translation>导出图纸和标注</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="591"/>
+        <location filename="MxCADViewer.cpp" line="630"/>
         <source>Import/Export</source>
         <translation>导入/导出</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="743"/>
+        <location filename="MxCADViewer.cpp" line="788"/>
         <source>The current language is English. No changes are needed.</source>
         <translation>当前语言已经是英语，无需改变</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="747"/>
-        <location filename="MxCADViewer.cpp" line="762"/>
+        <location filename="MxCADViewer.cpp" line="792"/>
+        <location filename="MxCADViewer.cpp" line="807"/>
         <source>Language settings updated successfully. The changes will take effect after restarting the application. Do you want to restart the application immediately?</source>
         <translation>语言设置成功，重启应用程序后生效，是否立即重启应用程序？</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="758"/>
+        <location filename="MxCADViewer.cpp" line="803"/>
         <source>The current language is Chinese. No changes are needed.</source>
         <translation>当前语言已经是简体中文，无需改变</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="612"/>
+        <location filename="MxCADViewer.cpp" line="860"/>
+        <source>Move Annotation</source>
+        <translation>移动标注</translation>
+    </message>
+    <message>
+        <location filename="MxCADViewer.cpp" line="861"/>
+        <source>Copy Annotation</source>
+        <translation>复制标注</translation>
+    </message>
+    <message>
+        <location filename="MxCADViewer.cpp" line="862"/>
+        <source>Aligned</source>
+        <translation>对齐</translation>
+    </message>
+    <message>
+        <location filename="MxCADViewer.cpp" line="863"/>
+        <source>Linear</source>
+        <translation>线性</translation>
+    </message>
+    <message>
+        <location filename="MxCADViewer.cpp" line="864"/>
+        <source>Area</source>
+        <translation>面积</translation>
+    </message>
+    <message>
+        <location filename="MxCADViewer.cpp" line="865"/>
+        <source>Rectangular Area</source>
+        <translation>矩形面积</translation>
+    </message>
+    <message>
+        <location filename="MxCADViewer.cpp" line="866"/>
+        <source>Coordinate</source>
+        <translation>坐标标注</translation>
+    </message>
+    <message>
+        <location filename="MxCADViewer.cpp" line="867"/>
+        <source>Radius</source>
+        <translation>半径</translation>
+    </message>
+    <message>
+        <source>222</source>
+        <translation type="obsolete">222</translation>
+    </message>
+    <message>
+        <location filename="MxCADViewer.cpp" line="658"/>
         <source>Custom Rotation</source>
         <translation>自定义旋转</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="614"/>
+        <location filename="MxCADViewer.cpp" line="660"/>
         <source>Restore Initial View</source>
         <translation>恢复到初始视图</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="615"/>
+        <location filename="MxCADViewer.cpp" line="661"/>
         <source>Rotate View</source>
         <translation>旋转视图</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="615"/>
+        <location filename="MxCADViewer.cpp" line="661"/>
         <source>Rotate viewport</source>
         <translation>旋转视图</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="618"/>
+        <location filename="MxCADViewer.cpp" line="664"/>
         <source>Print</source>
         <translation>打印</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="619"/>
         <source>Annotation Categories</source>
-        <translation>标注分类</translation>
+        <translation type="vanished">标注分类</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="619"/>
         <source>Open annotation categories manager</source>
-        <translation>打开标注分类管理</translation>
+        <translation type="vanished">打开标注分类管理</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="694"/>
+        <location filename="MxCADViewer.cpp" line="739"/>
         <source>Open Containing Folder</source>
         <translation>打开至所在文件夹</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="704"/>
+        <location filename="MxCADViewer.cpp" line="749"/>
         <source>Select File</source>
         <translation>选择文件</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="705"/>
+        <location filename="MxCADViewer.cpp" line="750"/>
         <source>All Files (*.*);;CAD Files (*.dwg *.dxf *.mxweb);;STEP Files (*.step *.stp);;IGES Files (*.iges *.igs);;STL Files (*.stl);;VRML Files (*.wrl *.wrz *.vrml);;BREP Files (*.brep *.rle *.occ);;glTF Files (*.gltf *.glb);;OBJ Files (*.obj)</source>
         <translation>所有文件 (*.*);;CAD文件 (*.dwg *.dxf *.mxweb);;STEP文件 (*.step *.stp);;IGES文件 (*.iges *.igs);;STL文件 (*.stl);;VRML文件 (*.wrl *.wrz *.vrml);;BREP文件 (*.brep *.rle *.occ);;glTF文件 (*.gltf *.glb);;OBJ文件 (*.obj)</translation>
     </message>
@@ -3743,12 +3946,12 @@ Please ensure you have a default text file viewer installed.</source>
         <translation type="vanished">设置成功，重启应用后生效</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="781"/>
+        <location filename="MxCADViewer.cpp" line="826"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="781"/>
+        <location filename="MxCADViewer.cpp" line="826"/>
         <source>Failed to start new application process. Restart aborted.</source>
         <translation>新的进程启动失败，重启中断</translation>
     </message>
@@ -3757,57 +3960,57 @@ Please ensure you have a default text file viewer installed.</source>
         <translation type="vanished">设置成功，重启应用后生效</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="853"/>
-        <location filename="MxCADViewer.cpp" line="871"/>
+        <location filename="MxCADViewer.cpp" line="963"/>
+        <location filename="MxCADViewer.cpp" line="981"/>
         <source>Open Failed</source>
         <translation>打开失败</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="853"/>
+        <location filename="MxCADViewer.cpp" line="963"/>
         <source>File does not exist!</source>
         <translation>文件不存在！</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="871"/>
+        <location filename="MxCADViewer.cpp" line="981"/>
         <source>Unsupported file format!</source>
         <translation>不支持的文件格式！</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="937"/>
+        <location filename="MxCADViewer.cpp" line="1047"/>
         <source>Convert File: </source>
         <translation>转换文件：</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="943"/>
-        <location filename="MxCADViewer.cpp" line="999"/>
+        <location filename="MxCADViewer.cpp" line="1053"/>
+        <location filename="MxCADViewer.cpp" line="1109"/>
         <source>Reading: </source>
         <translation>正在读取：</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="951"/>
-        <location filename="MxCADViewer.cpp" line="969"/>
-        <location filename="MxCADViewer.cpp" line="974"/>
+        <location filename="MxCADViewer.cpp" line="1061"/>
+        <location filename="MxCADViewer.cpp" line="1079"/>
+        <location filename="MxCADViewer.cpp" line="1084"/>
         <source>Failed</source>
         <translation>失败</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="951"/>
+        <location filename="MxCADViewer.cpp" line="1061"/>
         <source>Failed to read file:%1</source>
         <translation>文件读取失败：%1</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="956"/>
-        <location filename="MxCADViewer.cpp" line="1003"/>
+        <location filename="MxCADViewer.cpp" line="1066"/>
+        <location filename="MxCADViewer.cpp" line="1113"/>
         <source>Rendering...</source>
         <translation>渲染中...</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="969"/>
+        <location filename="MxCADViewer.cpp" line="1079"/>
         <source>Failed to run mxconvert!</source>
         <translation>mxconvert图纸转换程序运行失败！</translation>
     </message>
     <message>
-        <location filename="MxCADViewer.cpp" line="974"/>
+        <location filename="MxCADViewer.cpp" line="1084"/>
         <source>Failed to convert! error:%1</source>
         <translation>转换失败！错误：%1</translation>
     </message>
@@ -3815,349 +4018,273 @@ Please ensure you have a default text file viewer installed.</source>
 <context>
     <name>MxForgetPasswordWidget</name>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.ui" line="14"/>
         <source>Form</source>
-        <translation>窗体</translation>
+        <translation type="vanished">窗体</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.ui" line="84"/>
         <source>Forgot Password</source>
-        <translation>忘记密码</translation>
+        <translation type="vanished">忘记密码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.ui" line="97"/>
         <source>Retrieve your password via mobile, securely and quickly</source>
-        <translation>运用手机号找回密码，安全快捷</translation>
+        <translation type="vanished">运用手机号找回密码，安全快捷</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.ui" line="129"/>
         <source>Image</source>
-        <translation>图片</translation>
+        <translation type="vanished">图片</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.ui" line="184"/>
         <source>Reset Password</source>
-        <translation>重置密码</translation>
+        <translation type="vanished">重置密码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.ui" line="212"/>
         <source>Login Now</source>
-        <translation>立即登录</translation>
+        <translation type="vanished">立即登录</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.ui" line="250"/>
         <source>Please enter your phone number</source>
-        <translation>请输入手机号</translation>
+        <translation type="vanished">请输入手机号</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.ui" line="267"/>
         <source>Please enter new password</source>
-        <translation>请输入新的密码</translation>
+        <translation type="vanished">请输入新的密码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.ui" line="284"/>
         <source>Please enter new password again</source>
-        <translation>请再次输入新的密码</translation>
+        <translation type="vanished">请再次输入新的密码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.ui" line="303"/>
         <source>Please enter the graphic code</source>
-        <translation>请输入图形验证码</translation>
+        <translation type="vanished">请输入图形验证码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.ui" line="343"/>
         <source>Please enter SMS code</source>
-        <translation>请输入短信验证码</translation>
+        <translation type="vanished">请输入短信验证码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.ui" line="367"/>
-        <location filename="mxlogin/mxforgetpasswordwidget.cpp" line="49"/>
         <source>Get Code</source>
-        <translation>获取验证码</translation>
+        <translation type="vanished">获取验证码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.ui" line="415"/>
         <source>Confirm Reset</source>
-        <translation>确认重置</translation>
+        <translation type="vanished">确认重置</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.cpp" line="107"/>
-        <location filename="mxlogin/mxforgetpasswordwidget.cpp" line="125"/>
         <source>Resend (%1s)</source>
-        <translation>重新发送（%1s）</translation>
+        <translation type="vanished">重新发送（%1s）</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.cpp" line="172"/>
         <source>Verification code has been sent.</source>
-        <translation>短信验证码已发送</translation>
+        <translation type="vanished">短信验证码已发送</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.cpp" line="176"/>
         <source>Failed to send code, please try again later.</source>
-        <translation>短信验证码发送失败，请稍后再试</translation>
+        <translation type="vanished">短信验证码发送失败，请稍后再试</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.cpp" line="180"/>
         <source>Incorrect graphic code.</source>
-        <translation>图形验证码错误</translation>
+        <translation type="vanished">图形验证码错误</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.cpp" line="188"/>
         <source>Invalid phone number format.</source>
-        <translation>手机号格式错误</translation>
+        <translation type="vanished">手机号格式错误</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.cpp" line="214"/>
         <source>This phone number is not registered.</source>
-        <translation>手机号未注册</translation>
+        <translation type="vanished">手机号未注册</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.cpp" line="225"/>
         <source>Graphic code cannot be empty.</source>
-        <translation>图形验证码不能为空</translation>
+        <translation type="vanished">图形验证码不能为空</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.cpp" line="262"/>
         <source>Password reset successful. Please log in again.</source>
-        <translation>密码重置成功，请重新登录</translation>
+        <translation type="vanished">密码重置成功，请重新登录</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.cpp" line="266"/>
         <source>Error: </source>
-        <translation>错误：</translation>
+        <translation type="vanished">错误：</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.cpp" line="278"/>
         <source>Password must contain a letter and be at least 5 characters long.</source>
-        <translation>密码应至少包含1个英文字母，并且长度不低于5个字符</translation>
+        <translation type="vanished">密码应至少包含1个英文字母，并且长度不低于5个字符</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.cpp" line="282"/>
         <source>The two passwords do not match.</source>
-        <translation>两次输入的密码不一致</translation>
+        <translation type="vanished">两次输入的密码不一致</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.cpp" line="286"/>
-        <location filename="mxlogin/mxforgetpasswordwidget.cpp" line="316"/>
         <source>SMS code cannot be empty.</source>
-        <translation>短信验证码不能为空</translation>
+        <translation type="vanished">短信验证码不能为空</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxforgetpasswordwidget.cpp" line="344"/>
         <source>Incorrect SMS code.</source>
-        <translation>短信验证码错误</translation>
+        <translation type="vanished">短信验证码错误</translation>
     </message>
 </context>
 <context>
     <name>MxNetworkManager</name>
     <message>
-        <location filename="mxlogin/MxNetworkManager.cpp" line="37"/>
-        <location filename="mxlogin/MxNetworkManager.cpp" line="48"/>
-        <location filename="mxlogin/MxNetworkManager.cpp" line="55"/>
         <source>Error</source>
-        <translation>错误</translation>
+        <translation type="vanished">错误</translation>
     </message>
     <message>
-        <location filename="mxlogin/MxNetworkManager.cpp" line="38"/>
         <source>Network request failed: %1</source>
-        <translation>网络请求失败：%1</translation>
+        <translation type="vanished">网络请求失败：%1</translation>
     </message>
     <message>
-        <location filename="mxlogin/MxNetworkManager.cpp" line="49"/>
         <source>Failed to parse response data: %1</source>
-        <translation>响应数据解析失败：%1</translation>
+        <translation type="vanished">响应数据解析失败：%1</translation>
     </message>
     <message>
-        <location filename="mxlogin/MxNetworkManager.cpp" line="55"/>
         <source>Response data format error</source>
-        <translation>响应数据格式错误</translation>
+        <translation type="vanished">响应数据格式错误</translation>
     </message>
 </context>
 <context>
     <name>MxPersonalCenterWidget</name>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.ui" line="14"/>
         <source>Form</source>
-        <translation>窗体</translation>
+        <translation type="vanished">窗体</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.ui" line="62"/>
         <source>small avatar</source>
-        <translation>小头像</translation>
+        <translation type="vanished">小头像</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.ui" line="75"/>
-        <location filename="mxlogin/mxpersonalcenterwidget.ui" line="346"/>
-        <location filename="mxlogin/mxpersonalcenterwidget.ui" line="395"/>
-        <location filename="mxlogin/mxpersonalcenterwidget.ui" line="428"/>
         <source>no data</source>
-        <translation>无数据</translation>
+        <translation type="vanished">无数据</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.ui" line="119"/>
         <source>Personal Info</source>
-        <translation>个人信息</translation>
+        <translation type="vanished">个人信息</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.ui" line="166"/>
         <source>Purchase/Renew</source>
-        <translation>购买/续费</translation>
+        <translation type="vanished">购买/续费</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.ui" line="218"/>
         <source>VIP</source>
-        <translation>VIP</translation>
+        <translation type="vanished">VIP</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.ui" line="254"/>
-        <location filename="mxlogin/mxpersonalcenterwidget.cpp" line="184"/>
         <source>After purchase or renew, your new VIP expiration date will be:</source>
-        <translation>购买/续费成功后，当前VIP会员到期时间为：</translation>
+        <translation type="vanished">购买/续费成功后，当前VIP会员到期时间为：</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.ui" line="271"/>
         <source>2025-12-21</source>
-        <translation>2025-12-21</translation>
+        <translation type="vanished">2025-12-21</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.ui" line="356"/>
         <source>Account:</source>
-        <translation>账号：</translation>
+        <translation type="vanished">账号：</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.ui" line="369"/>
         <source>Nickname:</source>
-        <translation>昵称：</translation>
+        <translation type="vanished">昵称：</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.ui" line="382"/>
         <source>Status:</source>
-        <translation>状态：</translation>
+        <translation type="vanished">状态：</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.ui" line="418"/>
         <source>Logout</source>
-        <translation>退出登录</translation>
+        <translation type="vanished">退出登录</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.ui" line="463"/>
         <source>big avatar</source>
-        <translation>大头像</translation>
+        <translation type="vanished">大头像</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.ui" line="647"/>
         <source>Refresh</source>
-        <translation>刷新</translation>
+        <translation type="vanished">刷新</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.ui" line="656"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;h3 style=&quot; margin-top:2px; margin-bottom:2px; margin-left:2px; margin-right:2px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:large; font-weight:600;&quot;&gt;Service Description&lt;/span&gt;&lt;/h3&gt;&lt;p&gt;1. Once the membership service is activated, refunds are not supported. &lt;/p&gt;&lt;p&gt;2. After activating the membership service, you can use the member functions corresponding to your membership level. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;Note: If you do not receive a prompt for successful membership activation (renewal) after payment, refresh the page to check the membership status.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;h3 style=&quot; margin-top:2px; margin-bottom:2px; margin-left:2px; margin-right:2px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:large; font-weight:600;&quot;&gt;Service Description&lt;/span&gt;&lt;/h3&gt;&lt;p&gt;1. Once the membership service is activated, refunds are not supported. &lt;/p&gt;&lt;p&gt;2. After activating the membership service, you can use the member functions corresponding to your membership level. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#ed583a;&quot;&gt;Note: If you do not receive a prompt for successful membership activation (renewal) after payment, refresh the page to check the membership status.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;h3 style=&quot; margin-top:2px; margin-bottom:2px; margin-left:2px; margin-right:2px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:large; font-weight:600;&quot;&gt;服务说明&lt;/span&gt;&lt;/h3&gt;&lt;p&gt;1.会员服务开通后，不支持退款。&lt;/p&gt;&lt;p&gt;2.会员服务开通后，可使用相应级别会员功能。&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;注：付款成功后未收到会员开通（续费）成功提示，请刷新页面查看会员到账情况。&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;h3 style=&quot; margin-top:2px; margin-bottom:2px; margin-left:2px; margin-right:2px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:large; font-weight:600;&quot;&gt;服务说明&lt;/span&gt;&lt;/h3&gt;&lt;p&gt;1.会员服务开通后，不支持退款。&lt;/p&gt;&lt;p&gt;2.会员服务开通后，可使用相应级别会员功能。&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;注：付款成功后未收到会员开通（续费）成功提示，请刷新页面查看会员到账情况。&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.cpp" line="33"/>
         <source>WeChat Pay</source>
-        <translation>微信支付</translation>
+        <translation type="vanished">微信支付</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.cpp" line="38"/>
-        <location filename="mxlogin/mxpersonalcenterwidget.cpp" line="43"/>
-        <location filename="mxlogin/mxpersonalcenterwidget.cpp" line="48"/>
         <source>CNY</source>
-        <translation>¥</translation>
+        <translation type="vanished">¥</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.cpp" line="41"/>
         <source>/One Month</source>
-        <translation>/每月</translation>
+        <translation type="vanished">/每月</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.cpp" line="46"/>
         <source>/Six Months</source>
-        <translation>/半年</translation>
+        <translation type="vanished">/半年</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.cpp" line="51"/>
         <source>/One Year</source>
-        <translation>/一年</translation>
+        <translation type="vanished">/一年</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.cpp" line="75"/>
         <source>VIP Expiration Date:%1</source>
         <oldsource>VIP Expires: %1</oldsource>
-        <translation>会员到期时间：%1</translation>
+        <translation type="vanished">会员到期时间：%1</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.cpp" line="78"/>
         <source>Non-VIP Membership</source>
         <oldsource>Not a VIP Member</oldsource>
-        <translation>非会员</translation>
+        <translation type="vanished">非会员</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.cpp" line="173"/>
         <source>VIP members can access more exclusive features</source>
         <oldsource>VIP members can use exclusive features.</oldsource>
-        <translation>VIP会员可以使用更多专属功能</translation>
+        <translation type="vanished">VIP会员可以使用更多专属功能</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.cpp" line="328"/>
         <source>Payment successful!</source>
-        <translation>支付成功！</translation>
+        <translation type="vanished">支付成功！</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.cpp" line="337"/>
         <source>System error during payment check.</source>
-        <translation>支付时发生系统错误</translation>
+        <translation type="vanished">支付时发生系统错误</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpersonalcenterwidget.cpp" line="354"/>
         <source>Logout error: %1</source>
-        <translation>退出登录错误：%1</translation>
+        <translation type="vanished">退出登录错误：%1</translation>
     </message>
 </context>
 <context>
     <name>MxPriceWidget</name>
     <message>
-        <location filename="mxlogin/mxpricewidget.ui" line="14"/>
         <source>Form</source>
-        <translation>窗体</translation>
+        <translation type="vanished">窗体</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpricewidget.ui" line="90"/>
         <source>HOT</source>
-        <translation>HOT</translation>
+        <translation type="vanished">HOT</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpricewidget.ui" line="123"/>
         <source>Origin Price: </source>
-        <translation>原价：</translation>
+        <translation type="vanished">原价：</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpricewidget.ui" line="136"/>
-        <location filename="mxlogin/mxpricewidget.ui" line="221"/>
         <source>CNY</source>
-        <translation>¥</translation>
+        <translation type="vanished">¥</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpricewidget.ui" line="149"/>
         <source> 30.00</source>
-        <translation> 30.00</translation>
+        <translation type="vanished"> 30.00</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpricewidget.ui" line="236"/>
         <source>24</source>
-        <translation>24</translation>
+        <translation type="vanished">24</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpricewidget.ui" line="249"/>
         <source>/One Month</source>
-        <translation>/每月</translation>
+        <translation type="vanished">/每月</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxpricewidget.ui" line="337"/>
         <source>price checked</source>
-        <translation>选中图标</translation>
+        <translation type="vanished">选中图标</translation>
     </message>
 </context>
 <context>
@@ -4247,412 +4374,326 @@ Please ensure you have a default text file viewer installed.</source>
 <context>
     <name>MxRegisterUserWidget</name>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.ui" line="14"/>
         <source>Form</source>
-        <translation>窗体</translation>
+        <translation type="vanished">窗体</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.ui" line="84"/>
         <source>New User Registration</source>
-        <translation>新用户注册</translation>
+        <translation type="vanished">新用户注册</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.ui" line="97"/>
         <source>Join us for a different tech life!</source>
-        <translation>加入我们，给你不一样的科技未来！</translation>
+        <translation type="vanished">加入我们，给你不一样的科技未来！</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.ui" line="129"/>
         <source>Image</source>
-        <translation>图片</translation>
+        <translation type="vanished">图片</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.ui" line="184"/>
         <source>Create New Account</source>
-        <translation>新账号注册</translation>
+        <translation type="vanished">新账号注册</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.ui" line="212"/>
         <source>Login Now</source>
-        <translation>立即登录</translation>
+        <translation type="vanished">立即登录</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.ui" line="250"/>
         <source>Please enter a username</source>
-        <translation>请输入用户名</translation>
+        <translation type="vanished">请输入用户名</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.ui" line="267"/>
         <source>Please enter your phone number</source>
-        <translation>请输入手机号</translation>
+        <translation type="vanished">请输入手机号</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.ui" line="284"/>
         <source>Please enter password</source>
-        <translation>请输入密码</translation>
+        <translation type="vanished">请输入密码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.ui" line="301"/>
         <source>Please enter password again</source>
-        <translation>请再次输入密码</translation>
+        <translation type="vanished">请再次输入密码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.ui" line="320"/>
         <source>Please enter the graphic code</source>
-        <translation>请输入图形验证码</translation>
+        <translation type="vanished">请输入图形验证码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.ui" line="360"/>
         <source>Please enter SMS code</source>
-        <translation>请输入短信验证码</translation>
+        <translation type="vanished">请输入短信验证码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.ui" line="384"/>
-        <location filename="mxlogin/mxregisteruserwidget.cpp" line="53"/>
         <source>Get Code</source>
-        <translation>获取验证码</translation>
+        <translation type="vanished">获取验证码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.ui" line="398"/>
         <source>I have read and agree to</source>
-        <translation>我已阅读并同意</translation>
+        <translation type="vanished">我已阅读并同意</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.ui" line="408"/>
         <source>&lt;span&gt;&lt;a href=&apos;#open_terms_of_service&apos;&gt;&amp;lt;&amp;lt;Terms of Service&amp;gt;&amp;gt;&lt;/a&gt;and&lt;a href=&apos;#open_privacy_policy&apos;&gt;&amp;lt;&amp;lt;Privacy Policy &amp;gt;&amp;gt;&lt;/a&gt;&lt;/span&gt;</source>
-        <translation>&lt;span&gt;&lt;a href=&apos;#open_terms_of_service&apos;&gt;《服务条款》&lt;/a&gt;和&lt;a href=&apos;#open_privacy_policy&apos;&gt;《隐私政策》&lt;/a&gt;&lt;/span&gt;</translation>
+        <translation type="vanished">&lt;span&gt;&lt;a href=&apos;#open_terms_of_service&apos;&gt;《服务条款》&lt;/a&gt;和&lt;a href=&apos;#open_privacy_policy&apos;&gt;《隐私政策》&lt;/a&gt;&lt;/span&gt;</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.ui" line="433"/>
         <source>Please read and agree to the &lt;&lt;Terms of Service&gt;&gt; and &lt;&lt;Privacy Policy&gt;&gt; first</source>
-        <translation>请先阅读并同意《服务条款》和《隐私政策》</translation>
+        <translation type="vanished">请先阅读并同意《服务条款》和《隐私政策》</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.ui" line="479"/>
         <source>Register Now</source>
-        <translation>立即注册</translation>
+        <translation type="vanished">立即注册</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.cpp" line="118"/>
-        <location filename="mxlogin/mxregisteruserwidget.cpp" line="146"/>
         <source>Resend (%1s)</source>
-        <translation>重新发送（%1s）</translation>
+        <translation type="vanished">重新发送（%1s）</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.cpp" line="176"/>
         <source>Username cannot be empty.</source>
-        <translation>用户名不能为空</translation>
+        <translation type="vanished">用户名不能为空</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.cpp" line="180"/>
-        <location filename="mxlogin/mxregisteruserwidget.cpp" line="276"/>
         <source>Invalid phone number format.</source>
-        <translation>手机号格式错误</translation>
+        <translation type="vanished">手机号格式错误</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.cpp" line="184"/>
         <source>Password must contain a letter and be at least 5 characters long.</source>
-        <translation>密码应至少包含1个英文字母，并且长度不低于5个字符</translation>
+        <translation type="vanished">密码应至少包含1个英文字母，并且长度不低于5个字符</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.cpp" line="188"/>
         <source>The two passwords do not match.</source>
-        <translation>两次输入的密码不一致</translation>
+        <translation type="vanished">两次输入的密码不一致</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.cpp" line="192"/>
         <source>Please enter the verification code.</source>
-        <translation>请输入短信验证码</translation>
+        <translation type="vanished">请输入短信验证码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.cpp" line="196"/>
         <source>Please agree to the user agreement.</source>
-        <translation>请先同意用户协议</translation>
+        <translation type="vanished">请先同意用户协议</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.cpp" line="219"/>
-        <location filename="mxlogin/mxregisteruserwidget.cpp" line="303"/>
         <source>Network request failed: </source>
-        <translation>网络请求失败：</translation>
+        <translation type="vanished">网络请求失败：</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.cpp" line="224"/>
         <source>Failed to parse server response.</source>
-        <translation>响应数据解析失败</translation>
+        <translation type="vanished">响应数据解析失败</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.cpp" line="231"/>
         <source>Registration successful.</source>
-        <translation>注册成功</translation>
+        <translation type="vanished">注册成功</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.cpp" line="236"/>
         <source>Incorrect or expired code.</source>
-        <translation>短信验证码错误或过期</translation>
+        <translation type="vanished">短信验证码错误或过期</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.cpp" line="239"/>
         <source>System error or user already exists.</source>
-        <translation>系统错误或用户已存在</translation>
+        <translation type="vanished">系统错误或用户已存在</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.cpp" line="281"/>
         <source>Please enter the graphic code.</source>
-        <translation>请输入图形验证码</translation>
+        <translation type="vanished">请输入图形验证码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.cpp" line="312"/>
         <source>Verification code sent.</source>
-        <translation>短信验证码已发送</translation>
+        <translation type="vanished">短信验证码已发送</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.cpp" line="316"/>
         <source>Failed to send code, please try again later.</source>
-        <translation>短信验证码发送失败，请稍后再试</translation>
+        <translation type="vanished">短信验证码发送失败，请稍后再试</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxregisteruserwidget.cpp" line="320"/>
         <source>Incorrect graphic code.</source>
-        <translation>图形验证码错误</translation>
+        <translation type="vanished">图形验证码错误</translation>
     </message>
 </context>
 <context>
     <name>MxSMSLoginWidget</name>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.ui" line="14"/>
         <source>Form</source>
-        <translation>窗体</translation>
+        <translation type="vanished">窗体</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.ui" line="84"/>
         <source>MxCAD Cloud</source>
-        <translation>MxCAD云图</translation>
+        <translation type="vanished">MxCAD云图</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.ui" line="97"/>
         <source>A high-speed CAD drawing collaboration platform</source>
-        <translation>极速的CAD图纸协同平台</translation>
+        <translation type="vanished">极速的CAD图纸协同平台</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.ui" line="129"/>
         <source>Image</source>
-        <translation>图片</translation>
+        <translation type="vanished">图片</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.ui" line="185"/>
         <source>Account Login</source>
-        <translation>账号登录</translation>
+        <translation type="vanished">账号登录</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.ui" line="211"/>
         <source>SMS Quick Login</source>
-        <translation>短信快捷登录</translation>
+        <translation type="vanished">短信快捷登录</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.ui" line="249"/>
         <source>Please enter your phone number</source>
-        <translation>请输入手机号</translation>
+        <translation type="vanished">请输入手机号</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.ui" line="268"/>
         <source>Please enter the graphic code</source>
-        <translation>请输入图形验证码</translation>
+        <translation type="vanished">请输入图形验证码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.ui" line="308"/>
         <source>Please enter SMS code</source>
-        <translation>请输入短信验证码</translation>
+        <translation type="vanished">请输入短信验证码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.ui" line="332"/>
-        <location filename="mxlogin/mxsmsloginwidget.cpp" line="53"/>
         <source>Get Code</source>
-        <translation>获取验证码</translation>
+        <translation type="vanished">获取验证码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.ui" line="380"/>
         <source>Login</source>
-        <translation>登录</translation>
+        <translation type="vanished">登录</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.ui" line="392"/>
         <source>Other login methods:</source>
-        <translation>其它登录方式：</translation>
+        <translation type="vanished">其它登录方式：</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.ui" line="411"/>
         <source>wxLogo</source>
-        <translation>微信图标</translation>
+        <translation type="vanished">微信图标</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.cpp" line="85"/>
-        <location filename="mxlogin/mxsmsloginwidget.cpp" line="123"/>
         <source>Resend (%1s)</source>
-        <translation>重新发送（%1s）</translation>
+        <translation type="vanished">重新发送（%1s）</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.cpp" line="178"/>
-        <location filename="mxlogin/mxsmsloginwidget.cpp" line="231"/>
         <source>Invalid phone number format.</source>
-        <translation>手机号格式错误</translation>
+        <translation type="vanished">手机号格式错误</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.cpp" line="183"/>
         <source>Please enter the graphic code.</source>
-        <translation>请输入图形验证码</translation>
+        <translation type="vanished">请输入图形验证码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.cpp" line="213"/>
         <source>Verification code sent.</source>
-        <translation>短信验证码已发送</translation>
+        <translation type="vanished">短信验证码已发送</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.cpp" line="217"/>
         <source>Failed to send verification code.</source>
-        <translation>短信验证码发送失败</translation>
+        <translation type="vanished">短信验证码发送失败</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.cpp" line="221"/>
         <source>Incorrect graphic code.</source>
-        <translation>图形验证码错误</translation>
+        <translation type="vanished">图形验证码错误</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.cpp" line="235"/>
         <source>Please enter the SMS code.</source>
-        <translation>请输入短信验证码</translation>
+        <translation type="vanished">请输入短信验证码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.cpp" line="257"/>
         <source>Network Error: </source>
-        <translation>网络错误：</translation>
+        <translation type="vanished">网络错误：</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.cpp" line="268"/>
         <source>Login successful.</source>
-        <translation>登录成功</translation>
+        <translation type="vanished">登录成功</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.cpp" line="275"/>
         <source>Incorrect or expired code.</source>
-        <translation>短信验证码错误或过期</translation>
+        <translation type="vanished">短信验证码错误或过期</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxsmsloginwidget.cpp" line="278"/>
         <source>System error.</source>
-        <translation>系统错误</translation>
+        <translation type="vanished">系统错误</translation>
     </message>
 </context>
 <context>
     <name>MxUserLoginWidget</name>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.ui" line="20"/>
         <source>Form</source>
-        <translation>窗体</translation>
+        <translation type="vanished">窗体</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.ui" line="93"/>
         <source>MxCAD Cloud</source>
-        <translation>MxCAD云图</translation>
+        <translation type="vanished">MxCAD云图</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.ui" line="106"/>
         <source>A high-speed CAD drawing collaboration platform</source>
-        <translation>极速的CAD图纸协同平台</translation>
+        <translation type="vanished">极速的CAD图纸协同平台</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.ui" line="138"/>
         <source>Image</source>
-        <translation>图片</translation>
+        <translation type="vanished">图片</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.ui" line="192"/>
         <source>Account Login</source>
-        <translation>账号登录</translation>
+        <translation type="vanished">账号登录</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.ui" line="220"/>
         <source>SMS Quick Login</source>
-        <translation>短信快捷登录</translation>
+        <translation type="vanished">短信快捷登录</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.ui" line="258"/>
         <source>Please enter your phone number</source>
-        <translation>请输入手机号</translation>
+        <translation type="vanished">请输入手机号</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.ui" line="278"/>
         <source>Please enter your password</source>
-        <translation>请输入密码</translation>
+        <translation type="vanished">请输入密码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.ui" line="297"/>
         <source>Please enter the graphic code</source>
-        <translation>请输入图形验证码</translation>
+        <translation type="vanished">请输入图形验证码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.ui" line="348"/>
         <source>New User Registration</source>
-        <translation>新用户注册</translation>
+        <translation type="vanished">新用户注册</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.ui" line="376"/>
         <source>Forgot account password?</source>
-        <translation>忘记账号密码？</translation>
+        <translation type="vanished">忘记账号密码？</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.ui" line="408"/>
         <source>Login</source>
-        <translation>登录</translation>
+        <translation type="vanished">登录</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.ui" line="420"/>
         <source>Other login methods:</source>
-        <translation>其它登录方式：</translation>
+        <translation type="vanished">其它登录方式：</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.ui" line="439"/>
         <source>wxLogo</source>
-        <translation>微信图标</translation>
+        <translation type="vanished">微信图标</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.cpp" line="166"/>
         <source>Invalid phone number format.</source>
-        <translation>手机号格式错误</translation>
+        <translation type="vanished">手机号格式错误</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.cpp" line="170"/>
         <source>Password must contain a letter and be at least 5 characters long.</source>
-        <translation>密码应至少包含1个英文字母，并且长度不低于5个字符</translation>
+        <translation type="vanished">密码应至少包含1个英文字母，并且长度不低于5个字符</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.cpp" line="174"/>
         <source>Please enter the verification code.</source>
-        <translation>请输入短信验证码</translation>
+        <translation type="vanished">请输入短信验证码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.cpp" line="197"/>
         <source>Error: </source>
-        <translation>错误：</translation>
+        <translation type="vanished">错误：</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.cpp" line="203"/>
         <source>Invalid server response.</source>
-        <translation>服务器响应无效</translation>
+        <translation type="vanished">服务器响应无效</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.cpp" line="215"/>
         <source>Login successful.</source>
-        <translation>登录成功</translation>
+        <translation type="vanished">登录成功</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.cpp" line="221"/>
         <source>Incorrect verification code.</source>
-        <translation>短信验证码错误</translation>
+        <translation type="vanished">短信验证码错误</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxuserloginwidget.cpp" line="224"/>
         <source>Incorrect account or password.</source>
-        <translation>账号或密码错误</translation>
+        <translation type="vanished">账号或密码错误</translation>
     </message>
 </context>
 <context>
@@ -4666,42 +4707,34 @@ Please ensure you have a default text file viewer installed.</source>
 <context>
     <name>MxWechatLoginWidget</name>
     <message>
-        <location filename="mxlogin/mxwechatloginwidget.ui" line="20"/>
         <source>Form</source>
-        <translation>窗体</translation>
+        <translation type="vanished">窗体</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxwechatloginwidget.ui" line="62"/>
         <source>CLOSE</source>
-        <translation>关闭</translation>
+        <translation type="vanished">关闭</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxwechatloginwidget.ui" line="71"/>
         <source>WeChat Login</source>
-        <translation>微信登录</translation>
+        <translation type="vanished">微信登录</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxwechatloginwidget.ui" line="108"/>
         <source>QrCode</source>
-        <translation>二维码</translation>
+        <translation type="vanished">二维码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxwechatloginwidget.ui" line="161"/>
         <source>Use WeChat QR Code Scanner to log in</source>
-        <translation>使用微信扫一扫登录</translation>
+        <translation type="vanished">使用微信扫一扫登录</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxwechatloginwidget.ui" line="171"/>
         <source>&quot;MxCloud&quot;</source>
-        <translation>“MxCloud”</translation>
+        <translation type="vanished">“MxCloud”</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxwechatloginwidget.ui" line="225"/>
         <source>Success</source>
-        <translation>成功图标</translation>
+        <translation type="vanished">成功图标</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxwechatloginwidget.ui" line="232"/>
         <source>        &lt;html&gt;
         &lt;head/&gt;
         &lt;body&gt;
@@ -4713,7 +4746,7 @@ Please ensure you have a default text file viewer installed.</source>
             &lt;/div&gt;
         &lt;/body&gt;
         &lt;/html&gt;</source>
-        <translation>        &lt;html&gt;
+        <translation type="vanished">        &lt;html&gt;
         &lt;head/&gt;
         &lt;body&gt;
             &lt;div style=&quot;display: flex; align-items: flex-start; gap: 8px;&quot;&gt;
@@ -4726,47 +4759,39 @@ Please ensure you have a default text file viewer installed.</source>
         &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxwechatloginwidget.cpp" line="158"/>
         <source>Login canceled by user. Please scan again.</source>
-        <translation>用户取消登录，请重新扫码</translation>
+        <translation type="vanished">用户取消登录，请重新扫码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxwechatloginwidget.cpp" line="165"/>
         <source>QR code has expired. Click to refresh.</source>
-        <translation>二维码已过期，点击刷新</translation>
+        <translation type="vanished">二维码已过期，点击刷新</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxwechatloginwidget.cpp" line="176"/>
         <source>Unknown error. Please scan again.</source>
-        <translation>未知错误，请重新扫码</translation>
+        <translation type="vanished">未知错误，请重新扫码</translation>
     </message>
 </context>
 <context>
     <name>MxWechatPayWidget</name>
     <message>
-        <location filename="mxlogin/mxwechatpaywidget.ui" line="26"/>
         <source>Form</source>
-        <translation>窗体</translation>
+        <translation type="vanished">窗体</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxwechatpaywidget.ui" line="68"/>
         <source>Logo</source>
-        <translation>图标</translation>
+        <translation type="vanished">图标</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxwechatpaywidget.ui" line="75"/>
         <source>Name</source>
-        <translation>名称</translation>
+        <translation type="vanished">名称</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxwechatpaywidget.ui" line="145"/>
         <source>QrCode</source>
-        <translation>二维码</translation>
+        <translation type="vanished">二维码</translation>
     </message>
     <message>
-        <location filename="mxlogin/mxwechatpaywidget.ui" line="180"/>
         <source>Scan to Pay</source>
-        <translation>扫描上方二维码完成支付</translation>
+        <translation type="vanished">扫描上方二维码完成支付</translation>
     </message>
 </context>
 </TS>

@@ -24,9 +24,10 @@ Mx2dCustomArcLengthDim::Mx2dCustomArcLengthDim(void)
 }
 
 Mx2dCustomArcLengthDim::Mx2dCustomArcLengthDim(const McGePoint3d& startPt, const McGePoint3d& midPt, const McGePoint3d& endPt, const McGePoint3d& dimPt, double textHeight)
-	:Mx2dCustomAnnotation(textHeight), m_startPt(startPt), m_midPt(midPt), m_endPt(endPt), m_dimPt(dimPt)
+	:Mx2dCustomAnnotation(textHeight), m_startPt(startPt), m_midPt(midPt), m_endPt(endPt)
 {
 	setType("arcLengthDim");
+	setDimPt(dimPt);
 }
 
 
@@ -64,6 +65,7 @@ Mdesk::Boolean Mx2dCustomArcLengthDim::worldDraw(McGiWorldDraw* wd)
 Mcad::ErrorStatus Mx2dCustomArcLengthDim::getGripPoints(McGePoint3dArray& gripPoints, McGeIntArray& osnapModes, McGeIntArray& geomIds) const
 {
 	assertReadEnabled();
+	return Mcad::eOk;
 	gripPoints.append(m_dimPt);
 	return Mcad::eOk;
 }
@@ -71,6 +73,7 @@ Mcad::ErrorStatus Mx2dCustomArcLengthDim::getGripPoints(McGePoint3dArray& gripPo
 Mcad::ErrorStatus Mx2dCustomArcLengthDim::moveGripPointsAt(const McGeIntArray& indices, const McGeVector3d& offset)
 {
 	assertWriteEnabled();
+	return Mcad::eOk;
 	int iIndex = indices[0];
 	switch (iIndex)
 	{
@@ -138,7 +141,6 @@ Mcad::ErrorStatus Mx2dCustomArcLengthDim::dwgInFields(McDbDwgFiler* pFiler)
 	pFiler->readPoint3d(&m_startPt);
 	pFiler->readPoint3d(&m_midPt);
 	pFiler->readPoint3d(&m_endPt);
-	pFiler->readPoint3d(&m_dimPt);
 
 	return Mcad::eOk;
 }
@@ -159,7 +161,6 @@ Mcad::ErrorStatus Mx2dCustomArcLengthDim::dwgOutFields(McDbDwgFiler* pFiler) con
 	pFiler->writePoint3d(m_startPt);
 	pFiler->writePoint3d(m_midPt);
 	pFiler->writePoint3d(m_endPt);
-	pFiler->writePoint3d(m_dimPt);
 	return Mcad::eOk;
 }
 
@@ -194,10 +195,12 @@ void Mx2dCustomArcLengthDim::fromJson(const QJsonObject& jsonObject)
 {
 	assertWriteEnabled();
 	Mx2dCustomAnnotation::fromJson(jsonObject);
+	if (!jsonObject.contains("startPoint"))	return;
 	m_startPt = Mx2d::jsonArray2dToPoint3d(jsonObject["startPoint"].toArray());
+    if (!jsonObject.contains("midPoint")) return;
 	m_midPt = Mx2d::jsonArray2dToPoint3d(jsonObject["midPoint"].toArray());
+    if (!jsonObject.contains("endPoint")) return;
 	m_endPt = Mx2d::jsonArray2dToPoint3d(jsonObject["endPoint"].toArray());
-	m_dimPt = Mx2d::jsonArray2dToPoint3d(jsonObject["dimPoint"].toArray());
 
 }
 
@@ -209,7 +212,6 @@ QJsonObject Mx2dCustomArcLengthDim::toJson() const
 	jsonObject["startPoint"] = Mx2d::point3dToJsonArray2d(m_startPt);
 	jsonObject["midPoint"] = Mx2d::point3dToJsonArray2d(m_midPt);
 	jsonObject["endPoint"] = Mx2d::point3dToJsonArray2d(m_endPt);
-	jsonObject["dimPoint"] = Mx2d::point3dToJsonArray2d(m_dimPt);
 
 	return jsonObject;
 }
@@ -232,6 +234,11 @@ Mx2d::TextInfoList Mx2dCustomArcLengthDim::findText(const QString& text, bool is
 	}
 
 	return { {textStr , extents} };
+}
+
+DimPropertyFlags Mx2dCustomArcLengthDim::dimPropertyFlags() const
+{
+	return Prop_Color | Prop_Category | Prop_TextHeight | Prop_Ratio;
 }
 
 void Mx2dCustomArcLengthDim::setStartPt(const McGePoint3d& pt)
@@ -268,18 +275,6 @@ McGePoint3d Mx2dCustomArcLengthDim::endPt() const
 {
 	assertReadEnabled();
 	return m_endPt;
-}
-
-void Mx2dCustomArcLengthDim::setDimPt(const McGePoint3d& pt)
-{
-	assertWriteEnabled();
-	m_dimPt = pt;
-}
-
-McGePoint3d Mx2dCustomArcLengthDim::dimPt() const
-{
-	assertReadEnabled();
-	return m_dimPt;
 }
 
 

@@ -23,10 +23,11 @@ Mx2dCustomRectArea::Mx2dCustomRectArea(void)
 	setType("rectArea");
 }
 
-Mx2dCustomRectArea::Mx2dCustomRectArea(const McGePoint3d& pt1, const McGePoint3d& pt2, const McGePoint3d& textPos, double textHeight)
-	: Mx2dCustomRect(pt1, pt2, textHeight), m_textPos(textPos)
+Mx2dCustomRectArea::Mx2dCustomRectArea(const McGePoint3d& pt1, const McGePoint3d& pt2, const McGePoint3d& dimPt, double textHeight)
+	: Mx2dCustomRect(pt1, pt2, textHeight)
 {
 	setType("rectArea");
+	setDimPt(dimPt);
 }
 
 Mx2dCustomRectArea::~Mx2dCustomRectArea(void)
@@ -48,21 +49,23 @@ Mdesk::Boolean Mx2dCustomRectArea::worldDraw(McGiWorldDraw* wd)
 Mcad::ErrorStatus Mx2dCustomRectArea::getGripPoints(McGePoint3dArray& gripPoints, McGeIntArray& osnapModes, McGeIntArray& geomIds) const
 {
 	assertReadEnabled();
+	return Mcad::eOk;
 	Mx2dCustomRect::getGripPoints(gripPoints, osnapModes, geomIds);
-	gripPoints.append(m_textPos);
+	gripPoints.append(m_dimPt);
 	return Mcad::eOk;
 }
 
 Mcad::ErrorStatus Mx2dCustomRectArea::moveGripPointsAt(const McGeIntArray& indices, const McGeVector3d& offset)
 {
 	assertWriteEnabled();
+	return Mcad::eOk;
 	Mx2dCustomRect::moveGripPointsAt(indices, offset);
 
 	int iIndex = indices[0];
 	switch (iIndex)
 	{
 	case 2:
-		m_textPos = m_textPos + offset;
+		m_dimPt = m_dimPt + offset;
 		break;
 	}
 	return Mcad::eOk;
@@ -101,7 +104,6 @@ Mcad::ErrorStatus Mx2dCustomRectArea::dwgInFields(McDbDwgFiler* pFiler)
 	Mx2dCustomRect::dwgInFields(pFiler);
 	int lVar = 1;
 	pFiler->readInt(&lVar);
-	pFiler->readPoint3d(&m_textPos);
 
 	return Mcad::eOk;
 }
@@ -119,7 +121,6 @@ Mcad::ErrorStatus Mx2dCustomRectArea::dwgOutFields(McDbDwgFiler* pFiler) const
 	}
 	Mx2dCustomRect::dwgOutFields(pFiler);
 	pFiler->writeInt(RECTAREA_VERSION);
-	pFiler->writePoint3d(m_textPos);
 
 	return Mcad::eOk;
 }
@@ -139,7 +140,7 @@ Mcad::ErrorStatus Mx2dCustomRectArea::transformBy(const McGeMatrix3d& xform)
 {
 	assertWriteEnabled();
 	Mx2dCustomRect::transformBy(xform);
-	m_textPos.transformBy(xform);
+	m_dimPt.transformBy(xform);
 	return Mcad::eOk;
 }
 
@@ -147,14 +148,12 @@ void Mx2dCustomRectArea::fromJson(const QJsonObject& jsonObject)
 {
 	assertWriteEnabled();
 	Mx2dCustomRect::fromJson(jsonObject);
-	m_textPos = Mx2d::jsonArray2dToPoint3d(jsonObject["textPos"].toArray());
 }
 
 QJsonObject Mx2dCustomRectArea::toJson() const
 {
 	assertReadEnabled();
 	QJsonObject jsonObject = Mx2dCustomRect::toJson();
-	jsonObject["textPos"] = Mx2d::point3dToJsonArray2d(m_textPos);
 
 	return jsonObject;
 }
@@ -179,18 +178,10 @@ Mx2d::TextInfoList Mx2dCustomRectArea::findText(const QString& text, bool isExac
 	return { {textStr , extents} };
 }
 
-void Mx2dCustomRectArea::setTextPos(const McGePoint3d& pos)
+DimPropertyFlags Mx2dCustomRectArea::dimPropertyFlags() const
 {
-	assertWriteEnabled();
-	m_textPos = pos;
+	return Prop_Color | Prop_Category | Prop_TextHeight | Prop_Ratio | Prop_TextPosition;
 }
-
-McGePoint3d Mx2dCustomRectArea::textPos() const
-{
-	assertReadEnabled();
-	return m_textPos;
-}
-
 
 
 McDbText* Mx2dCustomRectArea::createText() const
@@ -198,7 +189,7 @@ McDbText* Mx2dCustomRectArea::createText() const
 	McDbObjectId textStyle = Mx::mcdbCurDwg()->textstyle();
 	McDbText* pText = new McDbText();
 
-	pText->setAlignmentPoint(m_textPos);
+	pText->setAlignmentPoint(m_dimPt);
 	pText->setHeight(textHeight());
 
 	double area = getArea();

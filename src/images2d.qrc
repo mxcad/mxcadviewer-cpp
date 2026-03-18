@@ -79,5 +79,13 @@
         <file>resources/images2d/2d_singleLineText.svg</file>
         <file>resources/images2d/2d_test.svg</file>
         <file>resources/images2d/2d_dropdown.svg</file>
+        <file>resources/images2d/2d_eyeClose.svg</file>
+        <file>resources/images2d/2d_eyeOpen.svg</file>
+        <file>resources/images2d/2d_checkClassify.svg</file>
+        <file>resources/images2d/2d_down.svg</file>
+        <file>resources/images2d/2d_up.svg</file>
+        <file>resources/images2d/2d_deleteClassify.svg</file>
+        <file>resources/images2d/2d_modifyProperty.svg</file>
+        <file>resources/images2d/2d_shortcutSetting.svg</file>
     </qresource>
 </RCC>

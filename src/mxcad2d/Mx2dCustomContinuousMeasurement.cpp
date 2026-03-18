@@ -22,9 +22,10 @@ Mx2dCustomContinuousMeasurement::Mx2dCustomContinuousMeasurement(void)
 }
 
 Mx2dCustomContinuousMeasurement::Mx2dCustomContinuousMeasurement(const Mx2d::PLVertexList& pts, const McGePoint3d& dimPt, double textHeight)
-	:Mx2dCustomAnnotation(textHeight), m_pts(pts), m_dimPt(dimPt)
+	:Mx2dCustomAnnotation(textHeight), m_pts(pts)
 {
 	setType("continuousMeasurement");
+	setDimPt(dimPt);
 }
 
 Mx2dCustomContinuousMeasurement::~Mx2dCustomContinuousMeasurement(void)
@@ -68,6 +69,7 @@ Mdesk::Boolean Mx2dCustomContinuousMeasurement::worldDraw(McGiWorldDraw* wd)
 Mcad::ErrorStatus Mx2dCustomContinuousMeasurement::getGripPoints(McGePoint3dArray& gripPoints, McGeIntArray& osnapModes, McGeIntArray& geomIds) const
 {
 	assertReadEnabled();
+	return Mcad::eOk;
 	for (int i = 0; i < m_pts.length(); ++i) {
 		gripPoints.append(m_pts[i].pt);
 	}
@@ -78,6 +80,7 @@ Mcad::ErrorStatus Mx2dCustomContinuousMeasurement::getGripPoints(McGePoint3dArra
 Mcad::ErrorStatus Mx2dCustomContinuousMeasurement::moveGripPointsAt(const McGeIntArray& indices, const McGeVector3d& offset)
 {
 	assertWriteEnabled();
+	return Mcad::eOk;
 	int iIndex = indices[0];
 
 	if (iIndex == m_pts.length()) {
@@ -149,7 +152,6 @@ Mcad::ErrorStatus Mx2dCustomContinuousMeasurement::dwgInFields(McDbDwgFiler* pFi
 		pFiler->readDouble(&v.bulge);
 		m_pts.append(v);
 	}
-	pFiler->readPoint3d(&m_dimPt);
 
 	return Mcad::eOk;
 }
@@ -174,7 +176,6 @@ Mcad::ErrorStatus Mx2dCustomContinuousMeasurement::dwgOutFields(McDbDwgFiler* pF
 		pFiler->writePoint3d(v.pt);
 		pFiler->writeDouble(v.bulge);
 	}
-	pFiler->writePoint3d(m_dimPt);
 
 	return Mcad::eOk;
 }
@@ -215,6 +216,7 @@ void Mx2dCustomContinuousMeasurement::fromJson(const QJsonObject& jsonObject)
 {
 	assertWriteEnabled();
 	Mx2dCustomAnnotation::fromJson(jsonObject);
+	if(!jsonObject.contains("points")) return;
 	Mx2d::PLVertexList pts;
 	QJsonArray pointsArray = jsonObject["points"].toArray();
 	for (auto v : pointsArray)
@@ -226,7 +228,6 @@ void Mx2dCustomContinuousMeasurement::fromJson(const QJsonObject& jsonObject)
 		pts.append(v);
 	}
 	m_pts = pts;
-	m_dimPt = Mx2d::jsonArray2dToPoint3d(jsonObject["dimPoint"].toArray());
 }
 
 QJsonObject Mx2dCustomContinuousMeasurement::toJson() const
@@ -243,7 +244,6 @@ QJsonObject Mx2dCustomContinuousMeasurement::toJson() const
 		pointsArray.append(pointArray);
 	}
 	jsonObject["points"] = pointsArray;
-	jsonObject["dimPoint"] = Mx2d::point3dToJsonArray2d(m_dimPt);
 
 	return jsonObject;
 }
@@ -276,6 +276,11 @@ Mx2d::TextInfoList Mx2dCustomContinuousMeasurement::findText(const QString& text
 	return { {textStr , extents} };
 }
 
+DimPropertyFlags Mx2dCustomContinuousMeasurement::dimPropertyFlags() const
+{
+	return Prop_Color | Prop_Category | Prop_TextHeight | Prop_Ratio;
+}
+
 void Mx2dCustomContinuousMeasurement::setPoints(const Mx2d::PLVertexList& pts)
 {
 	assertWriteEnabled();
@@ -288,17 +293,6 @@ Mx2d::PLVertexList Mx2dCustomContinuousMeasurement::points() const
 	return m_pts;
 }
 
-void Mx2dCustomContinuousMeasurement::setDimPt(const McGePoint3d& pt)
-{
-	assertWriteEnabled();
-	m_dimPt = pt;
-}
-
-McGePoint3d Mx2dCustomContinuousMeasurement::dimPt() const
-{
-	assertReadEnabled();
-	return m_dimPt;
-}
 
 Mcad::ErrorStatus Mx2dCustomContinuousMeasurement::explodePoly(McDbVoidPtrArray& entitySet) const
 {

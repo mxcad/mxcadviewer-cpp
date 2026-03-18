@@ -44,6 +44,7 @@ Mcad::ErrorStatus Mx2dCustomAnnotation::dwgInFields(McDbDwgFiler* pFiler)
 	pFiler->readInt(&lVar);
 	pFiler->readDouble(&m_textHeight);
 	pFiler->readDouble(&m_dimRatio);
+	pFiler->readPoint3d(&m_dimPt);
 	MxString mxStr;
 	pFiler->readString(mxStr);
 	m_category = QString::fromLocal8Bit(mxStr.c_str());
@@ -71,6 +72,7 @@ Mcad::ErrorStatus Mx2dCustomAnnotation::dwgOutFields(McDbDwgFiler* pFiler) const
 	pFiler->writeInt(ANNOTATION_VERSION);
 	pFiler->writeDouble(m_textHeight);
 	pFiler->writeDouble(m_dimRatio);
+	pFiler->writePoint3d(m_dimPt);
 	pFiler->writeString(MxString(m_category.toLocal8Bit().constData()));
 	pFiler->writeString(MxString(m_type.toLocal8Bit().constData()));
     pFiler->writeString(MxString(m_layout.toLocal8Bit().constData()));
@@ -99,6 +101,18 @@ double Mx2dCustomAnnotation::dimRatio() const
 {
 	assertReadEnabled();
 	return m_dimRatio;
+}
+
+void Mx2dCustomAnnotation::setDimPt(const McGePoint3d& pt)
+{
+	assertWriteEnabled();
+	m_dimPt = pt;
+}
+
+McGePoint3d Mx2dCustomAnnotation::dimPt() const
+{
+	assertReadEnabled();
+	return m_dimPt;
 }
 
 void Mx2dCustomAnnotation::setCategory(const QString& category)
@@ -140,11 +154,23 @@ QString Mx2dCustomAnnotation::layout() const
 void Mx2dCustomAnnotation::fromJson(const QJsonObject& jsonObject)
 {
 	assertWriteEnabled();
+	if (!jsonObject.contains("textHeight")) return;
 	m_textHeight = jsonObject["textHeight"].toDouble();
+    if (!jsonObject.contains("dimRatio")) return;
 	m_dimRatio = jsonObject["dimRatio"].toDouble();
+    if (!jsonObject.contains("dimPoint")) return;
+    m_dimPt = Mx2d::jsonArray2dToPoint3d(jsonObject["dimPoint"].toArray());
+    if (!jsonObject.contains("category")) return;
 	m_category = jsonObject["category"].toString();
+    if (!jsonObject.contains("type")) return;
 	m_type = jsonObject["type"].toString();
+    if (!jsonObject.contains("layout")) return;
     m_layout = jsonObject["layout"].toString();
+    if (!jsonObject.contains("color")) return;
+	QJsonArray colorArr = jsonObject["color"].toArray();
+	McCmColor color;
+	color.setRGB(colorArr[0].toInt(), colorArr[1].toInt(), colorArr[2].toInt());
+	setColor(color);
 }
 
 QJsonObject Mx2dCustomAnnotation::toJson() const
@@ -153,13 +179,25 @@ QJsonObject Mx2dCustomAnnotation::toJson() const
 	QJsonObject jsonObject;
 	jsonObject["textHeight"] = m_textHeight;
 	jsonObject["dimRatio"] = m_dimRatio;
+    jsonObject["dimPoint"] = Mx2d::point3dToJsonArray2d(m_dimPt);
 	jsonObject["category"] = m_category;
 	jsonObject["type"] = m_type;
     jsonObject["layout"] = m_layout;
+    QJsonArray colorArr;
+	McCmColor col = color();
+    colorArr.append(col.red());
+    colorArr.append(col.green());
+    colorArr.append(col.blue());
+    jsonObject["color"] = colorArr;
 	return jsonObject;
 }
 
 Mx2d::TextInfoList Mx2dCustomAnnotation::findText(const QString& text, bool isExactMatch) const
 {
 	return {};
+}
+
+DimPropertyFlags Mx2dCustomAnnotation::dimPropertyFlags() const
+{
+	return Prop_None;
 }

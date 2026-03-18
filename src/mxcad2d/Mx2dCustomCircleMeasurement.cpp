@@ -25,9 +25,10 @@ Mx2dCustomCircleMeasurement::Mx2dCustomCircleMeasurement(void)
 
 
 Mx2dCustomCircleMeasurement::Mx2dCustomCircleMeasurement(const McGePoint3d& centerPt, double radius, const McGePoint3d& dimPt, double textHeight)
-	:Mx2dCustomAnnotation(textHeight), m_centerPt(centerPt), m_radius(radius), m_dimPt(dimPt)
+	:Mx2dCustomAnnotation(textHeight), m_centerPt(centerPt), m_radius(radius)
 {
 	setType("circleMeasurement");
+	setDimPt(dimPt);
 }
 
 Mx2dCustomCircleMeasurement::~Mx2dCustomCircleMeasurement(void)
@@ -54,6 +55,7 @@ Mdesk::Boolean Mx2dCustomCircleMeasurement::worldDraw(McGiWorldDraw* wd)
 Mcad::ErrorStatus Mx2dCustomCircleMeasurement::getGripPoints(McGePoint3dArray& gripPoints, McGeIntArray& osnapModes, McGeIntArray& geomIds) const
 {
 	assertReadEnabled();
+	return Mcad::eOk;
 	gripPoints.append(m_dimPt);
 	return Mcad::eOk;
 }
@@ -61,6 +63,7 @@ Mcad::ErrorStatus Mx2dCustomCircleMeasurement::getGripPoints(McGePoint3dArray& g
 Mcad::ErrorStatus Mx2dCustomCircleMeasurement::moveGripPointsAt(const McGeIntArray& indices, const McGeVector3d& offset)
 {
 	assertWriteEnabled();
+	return Mcad::eOk;
 	int iIndex = indices[0];
 	switch (iIndex)
 	{
@@ -108,7 +111,6 @@ Mcad::ErrorStatus Mx2dCustomCircleMeasurement::dwgInFields(McDbDwgFiler* pFiler)
 	int lVar = 1;
 	pFiler->readInt(&lVar);
 	pFiler->readPoint3d(&m_centerPt);
-	pFiler->readPoint3d(&m_dimPt);
 	pFiler->readDouble(&m_radius);
 
 	return Mcad::eOk;
@@ -128,7 +130,6 @@ Mcad::ErrorStatus Mx2dCustomCircleMeasurement::dwgOutFields(McDbDwgFiler* pFiler
 	Mx2dCustomAnnotation::dwgOutFields(pFiler);
 	pFiler->writeInt(CIRCLEMEASUREMENT_VERSION);
 	pFiler->writePoint3d(m_centerPt);
-	pFiler->writePoint3d(m_dimPt);
 	pFiler->writeDouble(m_radius);
 	return Mcad::eOk;
 }
@@ -158,8 +159,9 @@ void Mx2dCustomCircleMeasurement::fromJson(const QJsonObject& jsonObject)
 {
 	assertWriteEnabled();
 	Mx2dCustomAnnotation::fromJson(jsonObject);
+	if(!jsonObject.contains("centerPoint")) return;
 	m_centerPt = Mx2d::jsonArray2dToPoint3d(jsonObject["centerPoint"].toArray());
-	m_dimPt = Mx2d::jsonArray2dToPoint3d(jsonObject["dimPoint"].toArray());
+    if(!jsonObject.contains("radius")) return;
 	m_radius = jsonObject["radius"].toDouble();
 }
 
@@ -169,7 +171,6 @@ QJsonObject Mx2dCustomCircleMeasurement::toJson() const
 	QJsonObject jsonObject = Mx2dCustomAnnotation::toJson();
 
 	jsonObject["centerPoint"] = Mx2d::point3dToJsonArray2d(m_centerPt);
-	jsonObject["dimPoint"] = Mx2d::point3dToJsonArray2d(m_dimPt);
 	jsonObject["radius"] = m_radius;
 
 	return jsonObject;
@@ -202,6 +203,11 @@ Mx2d::TextInfoList Mx2dCustomCircleMeasurement::findText(const QString& text, bo
 	return res;
 }
 
+DimPropertyFlags Mx2dCustomCircleMeasurement::dimPropertyFlags() const
+{
+	return Prop_Color | Prop_Category | Prop_TextHeight | Prop_Ratio;
+}
+
 void Mx2dCustomCircleMeasurement::setCenterPt(const McGePoint3d& centerPt)
 {
 	assertWriteEnabled();
@@ -212,18 +218,6 @@ McGePoint3d Mx2dCustomCircleMeasurement::centerPt() const
 {
 	assertReadEnabled();
 	return m_centerPt;
-}
-
-void Mx2dCustomCircleMeasurement::setDimPt(const McGePoint3d& dimPt)
-{
-	assertWriteEnabled();
-	m_dimPt = dimPt;
-}
-
-McGePoint3d Mx2dCustomCircleMeasurement::dimPt() const
-{
-	assertReadEnabled();
-	return m_dimPt;
 }
 
 void Mx2dCustomCircleMeasurement::setRadius(double radius)

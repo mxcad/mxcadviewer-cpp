@@ -9,6 +9,7 @@ for the use of this software, its documentation or related materials.
 #include "Mx2dICommand.h"
 #include "Mx2dCustomText.h"
 #include "Mx2dCustomMText.h"
+#include "Mx2dCustomLeader.h"
 #include "Mx2dCustomPolyArea.h"
 #include "Mx2dCustomArcPolyArea.h"
 #include "Mx2dCustomRectArea.h"
@@ -156,6 +157,11 @@ Mx2dModifyTextCommand::Mx2dModifyTextCommand(McDbObjectId id, const QString& new
         Mx2dCustomMText* pMText = Mx2dCustomMText::cast(spEntity.object());
         m_oldText = pMText->contents();
     }
+    else if (spEntity->isA() == Mx2dCustomLeader::desc())
+    {
+        Mx2dCustomLeader* pLeader = Mx2dCustomLeader::cast(spEntity.object());
+        m_oldText = pLeader->text();
+    }
 }
 
 void Mx2dModifyTextCommand::execute()
@@ -172,6 +178,11 @@ void Mx2dModifyTextCommand::execute()
         Mx2dCustomMText* pMText = Mx2dCustomMText::cast(spEntity.object());
         pMText->setContents(m_newText);
     }
+    else if (spEntity->isA() == Mx2dCustomLeader::desc())
+    {
+        Mx2dCustomLeader* pLeader = Mx2dCustomLeader::cast(spEntity.object());
+        pLeader->setText(m_newText);
+    }
 }
 
 void Mx2dModifyTextCommand::undo()
@@ -187,6 +198,11 @@ void Mx2dModifyTextCommand::undo()
     {
         Mx2dCustomMText* pMText = Mx2dCustomMText::cast(spEntity.object());
         pMText->setContents(m_oldText);
+    }
+    else if (spEntity->isA() == Mx2dCustomLeader::desc())
+    {
+        Mx2dCustomLeader* pLeader = Mx2dCustomLeader::cast(spEntity.object());
+        pLeader->setText(m_oldText);
     }
 }
 
@@ -266,4 +282,101 @@ void Mx2dModifyRectAreaCommand::undo()
     if (spRectArea.openStatus() != Mcad::eOk) return;
     spRectArea->setCorner1(m_oldCorner1);
     spRectArea->setCorner2(m_oldCorner2);
+}
+
+Mx2dModifyAnnotationColorCommand::Mx2dModifyAnnotationColorCommand(McDbObjectId id, const QColor& oldColor, const QColor& newColor)
+    : m_id(id), m_oldColor(oldColor), m_newColor(newColor)
+{
+}
+
+void Mx2dModifyAnnotationColorCommand::execute()
+{
+    McDbObjectPointer<Mx2dCustomAnnotation> spAnnotation(m_id, McDb::kForWrite, true);
+    if (spAnnotation.openStatus() != Mcad::eOk) return;
+    McCmColor color = Mx2d::qColorToCadColor(m_newColor);
+    spAnnotation->setColor(color);
+}
+
+void Mx2dModifyAnnotationColorCommand::undo()
+{
+    McDbObjectPointer<Mx2dCustomAnnotation> spAnnotation(m_id, McDb::kForWrite, true);
+    if (spAnnotation.openStatus() != Mcad::eOk) return;
+    McCmColor color = Mx2d::qColorToCadColor(m_oldColor);
+    spAnnotation->setColor(color);
+}
+
+Mx2dModifyAnnotationCategoryCommand::Mx2dModifyAnnotationCategoryCommand(McDbObjectId id, const QString& oldCategory, const QString& newCategory)
+    : m_id(id), m_oldCategory(oldCategory), m_newCategory(newCategory)
+{
+}
+
+void Mx2dModifyAnnotationCategoryCommand::execute()
+{
+    McDbObjectPointer<Mx2dCustomAnnotation> spAnnotation(m_id, McDb::kForWrite, true);
+    if (spAnnotation.openStatus() != Mcad::eOk) return;
+    spAnnotation->setCategory(m_newCategory);
+}
+
+void Mx2dModifyAnnotationCategoryCommand::undo()
+{
+    McDbObjectPointer<Mx2dCustomAnnotation> spAnnotation(m_id, McDb::kForWrite, true);
+    if (spAnnotation.openStatus() != Mcad::eOk) return;
+    spAnnotation->setCategory(m_oldCategory);
+}
+
+Mx2dModifyAnnotationTextHeightCommand::Mx2dModifyAnnotationTextHeightCommand(McDbObjectId id, double oldTextHeight, double newTextHeight)
+    : m_id(id), m_oldTextHeight(oldTextHeight), m_newTextHeight(newTextHeight)
+{
+}
+
+void Mx2dModifyAnnotationTextHeightCommand::execute()
+{
+    McDbObjectPointer<Mx2dCustomAnnotation> spAnnotation(m_id, McDb::kForWrite, true);
+    if (spAnnotation.openStatus() != Mcad::eOk) return;
+    spAnnotation->setTextHeight(m_newTextHeight);
+}
+
+void Mx2dModifyAnnotationTextHeightCommand::undo()
+{
+    McDbObjectPointer<Mx2dCustomAnnotation> spAnnotation(m_id, McDb::kForWrite, true);
+    if (spAnnotation.openStatus() != Mcad::eOk) return;
+    spAnnotation->setTextHeight(m_oldTextHeight);
+}
+
+Mx2dModifyAnnotationRatioCommand::Mx2dModifyAnnotationRatioCommand(McDbObjectId id, double oldRatio, double newRatio)
+    : m_id(id), m_oldRatio(oldRatio), m_newRatio(newRatio)
+{
+}
+
+void Mx2dModifyAnnotationRatioCommand::execute()
+{
+    McDbObjectPointer<Mx2dCustomAnnotation> spAnnotation(m_id, McDb::kForWrite, true);
+    if (spAnnotation.openStatus() != Mcad::eOk) return;
+    spAnnotation->setDimRatio(m_newRatio);
+}
+
+void Mx2dModifyAnnotationRatioCommand::undo()
+{
+    McDbObjectPointer<Mx2dCustomAnnotation> spAnnotation(m_id, McDb::kForWrite, true);
+    if (spAnnotation.openStatus() != Mcad::eOk) return;
+    spAnnotation->setDimRatio(m_oldRatio);
+}
+
+Mx2dModifyAnnotationDimPtCommand::Mx2dModifyAnnotationDimPtCommand(McDbObjectId id, const McGePoint3d& oldPt, const McGePoint3d& newPt)
+    : m_id(id), m_oldPt(oldPt), m_newPt(newPt)
+{
+}
+
+void Mx2dModifyAnnotationDimPtCommand::execute()
+{
+    McDbObjectPointer<Mx2dCustomAnnotation> spAnnotation(m_id, McDb::kForWrite, true);
+    if (spAnnotation.openStatus() != Mcad::eOk) return;
+    spAnnotation->setDimPt(m_newPt);
+}
+
+void Mx2dModifyAnnotationDimPtCommand::undo()
+{
+    McDbObjectPointer<Mx2dCustomAnnotation> spAnnotation(m_id, McDb::kForWrite, true);
+    if (spAnnotation.openStatus() != Mcad::eOk) return;
+    spAnnotation->setDimPt(m_oldPt);
 }

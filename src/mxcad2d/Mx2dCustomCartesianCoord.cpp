@@ -52,6 +52,7 @@ Mdesk::Boolean Mx2dCustomCartesianCoord::worldDraw(McGiWorldDraw* wd)
 Mcad::ErrorStatus Mx2dCustomCartesianCoord::getGripPoints(McGePoint3dArray& gripPoints, McGeIntArray& osnapModes, McGeIntArray& geomIds) const
 {
 	assertReadEnabled();
+	return Mcad::eOk;
 	gripPoints.append(m_startPt);
 	gripPoints.append(m_endPt);
 	return Mcad::eOk;
@@ -60,6 +61,7 @@ Mcad::ErrorStatus Mx2dCustomCartesianCoord::getGripPoints(McGePoint3dArray& grip
 Mcad::ErrorStatus Mx2dCustomCartesianCoord::moveGripPointsAt(const McGeIntArray& indices, const McGeVector3d& offset)
 {
 	assertWriteEnabled();
+	return Mcad::eOk;
 	int iIndex = indices[0];
 	switch (iIndex)
 	{
@@ -159,7 +161,9 @@ void Mx2dCustomCartesianCoord::fromJson(const QJsonObject& jsonObject)
 {
 	assertWriteEnabled();
 	Mx2dCustomAnnotation::fromJson(jsonObject);
+	if(!jsonObject.contains("startPoint")) return;
 	m_startPt = Mx2d::jsonArray2dToPoint3d(jsonObject["startPoint"].toArray());
+    if(!jsonObject.contains("endPoint")) return;
 	m_endPt = Mx2d::jsonArray2dToPoint3d(jsonObject["endPoint"].toArray());
 }
 
@@ -200,6 +204,11 @@ Mx2d::TextInfoList Mx2dCustomCartesianCoord::findText(const QString& text, bool 
 	
 
 	return res;
+}
+
+DimPropertyFlags Mx2dCustomCartesianCoord::dimPropertyFlags() const
+{
+	return Prop_Color | Prop_Category | Prop_TextHeight;
 }
 
 void Mx2dCustomCartesianCoord::setStartPt(const McGePoint3d& pt)

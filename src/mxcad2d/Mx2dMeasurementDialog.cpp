@@ -29,25 +29,25 @@ Mx2dMeasurementDialog::Mx2dMeasurementDialog(Mx2dGuiDocument* guiDoc, QWidget* p
 	m_buttonLayout->setContentsMargins(0, 0, 0, 0);
 
 	// Add buttons
-	addButton(":/resources/images2d/2d_aligned.svg", tr("Aligned"), SLOT(onButtonAlignedDimClicked()));
-	addButton(":/resources/images2d/2d_linear.svg", tr("Linear"), SLOT(onButtonLinearDimClicked()));
-	addButton(":/resources/images2d/2d_area.svg", tr("Area"), SLOT(onButtonPolyAreaClicked()));
-	addButton(":/resources/images2d/2d_rectArea.svg", tr("Rectangular Area"), SLOT(onButtonRectAreaClicked()));
-	addButton(":/resources/images2d/2d_coordinate.svg", tr("Coordinate"), SLOT(onButtonCoordMarkClicked()));
+	addButton(":/resources/images2d/2d_aligned.svg", tr("Aligned"), "Aligned", SLOT(onButtonAlignedDimClicked()));
+	addButton(":/resources/images2d/2d_linear.svg", tr("Linear"), "Linear", SLOT(onButtonLinearDimClicked()));
+	addButton(":/resources/images2d/2d_area.svg", tr("Area"), "Area", SLOT(onButtonPolyAreaClicked()));
+	addButton(":/resources/images2d/2d_rectArea.svg", tr("Rectangular Area"), "Rectangular Area", SLOT(onButtonRectAreaClicked()));
+	addButton(":/resources/images2d/2d_coordinate.svg", tr("Coordinate"), "Coordinate", SLOT(onButtonCoordMarkClicked()));
 	
-	addButton(":/resources/images2d/2d_arcLength.svg", tr("Arc Length"), SLOT(onButtonArcLengthClicked()));
-	addButton(":/resources/images2d/2d_pt2lineDist.svg", tr("Point to Line Distance"), SLOT(onButtonDistPointToLineClicked()));
-	addButton(":/resources/images2d/2d_continuousMeasurement.svg", tr("Continuous Measurement"), SLOT(onButtonContinuousMeasurementClicked()));
-	addButton(":/resources/images2d/2d_batchMeasurement.svg", tr("Batch Measurement"), SLOT(onButtonBatchMeasurementClicked()));
-	addButton(":/resources/images2d/2d_segLength.svg", tr("Show Segment Lengths"), SLOT(onButtonShowSegmentLengthClicked()));
+	addButton(":/resources/images2d/2d_arcLength.svg", tr("Arc Length"), "Arc Length", SLOT(onButtonArcLengthClicked()));
+	addButton(":/resources/images2d/2d_pt2lineDist.svg", tr("Point to Line Distance"), "Point to Line Distance", SLOT(onButtonDistPointToLineClicked()));
+	addButton(":/resources/images2d/2d_continuousMeasurement.svg", tr("Continuous Measurement"), "Continuous Measurement", SLOT(onButtonContinuousMeasurementClicked()));
+	addButton(":/resources/images2d/2d_batchMeasurement.svg", tr("Batch Measurement"), "Batch Measurement", SLOT(onButtonBatchMeasurementClicked()));
+	addButton(":/resources/images2d/2d_segLength.svg", tr("Show Segment Lengths"), "Show Segment Lengths", SLOT(onButtonShowSegmentLengthClicked()));
 	
-	addButton(":/resources/images2d/2d_areaWithArc.svg", tr("Area(with arcs)"), SLOT(onButtonArcPolyAreaClicked()));
-	addButton(":/resources/images2d/2d_fillArea.svg", tr("Hatch Area"), SLOT(onButtonHatchAreaClicked()));
-	addButton(":/resources/images2d/2d_sideArea.svg", tr("Calculate Side Area"), SLOT(onButtonCalculateSiderAreaClicked()));
-	addButton(":/resources/images2d/2d_areaOffset.svg", tr("Area Offset"), SLOT(onButtonAreaOffsetClicked()));
-	addButton(":/resources/images2d/2d_measureCircle.svg", tr("Circle"), SLOT(onButtonCircleMeasurementClicked()));
-	addButton(":/resources/images2d/2d_radius.svg", tr("Radius"), SLOT(onButtonRadiusDimClicked()));
-	addButton(":/resources/images2d/2d_measureAngle.svg", tr("Angle"), SLOT(onButtonAngleMeasurementClicked()));
+	addButton(":/resources/images2d/2d_areaWithArc.svg", tr("Area(with arcs)"), "Area(with arcs)", SLOT(onButtonArcPolyAreaClicked()));
+	addButton(":/resources/images2d/2d_fillArea.svg", tr("Hatch Area"), "Hatch Area", SLOT(onButtonHatchAreaClicked()));
+	addButton(":/resources/images2d/2d_sideArea.svg", tr("Calculate Side Area"), "Calculate Side Area", SLOT(onButtonCalculateSiderAreaClicked()));
+	addButton(":/resources/images2d/2d_areaOffset.svg", tr("Area Offset"), "Area Offset", SLOT(onButtonAreaOffsetClicked()));
+	addButton(":/resources/images2d/2d_measureCircle.svg", tr("Circle"), "Circle", SLOT(onButtonCircleMeasurementClicked()));
+	addButton(":/resources/images2d/2d_radius.svg", tr("Radius"), "Radius", SLOT(onButtonRadiusDimClicked()));
+	addButton(":/resources/images2d/2d_measureAngle.svg", tr("Angle"), "Angle", SLOT(onButtonAngleMeasurementClicked()));
 	
 #ifdef MX_DEVELOPING
 	addButton(":/resources/images2d/2d_measure.svg", tr("Set Dimension Ratio"));
@@ -71,9 +71,10 @@ void Mx2dMeasurementDialog::initWindowFlags()
 	setWindowFlags(flags);
 }
 
-void Mx2dMeasurementDialog::addButton(const QString& iconPath, const QString& text, const char* slot)
+void Mx2dMeasurementDialog::addButton(const QString& iconPath, const QString& text, const QString& objName,const char* slot)
 {
 	QPushButton* button = new QPushButton(QIcon(iconPath), text, this);
+    button->setObjectName(objName);
 	button->setIconSize(QSize(24, 24));
 	button->setStyleSheet("text-align: left; padding: 5px; padding-right: 10px;");
 	m_buttonLayout->addWidget(button);

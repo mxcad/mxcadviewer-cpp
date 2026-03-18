@@ -48,6 +48,7 @@ Mdesk::Boolean Mx2dCustomEllipse::worldDraw(McGiWorldDraw* wd)
 Mcad::ErrorStatus Mx2dCustomEllipse::getGripPoints(McGePoint3dArray& gripPoints, McGeIntArray& osnapModes, McGeIntArray& geomIds) const
 {
 	assertReadEnabled();
+	return Mcad::eOk;
 	gripPoints.append(m_corner1);
 	gripPoints.append(m_corner2);
 	return Mcad::eOk;
@@ -56,6 +57,7 @@ Mcad::ErrorStatus Mx2dCustomEllipse::getGripPoints(McGePoint3dArray& gripPoints,
 Mcad::ErrorStatus Mx2dCustomEllipse::moveGripPointsAt(const McGeIntArray& indices, const McGeVector3d& offset)
 {
 	assertWriteEnabled();
+	return Mcad::eOk;
 	int iIndex = indices[0];
 	switch (iIndex)
 	{
@@ -144,7 +146,9 @@ void Mx2dCustomEllipse::fromJson(const QJsonObject& jsonObject)
 {
 	assertWriteEnabled();
 	Mx2dCustomAnnotation::fromJson(jsonObject);
+	if(!jsonObject.contains("corner1")) return;
 	m_corner1 = Mx2d::jsonArray2dToPoint3d(jsonObject["corner1"].toArray());
+    if(!jsonObject.contains("corner2")) return;
 	m_corner2 = Mx2d::jsonArray2dToPoint3d(jsonObject["corner2"].toArray());
 }
 
@@ -157,6 +161,11 @@ QJsonObject Mx2dCustomEllipse::toJson() const
 	jsonObject["corner2"] = Mx2d::point3dToJsonArray2d(m_corner2);
 
 	return jsonObject;
+}
+
+DimPropertyFlags Mx2dCustomEllipse::dimPropertyFlags() const
+{
+	return Prop_Color | Prop_Category;
 }
 
 void Mx2dCustomEllipse::setCorner1(const McGePoint3d& pt)
