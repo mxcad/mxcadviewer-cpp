@@ -130,7 +130,11 @@ void DimPropertyDelegate::setEditorData(QWidget* editor, const QModelIndex& inde
 		ColorComboBox* cb = qobject_cast<ColorComboBox*>(editor);
 		if (cb) cb->setCurrentColor(index.data(Qt::UserRole).value<QColor>());
 	}
-	else if (propType == Prop_Category || propType == Prop_Ratio) {
+	else if (propType == Prop_Category) {
+		QComboBox* cb = qobject_cast<QComboBox*>(editor);
+		if (cb) cb->setCurrentText(index.data(Qt::DisplayRole).toString());
+	}
+	else if (propType == Prop_Ratio) {
 		QComboBox* cb = qobject_cast<QComboBox*>(editor);
 		if (cb) {
 			cb->clear();
